@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`Users` (
   `email` VARCHAR(255) NOT NULL,
   `userType` ENUM('patient', 'doctor') NOT NULL,
   `password` VARCHAR(255) NOT NULL,
+  `acceptTerms` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
 ENGINE = InnoDB;
@@ -162,18 +163,18 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 -- Fill Table `hack_saude`.`Users`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Users` (`firstName`, `lastName`, `email`, `userType`, `password`)
-VALUES
-('John', 'Doe', 'john.doe@example.com', 'patient', 'password123'),
-('Jane', 'Smith', 'jane.smith@example.com', 'doctor', 'password123'),
-('Emily', 'Johnson', 'emily.johnson@example.com', 'patient', 'password123'),
-('Michael', 'Brown', 'michael.brown@example.com', 'doctor', 'password123'),
-('Sarah', 'Wilson', 'sarah.wilson@example.com', 'patient', 'password123'),
-('Tom', 'Brad', 'tom.brad@example.com', 'doctor', 'password123'),
-('Adam', 'Sand', 'adam.sand@example.com', 'patient', 'password123'),
-('Emma', 'Park', 'ema.park@example.com', 'doctor', 'password123'),
-('Peter', 'Mel', 'peter.mel@example.com', 'patient', 'password123'),
-('Dina', 'Hank', 'dina.hank@example.com', 'doctor', 'password123') ;
+INSERT INTO `hack_saude`.`Users` (`firstName`, `lastName`, `email`,
+`userType`, `password`, `acceptTerms`) VALUES
+('John', 'Doe', 'john.doe@example.com', 'patient', 'password123', 1),
+('Jane', 'Smith', 'jane.smith@example.com', 'doctor', 'password123', 1),
+('Emily', 'Johnson', 'emily.johnson@example.com', 'patient', 'password123', 1),
+('Michael', 'Brown', 'michael.brown@example.com', 'doctor', 'password123', 1),
+('Sarah', 'Wilson', 'sarah.wilson@example.com', 'patient', 'password123', 1),
+('Tom', 'Brad', 'tom.brad@example.com', 'doctor', 'password123', 1),
+('Adam', 'Sand', 'adam.sand@example.com', 'patient', 'password123', 1),
+('Emma', 'Park', 'ema.park@example.com', 'doctor', 'password123', 1),
+('Peter', 'Mel', 'peter.mel@example.com', 'patient', 'password123', 1),
+('Dina', 'Hank', 'dina.hank@example.com', 'doctor', 'password123', 1) ;
 
 
 -- -----------------------------------------------------

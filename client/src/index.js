@@ -2,12 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { PrimeReactProvider } from 'primereact/api';
+import { BrowserRouter } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
+import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/lara-light-purple/theme.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <PrimeReactProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </PrimeReactProvider>
   </React.StrictMode>
 );
 
