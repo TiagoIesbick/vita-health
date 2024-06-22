@@ -1,9 +1,61 @@
 type Query {
     medicalRecords: [MedicalRecords]
+    user(userId: ID!): Users
 }
 
 type MedicalRecords {
     recordId: ID!
     recordData: String!
     dateCreated: String!
+}
+
+type Users {
+    userId: ID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    userType: String!
+    password: String!
+    acceptTerms: Boolean!
+    patient: Patients
+    doctor: Doctors
+}
+
+type Patients {
+    patientId: ID!
+    dateOfBirth: String
+    gender: String
+}
+
+type Doctors {
+    doctorId: ID!
+    specialty: String
+    licenseNumber: String
+}
+
+type Mutation {
+    createUser(input: CreateUserInput!): UserConfirmation
+    createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
+    login(email: String!, password: String!): LoginResult
+}
+
+input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    userType: String!
+    password: String!
+    acceptTerms: Boolean!
+}
+
+type UserConfirmation {
+    userConfirmation: String
+    userError: String
+    user: Users
+}
+
+type LoginResult {
+    user: Users
+    error: String
+    token: String
 }

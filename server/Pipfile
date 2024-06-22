@@ -8,6 +8,9 @@ mysql-connector-python = "*"
 python-dotenv = "*"
 ariadne = "*"
 uvicorn = "*"
+cryptography = "*"
+pyjwt = "*"
+nh3 = "*"
 
 [dev-packages]
 

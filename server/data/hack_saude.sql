@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`Users` (
   `firstName` VARCHAR(255) NOT NULL,
   `lastName` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
-  `userType` ENUM('patient', 'doctor') NOT NULL,
+  `userType` ENUM('Patient', 'Doctor') NOT NULL,
   `password` VARCHAR(255) NOT NULL,
-  `acceptTerms` TINYINT(1) NOT NULL DEFAULT 0,
+  `acceptTerms` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
 ENGINE = InnoDB;
@@ -36,9 +36,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`Patients` (
   `patientId` INT NOT NULL AUTO_INCREMENT,
-  `dateOfBirth` DATE NOT NULL,
-  `gender` ENUM('male', 'female', 'other') NOT NULL,
-  `userId` INT NULL,
+  `dateOfBirth` DATE NULL,
+  `gender` ENUM('male', 'female', 'other') NULL,
+  `userId` INT NOT NULL,
   PRIMARY KEY (`patientId`),
   INDEX `patientsUserId_idx` (`userId` ASC) VISIBLE,
   CONSTRAINT `patientsUserId`
@@ -54,9 +54,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`Doctors` (
   `doctorId` INT NOT NULL AUTO_INCREMENT,
-  `specialty` VARCHAR(255) NOT NULL,
-  `licenseNumber` VARCHAR(255) NOT NULL,
-  `userId` INT NULL,
+  `specialty` VARCHAR(255) NULL,
+  `licenseNumber` VARCHAR(255) NULL,
+  `userId` INT NOT NULL,
   PRIMARY KEY (`doctorId`),
   UNIQUE INDEX `licenseNumber_UNIQUE` (`licenseNumber` ASC) VISIBLE,
   INDEX `doctorsUserId_idx` (`userId` ASC) VISIBLE,
@@ -165,16 +165,16 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 INSERT INTO `hack_saude`.`Users` (`firstName`, `lastName`, `email`,
 `userType`, `password`, `acceptTerms`) VALUES
-('John', 'Doe', 'john.doe@example.com', 'patient', 'password123', 1),
-('Jane', 'Smith', 'jane.smith@example.com', 'doctor', 'password123', 1),
-('Emily', 'Johnson', 'emily.johnson@example.com', 'patient', 'password123', 1),
-('Michael', 'Brown', 'michael.brown@example.com', 'doctor', 'password123', 1),
-('Sarah', 'Wilson', 'sarah.wilson@example.com', 'patient', 'password123', 1),
-('Tom', 'Brad', 'tom.brad@example.com', 'doctor', 'password123', 1),
-('Adam', 'Sand', 'adam.sand@example.com', 'patient', 'password123', 1),
-('Emma', 'Park', 'ema.park@example.com', 'doctor', 'password123', 1),
-('Peter', 'Mel', 'peter.mel@example.com', 'patient', 'password123', 1),
-('Dina', 'Hank', 'dina.hank@example.com', 'doctor', 'password123', 1) ;
+('John', 'Doe', 'john.doe@example.com', 'Patient', 'gAAAAABmdjVDuFGdiYvHpoIvF3IkEa6jiXsKx53JJv-ewfaVxzMVyW_pI9iJ31mrHE13-O851e1Y0HdN20C6UocVJrMIWn3R3A==', 1),
+('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', 'gAAAAABmdjVJdsVXcoOUnbYsdxOhbhXuZKXTGXRF8ENp-x1GxV4xInNjjEf43krRd9qIWDRr4XW_LmQH4MuWq8FqjEs1gM_4SQ==', 1),
+('Emily', 'Johnson', 'emily.johnson@example.com', 'Patient', 'gAAAAABmdjWn2Bqif4SKl5nlW4Rhjq71tjnV_MhV5Jf07eN9c0fHgftrFvO0F1r0GMTq7Nfl81ytkm55BU4Ld9psuF3azrcFzg==', 1),
+('Michael', 'Brown', 'michael.brown@example.com', 'Doctor', 'gAAAAABmdjW7U6a5dIIUPCMucyLmiWZfvVe9qhW_N2_g0_JqBbIF9oL_NtrS0Gr90vShS9Es5H3Hm19KthMV9AOTcdv_Yhjy9g==', 1),
+('Sarah', 'Wilson', 'sarah.wilson@example.com', 'Patient', 'gAAAAABmdjXQ06t3zM6rfaunHwWRGdDA1Vtf8flvDkMue2OFu_5lmBs7YpdGSFw_Ht4hqWHN91iIDuWYC480jeeewXEAmgUsKA==', 1),
+('Tom', 'Brad', 'tom.brad@example.com', 'Doctor', 'gAAAAABmdjXtQnyrdWW-iaXMdlpx6hokM7RIQr8xHRnqLeaRDoiEyQkzWRd1coG1c3D96N-1JF-9i95y4oMiOJ4sKi6OJphbOg==', 1),
+('Adam', 'Sand', 'adam.sand@example.com', 'Patient', 'gAAAAABmdjX_36IDYNZ9fbTcvS0BQl9KytdjYlpGaG6Jkc9bUPiLpVsLuywQSmgMChMYhaqS0PeQsv5l2kMBehWIPQ3bdNuWLQ==', 1),
+('Emma', 'Park', 'ema.park@example.com', 'Doctor', 'gAAAAABmdjYNDrtOlybN0g1ELGj0G44hBiSEHD7zfc2X4MNWHCmp60UN9o_vDQnN3vdgK4m_94jRkr1IXLQ5P1Cyhexa_AR6tg==', 1),
+('Peter', 'Mel', 'peter.mel@example.com', 'Patient', 'gAAAAABmdjYdeq3QpFMxJgzQFsapBCIPQZZd3XcZjprX_a5g2u0gKlZcKfkPbGvHyd0CnVWUVIIWbw4WECfiAyvsUmv4TZwqhw==', 1),
+('Dina', 'Hank', 'dina.hank@example.com', 'Doctor', 'gAAAAABmdjYvvtC59OvcXMqsXRn3BEyilWCrre6PGLz76FVPjsJPsGf4LWYjkLF7todgaBcUMCApWN65nYJX9iiyNIenWMdQRg==', 1) ;
 
 
 -- -----------------------------------------------------
@@ -247,3 +247,101 @@ VALUES
 (3, 3),
 (4, 4),
 (5, 5) ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to create user
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddUser(IN EMAIL VARCHAR(255), IN FTNM VARCHAR(255), IN LTNM VARCHAR(255), IN PASW VARCHAR(255), IN USTY ENUM('Patient', 'Doctor'), IN ACTR TINYINT)
+BEGIN
+DECLARE userConfirmation VARCHAR(45);
+DECLARE userError VARCHAR(45);
+PREPARE CountUsers FROM 'SELECT COUNT(`userId`) INTO @countUsers FROM `Users` WHERE `email` = ?' ;
+PREPARE InsertIntoUsers FROM 'INSERT INTO `hack_saude`.`Users` (`email`, `firstName`, `lastName`, `password`,
+`userType`, `acceptTerms`) VALUES (?, ?, ?, ?, ?, ?)' ;
+START TRANSACTION;
+SET @email = EMAIL;
+SET @firstName = FTNM;
+SET @lastName = LTNM;
+SET @password = PASW;
+SET @userType = USTY;
+SET @acceptTerms = ACTR;
+EXECUTE CountUsers USING @email ;
+IF  @countUsers > 0 THEN
+  ROLLBACK;
+	SET userError = 'Este e-mail já existe' ;
+ELSEIF @acceptTerms != 1 THEN
+	ROLLBACK;
+  SET userError = 'É preciso aceitar os termos e condições' ;
+ELSE
+	EXECUTE InsertIntoUsers USING @email, @firstName, @lastName, @password, @userType, @acceptTerms ;
+	COMMIT;
+  EXECUTE CountUsers USING @email ;
+  IF @countUsers = 1 THEN
+		SET userConfirmation = 'Usuário criado!' ;
+	ELSE
+		ROLLBACK;
+		SET userError = 'Usuário NÃO criado' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT userConfirmation) userConfirmation,
+  (SELECT userError) userError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to create patient or doctor user
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddPatientOrDoctorUser(IN USID INT, IN USTY ENUM('Patient', 'Doctor'))
+BEGIN
+DECLARE userConfirmation VARCHAR(45);
+DECLARE userError VARCHAR(45);
+PREPARE CountUsers FROM 'SELECT COUNT(`userId`) INTO @countUsers FROM `Users` WHERE `userId` = ?' ;
+PREPARE CountPatients FROM 'SELECT COUNT(`userId`) INTO @countPatients FROM `Patients` WHERE `userId` = ?' ;
+PREPARE CountDoctors FROM 'SELECT COUNT(`userId`) INTO @countDoctors FROM `Doctors` WHERE `userId` = ?' ;
+PREPARE InsertIntoPatients FROM 'INSERT INTO `hack_saude`.`Patients` (`userId`) VALUES (?)' ;
+PREPARE InsertIntoDoctors FROM 'INSERT INTO `hack_saude`.`Doctors` (`userId`) VALUES (?)' ;
+START TRANSACTION;
+SET @userId = USID;
+SET @userType = USTY;
+EXECUTE CountUsers USING @userId ;
+EXECUTE CountPatients USING @userId ;
+EXECUTE CountDoctors USING @userId ;
+IF @countUsers != 1 THEN
+	ROLLBACK;
+	SET userError = 'Usuário não existe' ;
+ELSEIF  @countPatients > 0 OR @countDoctors > 0 THEN
+  ROLLBACK;
+	SET userError = 'Este usuário já existe' ;
+ELSEIF @userType = 'Patient' THEN
+	EXECUTE InsertIntoPatients USING @userId ;
+	COMMIT;
+    EXECUTE CountPatients USING @userId ;
+    IF @countPatients = 1 THEN
+		SET userConfirmation = 'Usuário criado!' ;
+	ELSE
+		ROLLBACK;
+		SET userError = 'Usuário NÃO criado' ;
+	END IF ;
+ELSEIF @userType = 'Doctor' THEN
+	EXECUTE InsertIntoDoctors USING @userId ;
+    COMMIT;
+    EXECUTE CountDoctors USING @userId ;
+    IF @countDoctors = 1 THEN
+		SET userConfirmation = 'Usuário criado!' ;
+	ELSE
+		ROLLBACK;
+		SET userError = 'Usuário NÃO criado' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT userConfirmation) userConfirmation,
+  (SELECT userError) userError
+);
+END //
+DELIMITER ;

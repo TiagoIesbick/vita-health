@@ -8,15 +8,32 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { passwordHeader, passwordFooter } from '../utils/utils';
 import { Link } from "react-router-dom";
+import { useLogin } from "../hooks/hooks";
+import { useUser } from "../providers/userContext";
+import { useNavigate } from 'react-router';
+import { logout, storeToken } from "../graphql/auth";
 
 const Login = () => {
+    const navigate = useNavigate();
+    const { setUser, showMessage } = useUser();
+    const { doLogin, loading, error } = useLogin();
     const formik = useFormik({
         initialValues: {
             email: '',
             password: ''
         },
-        onSubmit: (values) => {
-            console.log(values);
+        onSubmit: async (values) => {
+            const login = await doLogin(values);
+            if (login.error) {
+                showMessage('error', 'Error', login.error, true);
+                logout();
+                setUser(null);
+            } else if (login.token) {
+                storeToken(login.token);
+                setUser(login.user);
+                navigate('/');
+                showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
+            };
         },
         validationSchema: Yup.object({
             email: Yup.string().email('E-mail inválido').required('Obrigatório'),
@@ -24,6 +41,11 @@ const Login = () => {
                 .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'Pelo menos 1 letra minúscula, 1 letra maiúscula e 1 número')
         }),
     });
+    if (error) {
+        navigate('/');
+        showMessage('error', 'Error', 'Sorry, we are experiencing some issues at the moment, please try again later', true);
+    };
+
     return (
         <Card
             title="Login"
@@ -53,7 +75,7 @@ const Login = () => {
                     <label htmlFor="password">Senha</label>
                     {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Login"  />
+                <Button type="submit" label="Login" disabled={loading || !formik.isValid} loading={loading}  />
             </form>
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">

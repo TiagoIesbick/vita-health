@@ -2,11 +2,16 @@ import Home from "./home";
 import MedicalRecords from "./medicalRecords";
 import Login from "./login";
 import CreateUser from "./createUser";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import { Toast } from 'primereact/toast';
+import { useUser } from "../providers/userContext";
+
 
 const Main = () => {
+    const { toast } = useUser();
     return (
         <main>
+            <Toast ref={toast} position="top-center" />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />

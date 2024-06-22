@@ -8,9 +8,18 @@ import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { passwordHeader, passwordFooter } from '../utils/utils';
+import { useCreatePatientOrDoctor, useCreateUser, useLogin } from "../hooks/hooks";
+import { useUser } from "../providers/userContext";
+import { useNavigate } from "react-router-dom";
+import { logout, storeToken } from "../graphql/auth";
 
 
 const CreateUser = () => {
+    const navigate = useNavigate();
+    const { setUser, showMessage } = useUser();
+    const { addUser, loadingUser, errorUser } = useCreateUser();
+    const { addPatientOrDoctor, loadingPatientOrDoctor, errorPatientOrDoctor } = useCreatePatientOrDoctor();
+    const { doLogin, loading, error } = useLogin();
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -20,8 +29,29 @@ const CreateUser = () => {
             userType: null,
             acceptTerms: false
         },
-        onSubmit: (values) => {
-            console.log(values);
+        onSubmit: async (values, { resetForm }) => {
+            const resUser = await addUser(values);
+            if (resUser.userError) {
+                showMessage('error', 'Error', resUser.userError)
+            } else {
+                const resPatientOrDoctor = await addPatientOrDoctor(resUser.user.userId, resUser.user.userType);
+                if (resPatientOrDoctor.userError) {
+                    showMessage('error', 'Error', resPatientOrDoctor.userError)
+                } else {
+                    const login = await doLogin({ email: values.email, password: values.password});
+                    if (login.error) {
+                        showMessage('error', 'Error', login.error);
+                        logout();
+                        setUser(null);
+                    } else if (login.token) {
+                        storeToken(login.token);
+                        setUser(login.user);
+                        resetForm();
+                        navigate('/');
+                        showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`)
+                    };
+                };
+            };
         },
         validationSchema: Yup.object({
             email: Yup.string().email('E-mail inválido').required('Obrigatório'),
@@ -36,9 +66,14 @@ const CreateUser = () => {
         }),
     });
     const userType = [
-        { type: 'patient', name: 'Paciente'},
-        { type: 'doctor', name: 'Profisional de Saúde'}
+        { type: 'Patient', name: 'Paciente'},
+        { type: 'Doctor', name: 'Profisional de Saúde'}
     ]
+    if (errorUser || errorPatientOrDoctor || error) {
+        navigate('/');
+        showMessage('error', 'Error', 'Sorry, we are experiencing some issues at the moment, please try again later', true);
+    };
+
     return (
         <Card
             title="Crie uma Conta"
@@ -111,7 +146,7 @@ const CreateUser = () => {
                     <label htmlFor="acceptTerms" className="ml-1 text-sm">Aceite de Termos</label>
                     {formik.touched.acceptTerms && formik.errors.acceptTerms &&<div className="text-red-500 text-xs">{formik.errors.acceptTerms}</div>}
                 </div>
-                <Button type="submit" label="Confirme" disabled={!formik.isValid } />
+                <Button type="submit" label="Confirme" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
             </form>
         </Card>
     );
