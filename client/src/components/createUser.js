@@ -11,7 +11,7 @@ import { passwordHeader, passwordFooter } from '../utils/utils';
 import { useCreatePatientOrDoctor, useCreateUser, useLogin } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
-import { logout, storeToken } from "../graphql/auth";
+import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 
 
 const CreateUser = () => {
@@ -44,7 +44,7 @@ const CreateUser = () => {
                         logout();
                         setUser(null);
                     } else if (login.token) {
-                        storeToken(login.token);
+                        storeToken(ACCESS_TOKEN_KEY, login.token);
                         setUser(login.user);
                         resetForm();
                         navigate('/');

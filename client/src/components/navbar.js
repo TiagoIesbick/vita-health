@@ -3,7 +3,7 @@ import { useUser } from "../providers/userContext";
 import UserBar from "./userBar";
 
 const Navbar = () => {
-    const { user } = useUser();
+    const { user, patient } = useUser();
     return (
         <nav>
             <ul className="flex flex-row justify-content-around align-items-center p-0" style={{listStyle: "none"}}>
@@ -15,6 +15,7 @@ const Navbar = () => {
                     </>
                 }
                 {user && user.userType === 'Doctor' && <li><Link to="/insert-token">Inserir Token</Link></li>}
+                {user && user.userType === 'Doctor' && patient && <li><Link to="/medical-records-access">Acesso aos Dados Médicos</Link></li>}
                 {!user && <li><Link to="/login">Login</Link></li>}
                 {user && <li><UserBar /></li>}
             </ul>

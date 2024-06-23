@@ -1,10 +1,15 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { medicalRecordsQuery } from "../graphql/queries";
+import { medicalRecordsByPatientIdQuery, medicalRecordsQuery } from "../graphql/queries";
 import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
+};
+
+export const useMedicalRecordsByPatientId = (patientId) => {
+    const { data, loading, error } = useQuery(medicalRecordsByPatientIdQuery, { variables: { patientId } });
+    return {medicalRecords: data?.medicalRecordsByPatientId, loading, error: Boolean(error)};
 };
 
 export const useCreateUser = () => {

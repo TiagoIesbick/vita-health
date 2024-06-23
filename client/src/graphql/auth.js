@@ -3,22 +3,24 @@
 // for better security. Also, it doesn't handle token expiration.
 import { jwtDecode } from 'jwt-decode';
 
-const ACCESS_TOKEN_KEY = 'accessToken';
+export const ACCESS_TOKEN_KEY = 'accessToken';
 
-export const getAccessToken = () => {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+export const ACCESS_MEDICAL_TOKEN_KEY = 'accessMedicalToken';
+
+export const getAccessToken = (access) => {
+  return localStorage.getItem(access);
 }
 
-export const storeToken = (token) => {
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
+export const storeToken = (access, token) => {
+  localStorage.setItem(access, token);
 };
 
 export const logout = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
 };
 
-export const getCredentials = () => {
-   const token = getAccessToken();
+export const getCredentials = (access) => {
+   const token = getAccessToken(access);
    if (!token) {
       return null;
    };

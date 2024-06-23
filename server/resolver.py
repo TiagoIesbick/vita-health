@@ -78,6 +78,14 @@ def resolve_medical_records(_, info):
         return None
     return get_medical_records_by_pacient(patient['patientId'])
 
+@query.field("medicalRecordsByPatientId")
+def resolve_medical_records_by_patient_id(_, info, patientId):
+    if not info.context['authenticated']:
+        return None
+    if info.context['user_detail']['userType'] != 'Doctor':
+        return None
+    return get_medical_records_by_pacient(patientId)
+
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
     return get_medical_records_type(medicalRecords['recordTypeId'])

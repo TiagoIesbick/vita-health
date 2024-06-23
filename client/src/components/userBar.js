@@ -43,7 +43,7 @@ const UserBar = () => {
         <>
             <Menu model={items} popup ref={userMenu} />
             <motion.button
-                className="p-link mr-2"
+                className="p-link"
                 whileHover={{scale: 1.2}}
                 onClick={(e) => userMenu?.current?.toggle(e)}
             >

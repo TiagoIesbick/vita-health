@@ -20,7 +20,7 @@ const GenerateAccessToken = () => {
     const [token, setToken] = useState('');
     const formik = useFormik({
         initialValues: {
-            tokenExpirationDateTime: toDay
+            tokenExpirationDateTime: new Date()
         },
         onSubmit: async (values, { resetForm }) => {
             const resToken = await addToken(values.tokenExpirationDateTime);
@@ -57,18 +57,22 @@ const GenerateAccessToken = () => {
                         dateFormat="yy-mm-dd"
                         minDate={toDay}
                         maxDate={toDayPlus90}
-                        readOnlyInput
                         showIcon
                         showTime
                         hourFormat="24"
                         {...formik.getFieldProps("tokenExpirationDateTime")}
                     />
                     <label htmlFor="token-expiration-date-time">Tempo de expiração</label>
-                    {formik.touched.bookingDate && formik.errors.bookingDate &&<div className="text-red-500 text-xs">{formik.errors.bookingDate}</div>}
+                    {formik.touched.tokenExpirationDateTime && formik.errors.tokenExpirationDateTime &&<div className="text-red-500 text-xs">{formik.errors.tokenExpirationDateTime}</div>}
                 </FloatLabel>
                 <Button type="submit" label="Confirme" disabled={!formik.isValid || loading} loading={loading} />
             </form>
-            <Dialog header="Token" visible={visible} style={{ width: '50vw' }} onHide={() => {if (!visible) return; setVisible(false); setToken('');}}>
+            <Dialog
+                header="Token"
+                visible={visible}
+                style={{ width: '50vw' }}
+                onHide={() => {if (!visible) return; setVisible(false); setToken('');}}
+            >
                 <p style={{ wordBreak: 'break-word' }} className="m-0">{token}</p>
             </Dialog>
         </Card>

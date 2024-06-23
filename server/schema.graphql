@@ -1,6 +1,6 @@
 type Query {
     medicalRecords: [MedicalRecords]
-    medicalRecordsById(patientId: ID!): [MedicalRecords]
+    medicalRecordsByPatientId(patientId: ID!): [MedicalRecords]
     user(userId: ID!): Users
 }
 

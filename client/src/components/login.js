@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
-import { logout, storeToken } from "../graphql/auth";
+import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ const Login = () => {
                 logout();
                 setUser(null);
             } else if (login.token) {
-                storeToken(login.token);
+                storeToken(ACCESS_TOKEN_KEY, login.token);
                 setUser(login.user);
                 navigate('/');
                 showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
