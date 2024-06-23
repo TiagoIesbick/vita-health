@@ -109,13 +109,12 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`Tokens` (
   `tokenId` INT NOT NULL AUTO_INCREMENT,
-  `token` VARCHAR(255) NOT NULL,
+  `token` LONGTEXT NOT NULL,
   `patientId` INT NULL,
   `doctorId` INT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT NOW(),
   `expirationDate` DATETIME NOT NULL,
   PRIMARY KEY (`tokenId`),
-  UNIQUE INDEX `token_UNIQUE` (`token` ASC) VISIBLE,
   INDEX `tokensPatientId_idx` (`patientId` ASC) VISIBLE,
   INDEX `tokensDoctorId_idx` (`doctorId` ASC) VISIBLE,
   CONSTRAINT `tokensPatientId`
@@ -342,6 +341,37 @@ END IF ;
 SELECT * FROM(
   (SELECT userConfirmation) userConfirmation,
   (SELECT userError) userError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to add tokens
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddToken(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
+BEGIN
+DECLARE tokenConfirmation VARCHAR(45);
+DECLARE tokenError VARCHAR(45);
+PREPARE InsertIntoTokens FROM 'INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `expirationDate`)
+	VALUES (?, ?, ?)' ;
+START TRANSACTION;
+SET @issuedToken = TK;
+SET @patientId = PTID;
+SET @expirationDate = EXP;
+IF @expirationDate < NOW() THEN
+	ROLLBACK;
+	SET tokenError = 'Data expirada' ;
+ELSE
+	EXECUTE InsertIntoTokens USING @issuedToken, @patientId, @expirationDate ;
+    COMMIT;
+	SET tokenConfirmation = 'Token emitido' ;
+END IF ;
+SELECT * FROM(
+  (SELECT tokenConfirmation) tokenConfirmation,
+  (SELECT tokenError) tokenError,
+  (SELECT LAST_INSERT_ID() AS tokenId) tokenId
 );
 END //
 DELIMITER ;

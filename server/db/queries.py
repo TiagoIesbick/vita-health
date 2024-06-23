@@ -28,6 +28,23 @@ def get_user_by_email_password(email:str, password:str) -> (None | dict):
         return None
     return user[0]
 
-def get_medical_records() -> list[dict]:
-    return mysql_results('SELECT * FROM MedicalRecords;')
+def get_medical_records_by_pacient(id: int) -> list[dict]:
+    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id};'
+    records = mysql_results(query)
+    if len(records) == 0:
+        return None
+    return records
 
+def get_medical_records_type(id: int) -> (None | dict):
+    query = rf'SELECT * FROM RecordTypes WHERE recordTypeId = {id};'
+    record_type = mysql_results(query)
+    if len(record_type) == 0:
+        return None
+    return record_type[0]
+
+def get_token(id: int) -> (None | dict):
+    query = rf'SELECT * FROM Tokens WHERE tokenId = {id};'
+    token = mysql_results(query)
+    if len(token) == 0:
+        return None
+    return token[0]

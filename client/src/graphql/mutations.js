@@ -56,3 +56,17 @@ export const mutationLogin = gql`
     }
     ${userDetailFragment}
 `;
+
+export const mutationGenerateToken = gql`
+    mutation GenerateToken ($expirationDate: String!) {
+        generateToken(expirationDate: $expirationDate) {
+            tokenConfirmation
+            tokenError
+            token {
+                tokenId
+                token
+                expirationDate
+            }
+        }
+    }
+`;

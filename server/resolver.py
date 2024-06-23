@@ -1,13 +1,18 @@
 from ariadne import QueryType, ObjectType, MutationType
+from datetime import datetime
+from pytz import timezone
 from db.queries import *
 from db.mutations import *
-from utils.utils import encrypt, validate_email, validate_password, validate_name
+from utils.utils import encrypt, validate_email, validate_password, \
+    validate_name, generate_token
 from auth import handle_login
 import nh3
+
 
 query = QueryType()
 users = ObjectType("Users")
 mutation = MutationType()
+medical_records = ObjectType("MedicalRecords")
 
 @query.field("user")
 def resolve_user(*_, userId):
@@ -51,7 +56,7 @@ def resolve_create_user(*_, input):
 
 @mutation.field("createPatientOrDoctorUser")
 def resolve_create_patient_or_doctor_user(*_, userId, userType):
-    res = createPatientOrDoctorUser(userId, userType)
+    res = create_patient_or_doctor_user(userId, userType)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
     return res
@@ -65,5 +70,34 @@ def resolve_login(*_, email, password):
     return { 'error': 'E-mail ou senha inválidos' }
 
 @query.field("medicalRecords")
-def resolve_medical_records(*_):
-    return get_medical_records()
+def resolve_medical_records(_, info):
+    if not info.context['authenticated']:
+        return None
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    return get_medical_records_by_pacient(patient['patientId'])
+
+@medical_records.field("recordType")
+def resolve_medical_records_type(medicalRecords, *_):
+    return get_medical_records_type(medicalRecords['recordTypeId'])
+
+@mutation.field("generateToken")
+def resolve_generate_token(_, info, expirationDate):
+    if not info.context['authenticated']:
+        return None
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    token = generate_token(
+        expirationDate,
+        {'patientId': patient['patientId'], 'userId': patient['userId']}
+        )
+    res = create_token(
+        token,
+        patient['patientId'],
+        datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
+        )
+    if res['tokenConfirmation']:
+        res['token'] = get_token(res['tokenId'])
+    return res

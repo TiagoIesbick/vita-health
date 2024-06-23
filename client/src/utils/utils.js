@@ -14,3 +14,7 @@ export const passwordFooter = (
         </ul>
     </>
 );
+
+export const toDay = new Date();
+
+export const toDayPlus90 = new Date( Date.now() + 90 * 24 * 60 * 60 * 1000);

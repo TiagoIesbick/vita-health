@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { medicalRecordsQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationLogin } from "../graphql/mutations";
+import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
@@ -51,6 +51,22 @@ export const useLogin = () => {
     };
     return {
         doLogin,
+        loading,
+        error
+    };
+};
+
+export const useGenerateToken = () => {
+    const [mutate, { loading, error }] = useMutation(mutationGenerateToken);
+
+    const addToken = async (tokenExpirationDateTime) => {
+        const { data: { generateToken } } = await mutate({
+            variables: { expirationDate: tokenExpirationDateTime}
+        });
+        return generateToken;
+    };
+    return {
+        addToken,
         loading,
         error
     };

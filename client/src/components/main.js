@@ -2,6 +2,8 @@ import Home from "./home";
 import MedicalRecords from "./medicalRecords";
 import Login from "./login";
 import CreateUser from "./createUser";
+import GenerateAccessToken from "./generateAccessToken";
+import InsertToken from "./insertToken";
 import { Routes, Route } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
@@ -17,6 +19,8 @@ const Main = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/create-user" element={<CreateUser />} />
                 <Route path="/medical-records" element={<MedicalRecords />} />
+                <Route path="/generate-access-token" element={<GenerateAccessToken />} />
+                <Route path="/insert-token" element={<InsertToken />} />
             </Routes>
         </main>
     );

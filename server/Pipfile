@@ -11,6 +11,7 @@ uvicorn = "*"
 cryptography = "*"
 pyjwt = "*"
 nh3 = "*"
+pytz = "*"
 
 [dev-packages]
 

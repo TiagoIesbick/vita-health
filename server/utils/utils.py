@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from os import getenv
 import re
+import jwt
 
 load_dotenv()
 
@@ -14,6 +15,10 @@ def encrypt(msg: str) -> bytes:
 def decrypt(encrypted: bytes) -> str:
     decrypted = fernet.decrypt(encrypted).decode('utf-8')
     return decrypted
+
+def generate_token(exp: str, patient: dict) -> str:
+    token = jwt.encode({"exp": exp} | patient , getenv('SECRET'), algorithm="HS256")
+    return token
 
 def validate_email(email: str) -> bool:
     if re.search(r'^[a-zA-Z0-9_.±]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$', email):
