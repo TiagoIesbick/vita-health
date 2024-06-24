@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { medicalRecordsByPatientIdQuery, medicalRecordsQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin } from "../graphql/mutations";
+import { medicalRecordsByPatientIdQuery, medicalRecordsQuery, tokenIdQuery, userQuery } from "../graphql/queries";
+import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
@@ -75,4 +75,30 @@ export const useGenerateToken = () => {
         loading,
         error
     };
+};
+
+export const useSaveTokenAccess = () => {
+    const [mutate, { loading, error }] = useMutation(mutationSaveTokenAccess);
+
+    const addTokenAccess = async (tokenId, doctorId) => {
+        const { data: { saveTokenAccess } } = await mutate({
+            variables: { tokenId: tokenId.tokenId, doctorId}
+        });
+        return saveTokenAccess;
+    };
+    return {
+        addTokenAccess,
+        loadingTokenAccess: loading,
+        errorTokenAccess: error
+    };
+};
+
+export const useTokenId = (token, patientId, expirationDate) => {
+    const { data, loading, error } = useQuery(tokenIdQuery, { variables: { token, patientId, expirationDate } });
+    return {tokenId: data?.token, loadingToken: loading, errorToken: Boolean(error)};
+};
+
+export const useUserQuery = (userId) => {
+    const { data, loading, error } = useQuery(userQuery, { variables: { id: userId } });
+    return {userDetail: data?.user, loadingUser: loading, errorUser: Boolean(error)};
 };

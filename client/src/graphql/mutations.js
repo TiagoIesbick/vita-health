@@ -70,3 +70,20 @@ export const mutationGenerateToken = gql`
         }
     }
 `;
+
+export const mutationSaveTokenAccess = gql`
+    mutation SaveTokenAccess ($tokenId: ID!, $doctorId: ID!) {
+        saveTokenAccess(tokenId: $tokenId, doctorId: $doctorId) {
+            accessConfirmation
+            accessError
+        }
+    }
+`;
+
+export const mutationTokenId = gql`
+    mutation TokenId($token: String!, $patientId: ID!, $expirationDate: String!) {
+        token(token: $token, patientId: $patientId, expirationDate: $expirationDate) {
+            tokenId
+        }
+    }
+`;

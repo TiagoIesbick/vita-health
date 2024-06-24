@@ -93,10 +93,10 @@ def resolve_medical_records_type(medicalRecords, *_):
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):
     if not info.context['authenticated']:
-        return None
+        return {'tokenError': 'Faltando autenticação'}
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
-        return None
+        return {'tokenError': 'Faltando credencial de paciente'}
     token = generate_token(
         expirationDate,
         {'patientId': patient['patientId'], 'userId': patient['userId']}
@@ -109,3 +109,19 @@ def resolve_generate_token(_, info, expirationDate):
     if res['tokenConfirmation']:
         res['token'] = get_token(res['tokenId'])
     return res
+
+@mutation.field("saveTokenAccess")
+def resolve_save_token_access(_, info, tokenId, doctorId):
+    if not info.context['authenticated']:
+        return {'acessError': 'Faltando autenticação'}
+    if info.context['user_detail']['userType'] != 'Doctor':
+        return {'acessError': 'Faltando credencial de profissional de saúde'}
+    return create_token_access(tokenId, doctorId)
+
+@query.field("token")
+def resolve_token(*_, token, patientId, expirationDate):
+    return get_token_by_token(
+        token,
+        patientId,
+        datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
+        )

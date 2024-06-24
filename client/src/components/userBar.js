@@ -20,10 +20,6 @@ const UserBar = () => {
             label: 'My Tokens',
             icon: 'pi pi-ticket'
         },
-        // {
-        //     label: 'My Orders',
-        //     icon: 'pi pi-shopping-cart'
-        // },
         {
             separator: true
         },

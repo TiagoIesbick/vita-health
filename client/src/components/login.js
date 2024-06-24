@@ -13,6 +13,7 @@ import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 
+
 const Login = () => {
     const navigate = useNavigate();
     const { setUser, showMessage } = useUser();
@@ -31,7 +32,8 @@ const Login = () => {
             } else if (login.token) {
                 storeToken(ACCESS_TOKEN_KEY, login.token);
                 setUser(login.user);
-                navigate('/');
+                if (login.user.userType === 'Patient') navigate('/generate-access-token');
+                if (login.user.userType === 'Doctor') navigate('/insert-token');
                 showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
             };
         },
@@ -43,13 +45,14 @@ const Login = () => {
     });
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Sorry, we are experiencing some issues at the moment, please try again later', true);
+        showMessage('error', 'Error', 'Dados não disponíveis. Tente novamente mais tarde.', true);
     };
 
     return (
         <Card
             title="Login"
             className="flex justify-content-center align-items-center"
+            style={{minHeight: 'calc(100vh - 128px)'}}
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
             <FloatLabel>

@@ -1,0 +1,25 @@
+.underline-move {
+    display: inline;
+    position: relative;
+    overflow: hidden;
+}
+
+.underline-move:after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    right: 0;
+    width: 0;
+    bottom: -2px;
+    background: var(--primary-500);
+    height: 2px;
+    transition-property: width;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+}
+
+.underline-move:hover:after, .underline-move:focus:after, .underline-move:active:after {
+    left: 0;
+    right: auto;
+    width: 100%;
+}

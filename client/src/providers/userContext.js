@@ -15,7 +15,6 @@ export const UserProvider = ({children}) => {
             setPatient(null);
             localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
     };
-    console.log(patient);
 
     return (
         <UserContext.Provider

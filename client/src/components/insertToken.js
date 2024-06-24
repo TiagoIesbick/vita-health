@@ -16,7 +16,7 @@ const InsertToken = () => {
         initialValues: {
             token: ''
         },
-        onSubmit: (values, { resetForm }) => {
+        onSubmit: async (values, { resetForm }) => {
             storeToken(ACCESS_MEDICAL_TOKEN_KEY, values.token);
             const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
             if (Date.parse(credentials.exp) <= Date.now()) {
@@ -26,6 +26,7 @@ const InsertToken = () => {
             } else {
                 setPatient(credentials);
                 navigate("/medical-records-access");
+                showMessage('success', 'Sucesso', 'Permissão Concedida');
             };
             resetForm();
         },
@@ -33,12 +34,13 @@ const InsertToken = () => {
             token: Yup.string().required('Obrigatório').min(83, 'Mínimo 83 caracteres')
         })
     });
-    console.log(formik.values);
+
+
     return (
         <Card
             title="Inserir Token"
             className="flex justify-content-center align-items-center"
-            style={{minHeight: 'calc(100vh - 168px)'}}
+            style={{minHeight: 'calc(100vh - 128px)'}}
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>

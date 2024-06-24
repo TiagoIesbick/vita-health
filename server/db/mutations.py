@@ -23,3 +23,11 @@ def create_token(token: str, patientId: int, expirationDate: str) -> (None | dic
     if len(confirmation) == 0:
         return None
     return confirmation[0]
+
+def create_token_access(tokenId: int, doctorId: int):
+    args = [tokenId, doctorId]
+    query = 'AddTokenAccess'
+    confirmation = mysql_results(query, 'procedure', args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]

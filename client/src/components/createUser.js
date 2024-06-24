@@ -71,13 +71,14 @@ const CreateUser = () => {
     ]
     if (errorUser || errorPatientOrDoctor || error) {
         navigate('/');
-        showMessage('error', 'Error', 'Sorry, we are experiencing some issues at the moment, please try again later', true);
+        showMessage('error', 'Error', 'Dados não disponíveis. Tente novamente mais tarde.', true);
     };
 
     return (
         <Card
             title="Crie uma Conta"
             className="flex justify-content-center align-items-center"
+            style={{minHeight: 'calc(100vh - 128px)'}}
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>

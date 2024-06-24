@@ -1,9 +1,9 @@
 import { useMedicalRecords } from "../hooks/hooks";
+import { Card } from "primereact/card";
 
 const MedicalRecords = () => {
     const { medicalRecords, loading, error } = useMedicalRecords();
 
-    console.log('[Medical Records]:', medicalRecords);
     if (loading) {
         return <div>Loading...</div>
     };
@@ -11,9 +11,15 @@ const MedicalRecords = () => {
         return <div>Data Unavailable</div>
     };
     return (
-        <pre>
-            {JSON.stringify(medicalRecords, undefined, 2)}
-        </pre>
+        <Card
+            title="Dados Médicos"
+            className="flex justify-content-center align-items-center"
+            style={{minHeight: 'calc(100vh - 128px)'}}
+        >
+            <pre>
+                {JSON.stringify(medicalRecords, undefined, 2)}
+            </pre>
+        </Card>
     );
 };
 export default MedicalRecords;

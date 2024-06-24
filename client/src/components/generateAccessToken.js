@@ -47,7 +47,7 @@ const GenerateAccessToken = () => {
         <Card
             title="Gerar Token"
             className="flex justify-content-center align-items-center"
-            style={{minHeight: 'calc(100vh - 168px)'}}
+            style={{minHeight: 'calc(100vh - 128px)'}}
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>

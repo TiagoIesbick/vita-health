@@ -84,10 +84,10 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`MedicalRecords` (
   `recordId` INT NOT NULL AUTO_INCREMENT,
-  `patientId` INT NULL,
-  `recordTypeId` INT NULL,
+  `patientId` INT NOT NULL,
+  `recordTypeId` INT NOT NULL,
   `recordData` LONGTEXT NULL,
-  `dateCreated` DATETIME NULL DEFAULT NOW(),
+  `dateCreated` DATETIME NOT NULL DEFAULT NOW(),
   PRIMARY KEY (`recordId`),
   INDEX `medicalRecordsPatientId_idx` (`patientId` ASC) VISIBLE,
   INDEX `medicalRecordsTypeId_idx` (`recordTypeId` ASC) VISIBLE,
@@ -109,24 +109,17 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`Tokens` (
   `tokenId` INT NOT NULL AUTO_INCREMENT,
-  `token` LONGTEXT NOT NULL,
-  `patientId` INT NULL,
-  `doctorId` INT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  `patientId` INT NOT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT NOW(),
   `expirationDate` DATETIME NOT NULL,
   PRIMARY KEY (`tokenId`),
   INDEX `tokensPatientId_idx` (`patientId` ASC) VISIBLE,
-  INDEX `tokensDoctorId_idx` (`doctorId` ASC) VISIBLE,
   CONSTRAINT `tokensPatientId`
     FOREIGN KEY (`patientId`)
     REFERENCES `hack_saude`.`Patients` (`patientId`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `tokensDoctorId`
-    FOREIGN KEY (`doctorId`)
-    REFERENCES `hack_saude`.`Doctors` (`doctorId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -135,20 +128,20 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hack_saude`.`TokenAccess` (
   `tokenAccessId` INT NOT NULL AUTO_INCREMENT,
-  `tokenId` INT NULL,
-  `recordId` INT NULL,
-  `accessTime` DATETIME NULL DEFAULT NOW(),
+  `tokenId` INT NOT NULL,
+  `accessTime` DATETIME NOT NULL DEFAULT NOW(),
+  `doctorId` INT NOT NULL,
   PRIMARY KEY (`tokenAccessId`),
   INDEX `tokenAccessTokenId_idx` (`tokenId` ASC) VISIBLE,
-  INDEX `tokenAccessRecordId_idx` (`recordId` ASC) VISIBLE,
+  INDEX `tokenAccessDoctorId_idx` (`doctorId` ASC) VISIBLE,
   CONSTRAINT `tokenAccessTokenId`
     FOREIGN KEY (`tokenId`)
     REFERENCES `hack_saude`.`Tokens` (`tokenId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `tokenAccessRecordId`
-    FOREIGN KEY (`recordId`)
-    REFERENCES `hack_saude`.`MedicalRecords` (`recordId`)
+  CONSTRAINT `tokenAccessDoctorId`
+    FOREIGN KEY (`doctorId`)
+    REFERENCES `hack_saude`.`Doctors` (`doctorId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -157,7 +150,6 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 -- -----------------------------------------------------
 -- Fill Table `hack_saude`.`Users`
@@ -227,19 +219,19 @@ VALUES
 -- -----------------------------------------------------
 -- Fill Table `hack_saude`.`Tokens`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `doctorId`, `expirationDate`)
+INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `expirationDate`)
 VALUES
-('token123', 1, 1, '2024-07-01'),
-('token456', 2, 2, '2024-07-01'),
-('token789', 3, 3, '2024-07-01'),
-('token101', 4, 4, '2024-07-01'),
-('token112', 5, 5, '2024-07-01') ;
+('token123', 1, '2024-07-01'),
+('token456', 2, '2024-07-01'),
+('token789', 3, '2024-07-01'),
+('token101', 4, '2024-07-01'),
+('token112', 5, '2024-07-01') ;
 
 
 -- -----------------------------------------------------
 -- Fill Table `hack_saude`.`TokenAccess`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`TokenAccess` (`tokenId`, `recordId`)
+INSERT INTO `hack_saude`.`TokenAccess` (`tokenId`, `doctorId`)
 VALUES
 (1, 1),
 (2, 2),
@@ -372,6 +364,38 @@ SELECT * FROM(
   (SELECT tokenConfirmation) tokenConfirmation,
   (SELECT tokenError) tokenError,
   (SELECT LAST_INSERT_ID() AS tokenId) tokenId
+);
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE AddTokenAccess(IN TKID INT, IN DTID INT)
+BEGIN
+DECLARE accessConfirmation VARCHAR(45);
+DECLARE accessError VARCHAR(45);
+PREPARE CountPreviousTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousTokenAccess FROM `hack_saude`.`TokenAccess`
+	WHERE `tokenId` = ?' ;
+PREPARE InsertIntoTokenAccess FROM 'INSERT INTO `hack_saude`.`TokenAccess` (`tokenId`, `doctorId`)
+	VALUES (?, ?)' ;
+PREPARE CountTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countTokenAccess FROM `hack_saude`.`TokenAccess`
+	WHERE `tokenId` = ?' ;
+START TRANSACTION;
+SET @tokenId = TKID;
+SET @doctorId = DTID;
+EXECUTE CountPreviousTokenAccess USING @tokenId ;
+EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
+EXECUTE CountTokenAccess USING @tokenId ;
+IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
+	COMMIT;
+	SET accessConfirmation = 'Acesso salvo' ;
+ELSE
+	ROLLBACK ;
+  SET accessError = 'Acesso NÃO salvo' ;
+END IF ;
+SELECT * FROM(
+  (SELECT accessConfirmation) accessConfirmation,
+  (SELECT accessError) accessError
 );
 END //
 DELIMITER ;

@@ -1,0 +1,17 @@
+header {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+}
+
+header a {
+    grid-column: 2;
+}
+
+header nav {
+    grid-column: 3 / span 9;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+}
