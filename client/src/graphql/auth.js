@@ -17,6 +17,7 @@ export const storeToken = (access, token) => {
 
 export const logout = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
 };
 
 export const getCredentials = (access) => {
