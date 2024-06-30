@@ -16,8 +16,16 @@ def create_patient_or_doctor_user(userId: int, userType: str) -> (None | dict):
         return None
     return confirmation[0]
 
-def create_token(token: str, patientId: int, expirationDate: str) -> (None | dict):
+def reserve_token_id(patientId: int, expirationDate: str, token: str = 'reserve') -> (None | dict):
     args = [token, patientId, expirationDate]
+    query = 'reserveTokenId'
+    confirmation = mysql_results(query, type='procedure', args=args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]
+
+def create_token(tokenId: int, token: str) -> (None | dict):
+    args = [tokenId, token]
     query = 'AddToken'
     confirmation = mysql_results(query, type='procedure', args=args)
     if len(confirmation) == 0:

@@ -31,14 +31,6 @@ export const medicalRecordsByPatientIdQuery = gql`
     ${medicalRecordsFragment}
 `;
 
-export const tokenIdQuery = gql`
-    query TokenId($token: String!, $patientId: ID!, $expirationDate: String!) {
-        token(token: $token, patientId: $patientId, expirationDate: $expirationDate) {
-            tokenId
-        }
-    }
-`;
-
 export const userQuery = gql`
     query User($id: ID!) {
         user(userId: $id) {

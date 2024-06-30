@@ -48,10 +48,3 @@ def get_token(id: int) -> (None | dict):
     if len(token) == 0:
         return None
     return token[0]
-
-def get_token_by_token(token: str, patientId: int, expirationDate: str) -> (None | dict):
-    query = rf"SELECT * FROM Tokens WHERE token = '{token}' AND patientId = {patientId} AND expirationDate = '{expirationDate}';"
-    res_token = mysql_results(query)
-    if len(res_token) == 0:
-        return None
-    return res_token[-1]

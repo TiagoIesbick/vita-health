@@ -97,17 +97,23 @@ def resolve_generate_token(_, info, expirationDate):
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
         return {'tokenError': 'Faltando credencial de paciente'}
+    exp = datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
+    reserve_tokenId = reserve_token_id(patient['patientId'], exp)
+    if reserve_tokenId['tokenError']:
+        return {'tokenError': reserve_tokenId['tokenError']}
     token = generate_token(
         expirationDate,
-        {'patientId': patient['patientId'], 'userId': patient['userId']}
+        {
+            'patientId': patient['patientId'],
+            'userId': patient['userId'],
+            'tokenId': reserve_tokenId['tokenId']
+        }
         )
-    res = create_token(
-        token,
-        patient['patientId'],
-        datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
-        )
+    res = create_token(reserve_tokenId['tokenId'], token)
+    if res['tokenError']:
+        return {'tokenError': res['tokenError']}
     if res['tokenConfirmation']:
-        res['token'] = get_token(res['tokenId'])
+        res['token'] = get_token(reserve_tokenId['tokenId'])
     return res
 
 @mutation.field("saveTokenAccess")
@@ -117,11 +123,3 @@ def resolve_save_token_access(_, info, tokenId, doctorId):
     if info.context['user_detail']['userType'] != 'Doctor':
         return {'acessError': 'Faltando credencial de profissional de saúde'}
     return create_token_access(tokenId, doctorId)
-
-@query.field("token")
-def resolve_token(*_, token, patientId, expirationDate):
-    return get_token_by_token(
-        token,
-        patientId,
-        datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
-        )

@@ -2,7 +2,6 @@ type Query {
     medicalRecords: [MedicalRecords]
     medicalRecordsByPatientId(patientId: ID!): [MedicalRecords]
     user(userId: ID!): Users
-    token(token: String!, patientId: ID!, expirationDate: String!): Tokens
 }
 
 type MedicalRecords {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { medicalRecordsByPatientIdQuery, medicalRecordsQuery, tokenIdQuery, userQuery } from "../graphql/queries";
+import { medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
 import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
@@ -82,7 +82,7 @@ export const useSaveTokenAccess = () => {
 
     const addTokenAccess = async (tokenId, doctorId) => {
         const { data: { saveTokenAccess } } = await mutate({
-            variables: { tokenId: tokenId.tokenId, doctorId}
+            variables: { tokenId: tokenId, doctorId}
         });
         return saveTokenAccess;
     };
@@ -91,11 +91,6 @@ export const useSaveTokenAccess = () => {
         loadingTokenAccess: loading,
         errorTokenAccess: error
     };
-};
-
-export const useTokenId = (token, patientId, expirationDate) => {
-    const { data, loading, error } = useQuery(tokenIdQuery, { variables: { token, patientId, expirationDate } });
-    return {tokenId: data?.token, loadingToken: loading, errorToken: Boolean(error)};
 };
 
 export const useUserQuery = (userId) => {

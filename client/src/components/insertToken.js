@@ -7,11 +7,14 @@ import { Button } from "primereact/button";
 import { ACCESS_MEDICAL_TOKEN_KEY, getCredentials, storeToken } from "../graphql/auth";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
+import { useSaveTokenAccess, useUserQuery } from "../hooks/hooks";
 
 
 const InsertToken = () => {
     const navigate = useNavigate();
-    const { setPatient, showMessage } = useUser();
+    const { user, setPatient, showMessage } = useUser();
+    const { userDetail } = useUserQuery(user.userId);
+    const { addTokenAccess } = useSaveTokenAccess();
     const formik = useFormik({
         initialValues: {
             token: ''
@@ -25,6 +28,7 @@ const InsertToken = () => {
                 localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
             } else {
                 setPatient(credentials);
+                await addTokenAccess(credentials.tokenId, userDetail?.doctor.doctorId);
                 navigate("/medical-records-access");
                 showMessage('success', 'Sucesso', 'Permissão Concedida');
             };
