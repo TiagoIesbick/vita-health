@@ -339,26 +339,37 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
--- Create Procedure to add tokens
+-- Create Procedure to reserve tokenId
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddToken(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
+CREATE PROCEDURE reserveTokenId(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);
+PREPARE CountPreviousToken FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousToken FROM `hack_saude`.`Tokens`
+	WHERE `token` = ? AND `patientId` = ? AND `expirationDate` = ?' ;
 PREPARE InsertIntoTokens FROM 'INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `expirationDate`)
 	VALUES (?, ?, ?)' ;
+PREPARE CountToken FROM 'SELECT COUNT(`tokenId`) INTO @countToken FROM `hack_saude`.`Tokens`
+	WHERE `token` = ? AND `patientId` = ? AND `expirationDate` = ?' ;
 START TRANSACTION;
 SET @issuedToken = TK;
 SET @patientId = PTID;
 SET @expirationDate = EXP;
 IF @expirationDate < NOW() THEN
-	ROLLBACK;
+	ROLLBACK ;
 	SET tokenError = 'Data expirada' ;
 ELSE
+	EXECUTE CountPreviousToken USING @issuedToken, @patientId, @expirationDate ;
 	EXECUTE InsertIntoTokens USING @issuedToken, @patientId, @expirationDate ;
-    COMMIT;
-	SET tokenConfirmation = 'Token emitido' ;
+  EXECUTE CountToken USING @issuedToken, @patientId, @expirationDate ;
+  IF @countToken - @countPreviousToken = 1 THEN
+    COMMIT ;
+    SET tokenConfirmation = 'TokenId reservado' ;
+	ELSE
+		ROLLBACK ;
+    SET tokenError = 'TokenId NÃO reservado' ;
+	END IF ;
 END IF ;
 SELECT * FROM(
   (SELECT tokenConfirmation) tokenConfirmation,
@@ -369,6 +380,40 @@ END //
 DELIMITER ;
 
 
+-- -----------------------------------------------------
+-- Create Procedure to add tokens
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddToken(IN TKID INT, IN TK LONGTEXT)
+BEGIN
+DECLARE tokenConfirmation VARCHAR(45);
+DECLARE tokenError VARCHAR(45);
+PREPARE UpdateToken FROM 'UPDATE `hack_saude`.`Tokens` SET `token` = ? WHERE `tokenId` = ?' ;
+PREPARE CountTokenId  FROM 'SELECT COUNT(`tokenId`) INTO @countTokenId FROM `hack_saude`.`Tokens`
+	WHERE `token` = ? AND `tokenId` = ?' ;
+START TRANSACTION;
+SET @reservedTokenId = TKID;
+SET @issuedToken = TK;
+EXECUTE UpdateToken USING @issuedToken, @reservedTokenId ;
+EXECUTE CountTokenId USING @issuedToken, @reservedTokenId ;
+IF @countTokenId != 1 THEN
+	ROLLBACK ;
+  SET tokenError = 'Token NÃO registrado' ;
+ELSE
+  COMMIT;
+	SET tokenConfirmation = 'Token registrado' ;
+END IF ;
+SELECT * FROM(
+  (SELECT tokenConfirmation) tokenConfirmation,
+  (SELECT tokenError) tokenError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to add tokens access
+-- -----------------------------------------------------
 DELIMITER //
 CREATE PROCEDURE AddTokenAccess(IN TKID INT, IN DTID INT)
 BEGIN
