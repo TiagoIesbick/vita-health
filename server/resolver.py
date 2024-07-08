@@ -33,15 +33,15 @@ def resolve_users_patient(users, *_):
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
     email, firstName, lastName, password, userType, acceptTerms = \
-        input['email'], input['firstName'], input['lastName'], input['password'], input['userType'], input['acceptTerms']
+        input['email'], input['firstName'].strip().capitalize(), input['lastName'].strip().capitalize(), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
-        return { 'userError': 'E-mail inválido'}
-    if not validate_name(firstName.strip()):
-        return { 'userError': 'Nome deve começar com pelo menos 2 caracteres de palavra' }
-    if not validate_name(lastName.strip()):
-        return { 'userError': 'Sobrenome deve começar com pelo menos 2 caracteres de palavra' }
+        return { 'userError': 'Invalid e-mail'}
+    if not validate_name(firstName):
+        return { 'userError': 'First name must start with at least 2 word characters' }
+    if not validate_name(lastName):
+        return { 'userError': 'Last name must start with at least 2 word characters' }
     if not validate_password(password):
-        return { 'userError': 'Senha inválida'}
+        return { 'userError': 'Invalid password' }
     res = create_user(
         email,
         nh3.clean(firstName),
@@ -67,7 +67,7 @@ def resolve_login(*_, email, password):
     if user:
         token = handle_login(user)
         return { 'user': user, 'token': token }
-    return { 'error': 'E-mail ou senha inválidos' }
+    return { 'error': 'Invalid email or password' }
 
 @query.field("medicalRecords")
 def resolve_medical_records(_, info):
@@ -93,10 +93,12 @@ def resolve_medical_records_type(medicalRecords, *_):
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):
     if not info.context['authenticated']:
-        return {'tokenError': 'Faltando autenticação'}
+        return {'tokenError': 'Missing authentication'}
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
-        return {'tokenError': 'Faltando credencial de paciente'}
+        return {'tokenError': 'Missing patient credential'}
+    # as my mysql database is recording dates in the Brazilian time zone, it is necessary to transform the date to my respective time zone,
+    # if your mysql database is recording dates in different time zone, transform the 'exp' variable into your respective time zone
     exp = datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
     reserve_tokenId = reserve_token_id(patient['patientId'], exp)
     if reserve_tokenId['tokenError']:
@@ -119,7 +121,7 @@ def resolve_generate_token(_, info, expirationDate):
 @mutation.field("saveTokenAccess")
 def resolve_save_token_access(_, info, tokenId, doctorId):
     if not info.context['authenticated']:
-        return {'acessError': 'Faltando autenticação'}
+        return {'acessError': 'Missing authentication'}
     if info.context['user_detail']['userType'] != 'Doctor':
-        return {'acessError': 'Faltando credencial de profissional de saúde'}
+        return {'acessError': 'Missing healthcare professional credential'}
     return create_token_access(tokenId, doctorId)

@@ -6,7 +6,7 @@ const Footer = () => {
     return (
         <footer className="flex justify-content-center align-items-center m-2">
             <Link to="/"><motion.img src={logo} alt="logo" style={{width: 48}} whileHover={{scale: 1.2}} /></Link>
-            <p>Você no controle da sua saúde</p>
+            <p>Empower Your Health: Take Control of Your Medical Data</p>
         </footer>
     );
 };

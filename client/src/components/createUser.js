@@ -22,9 +22,9 @@ const CreateUser = () => {
     const { doLogin, loading, error } = useLogin();
     const formik = useFormik({
         initialValues: {
-            email: '',
             firstName: '',
             lastName: '',
+            email: '',
             password: '',
             userType: null,
             acceptTerms: false
@@ -54,33 +54,53 @@ const CreateUser = () => {
             };
         },
         validationSchema: Yup.object({
-            email: Yup.string().email('E-mail inválido').required('Obrigatório'),
-            firstName: Yup.string().required('Obrigatório').min(2, 'Pelo menos 2 caracteres')
-                .matches(/^\s*?\w{2,}.*/, 'Nome deve começar com pelo menos 2 caracteres de palavra'),
-            lastName: Yup.string().required('Obrigatório').min(2, 'Pelo menos 2 caracteres')
-                .matches(/^\s*?\w{2,}.*/, 'Sobrenome deve começar com pelo menos 2 caracteres de palavra'),
-            password: Yup.string().required('Obrigatório').min(8, 'Mínimo 8 caracteres')
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'Pelo menos 1 letra minúscula, 1 letra maiúscula e 1 número'),
-            userType: Yup.string().required('Obrigatório'),
-            acceptTerms: Yup.bool().oneOf([true], 'É preciso aceitar os termos e condições')
+            firstName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
+                .matches(/^\s*?\w{2,}.*/, 'First name must start with at least 2 word characters'),
+            lastName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
+                .matches(/^\s*?\w{2,}.*/, 'Last name must start with at least 2 word characters'),
+            email: Yup.string().email('Invalid e-mail').required('Required'),
+            password: Yup.string().required('Required').min(8, 'Minimum 8 characters')
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'At least one lowercase, one uppercase and one numeric'),
+            userType: Yup.string().required('Required'),
+            acceptTerms: Yup.bool().oneOf([true], 'You must accept the terms and conditions')
         }),
     });
     const userType = [
-        { type: 'Patient', name: 'Paciente'},
-        { type: 'Doctor', name: 'Profisional de Saúde'}
+        { type: 'Patient', name: 'Patient'},
+        { type: 'Doctor', name: 'Healthcare professional'}
     ]
     if (errorUser || errorPatientOrDoctor || error) {
         navigate('/');
-        showMessage('error', 'Error', 'Dados não disponíveis. Tente novamente mais tarde.', true);
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
     return (
         <Card
-            title="Crie uma Conta"
+            title="Create an Account"
             className="flex justify-content-center align-items-center"
             style={{minHeight: 'calc(100vh - 128px)'}}
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
+                <FloatLabel>
+                    <InputText
+                        id="firstName"
+                        autoComplete="given-name"
+                        className="w-full"
+                        {...formik.getFieldProps("firstName")}
+                    />
+                    <label htmlFor="firstName">First Name</label>
+                    {formik.touched.firstName && formik.errors.firstName &&<div className="text-red-500 text-xs">{formik.errors.firstName}</div>}
+                </FloatLabel>
+                <FloatLabel>
+                    <InputText
+                        id="lastName"
+                        autoComplete="family-name"
+                        className="w-full"
+                        {...formik.getFieldProps("lastName")}
+                    />
+                    <label htmlFor="lastName">Last Name</label>
+                    {formik.touched.lastName && formik.errors.lastName &&<div className="text-red-500 text-xs">{formik.errors.lastName}</div>}
+                </FloatLabel>
                 <FloatLabel>
                     <InputText
                         id="email"
@@ -92,26 +112,6 @@ const CreateUser = () => {
                     {formik.touched.email && formik.errors.email &&<div className="text-red-500 text-xs">{formik.errors.email}</div>}
                 </FloatLabel>
                 <FloatLabel>
-                    <InputText
-                        id="firstName"
-                        autoComplete="given-name"
-                        className="w-full"
-                        {...formik.getFieldProps("firstName")}
-                    />
-                    <label htmlFor="firstName">Nome</label>
-                    {formik.touched.firstName && formik.errors.firstName &&<div className="text-red-500 text-xs">{formik.errors.firstName}</div>}
-                </FloatLabel>
-                <FloatLabel>
-                    <InputText
-                        id="lastName"
-                        autoComplete="family-name"
-                        className="w-full"
-                        {...formik.getFieldProps("lastName")}
-                    />
-                    <label htmlFor="lastName">Sobrenome</label>
-                    {formik.touched.lastName && formik.errors.lastName &&<div className="text-red-500 text-xs">{formik.errors.lastName}</div>}
-                </FloatLabel>
-                <FloatLabel>
                     <Password
                         inputId="password"
                         autoComplete="current-password"
@@ -121,7 +121,7 @@ const CreateUser = () => {
                         className="w-full"
                         {...formik.getFieldProps("password")}
                     />
-                    <label htmlFor="password">Senha</label>
+                    <label htmlFor="password">Password</label>
                     {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -133,7 +133,7 @@ const CreateUser = () => {
                         className="w-full"
                         {...formik.getFieldProps("userType")}
                     />
-                    <label htmlFor="user-type">Tipo de Usuário</label>
+                    <label htmlFor="user-type">User Type</label>
                     {formik.touched.userType && formik.errors.userType &&<div className="text-red-500 text-xs">{formik.errors.userType}</div>}
                 </FloatLabel>
                 <div>
@@ -144,10 +144,10 @@ const CreateUser = () => {
                         }}
                         inputId="acceptTerms"
                         checked={formik.values.acceptTerms} />
-                    <label htmlFor="acceptTerms" className="ml-1 text-sm">Aceite de Termos</label>
+                    <label htmlFor="acceptTerms" className="ml-1 text-sm">Accept Terms</label>
                     {formik.touched.acceptTerms && formik.errors.acceptTerms &&<div className="text-red-500 text-xs">{formik.errors.acceptTerms}</div>}
                 </div>
-                <Button type="submit" label="Confirme" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
             </form>
         </Card>
     );

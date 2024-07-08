@@ -38,14 +38,14 @@ const Login = () => {
             };
         },
         validationSchema: Yup.object({
-            email: Yup.string().email('E-mail inválido').required('Obrigatório'),
-            password: Yup.string().required('Obrigatório').min(8, 'Mínimo 8 caracteres')
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'Pelo menos 1 letra minúscula, 1 letra maiúscula e 1 número')
+            email: Yup.string().email('Invalid e-mail').required('Required'),
+            password: Yup.string().required('Required').min(8, 'Minimum 8 characters')
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'At least one lowercase, one uppercase and one numeric')
         }),
     });
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Dados não disponíveis. Tente novamente mais tarde.', true);
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
     return (
@@ -75,15 +75,15 @@ const Login = () => {
                         className="w-full"
                         {...formik.getFieldProps("password")}
                     />
-                    <label htmlFor="password">Senha</label>
+                    <label htmlFor="password">Password</label>
                     {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
                 </FloatLabel>
                 <Button type="submit" label="Login" disabled={loading || !formik.isValid} loading={loading}  />
             </form>
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">
-                Não tem uma conta?
-                <Link className='mt-1' to="/create-user">Crie uma conta</Link>
+                Don't have an account?
+                <Link className='mt-1' to="/create-user">Create an Account</Link>
             </div>
         </Card>
     );

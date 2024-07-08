@@ -33,19 +33,19 @@ const GenerateAccessToken = () => {
             };
         },
         validationSchema: Yup.object({
-            tokenExpirationDateTime: Yup.date().required('Obrigatório')
-                .min(toDay, 'A data não pode ser no passado')
-                .max(toDayPlus90, 'Máximo de 90 dias')
+            tokenExpirationDateTime: Yup.date().required('Required')
+                .min(toDay, 'The date cannot be in the past')
+                .max(toDayPlus90, 'Maximum 90 days')
         }),
     });
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Sorry, we are experiencing some issues at the moment, please try again later', true);
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
     return (
         <Card
-            title="Gerar Token"
+            title="Generate Token"
             className="flex justify-content-center align-items-center"
             style={{minHeight: 'calc(100vh - 128px)'}}
         >
@@ -62,10 +62,10 @@ const GenerateAccessToken = () => {
                         hourFormat="24"
                         {...formik.getFieldProps("tokenExpirationDateTime")}
                     />
-                    <label htmlFor="token-expiration-date-time">Tempo de expiração</label>
+                    <label htmlFor="token-expiration-date-time">Expiration Time</label>
                     {formik.touched.tokenExpirationDateTime && formik.errors.tokenExpirationDateTime &&<div className="text-red-500 text-xs">{formik.errors.tokenExpirationDateTime}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Confirme" disabled={!formik.isValid || loading} loading={loading} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loading} loading={loading} />
             </form>
             <Dialog
                 header="Token"

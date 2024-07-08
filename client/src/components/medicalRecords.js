@@ -12,7 +12,7 @@ const MedicalRecords = () => {
     };
     return (
         <Card
-            title="Dados Médicos"
+            title="Medical Records"
             className="flex justify-content-center align-items-center"
             style={{minHeight: 'calc(100vh - 128px)'}}
         >

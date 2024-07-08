@@ -14,11 +14,11 @@ const MedicalRecordsAccess = () => {
     };
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Dados não disponíveis', true);
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
     return (
         <Card
-            title="Dados Médicos"
+            title="Patient Medical Records"
             className="flex justify-content-center align-items-center"
             style={{minHeight: 'calc(100vh - 128px)'}}
         >

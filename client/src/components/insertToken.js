@@ -30,19 +30,19 @@ const InsertToken = () => {
                 setPatient(credentials);
                 await addTokenAccess(credentials.tokenId, userDetail?.doctor.doctorId);
                 navigate("/medical-records-access");
-                showMessage('success', 'Sucesso', 'Permissão Concedida');
+                showMessage('success', 'Sucess', 'Permission Granted');
             };
             resetForm();
         },
         validationSchema: Yup.object({
-            token: Yup.string().required('Obrigatório').min(83, 'Mínimo 83 caracteres')
+            token: Yup.string().required('Required').min(83, 'Minimum 83 characters')
         })
     });
 
 
     return (
         <Card
-            title="Inserir Token"
+            title="Insert Token"
             className="flex justify-content-center align-items-center"
             style={{minHeight: 'calc(100vh - 128px)'}}
         >
@@ -58,7 +58,7 @@ const InsertToken = () => {
                     <label htmlFor="token">Token</label>
                     {formik.touched.token && formik.errors.token &&<div className="text-red-500 text-xs">{formik.errors.token}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Confirme" disabled={!formik.isValid} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid} />
             </form>
         </Card>
     );

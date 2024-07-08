@@ -156,16 +156,16 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 INSERT INTO `vita_health`.`Users` (`firstName`, `lastName`, `email`,
 `userType`, `password`, `acceptTerms`) VALUES
-('John', 'Doe', 'john.doe@example.com', 'Patient', 'gAAAAABmdjVDuFGdiYvHpoIvF3IkEa6jiXsKx53JJv-ewfaVxzMVyW_pI9iJ31mrHE13-O851e1Y0HdN20C6UocVJrMIWn3R3A==', 1),
-('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', 'gAAAAABmdjVJdsVXcoOUnbYsdxOhbhXuZKXTGXRF8ENp-x1GxV4xInNjjEf43krRd9qIWDRr4XW_LmQH4MuWq8FqjEs1gM_4SQ==', 1),
-('Emily', 'Johnson', 'emily.johnson@example.com', 'Patient', 'gAAAAABmdjWn2Bqif4SKl5nlW4Rhjq71tjnV_MhV5Jf07eN9c0fHgftrFvO0F1r0GMTq7Nfl81ytkm55BU4Ld9psuF3azrcFzg==', 1),
-('Michael', 'Brown', 'michael.brown@example.com', 'Doctor', 'gAAAAABmdjW7U6a5dIIUPCMucyLmiWZfvVe9qhW_N2_g0_JqBbIF9oL_NtrS0Gr90vShS9Es5H3Hm19KthMV9AOTcdv_Yhjy9g==', 1),
-('Sarah', 'Wilson', 'sarah.wilson@example.com', 'Patient', 'gAAAAABmdjXQ06t3zM6rfaunHwWRGdDA1Vtf8flvDkMue2OFu_5lmBs7YpdGSFw_Ht4hqWHN91iIDuWYC480jeeewXEAmgUsKA==', 1),
-('Tom', 'Brad', 'tom.brad@example.com', 'Doctor', 'gAAAAABmdjXtQnyrdWW-iaXMdlpx6hokM7RIQr8xHRnqLeaRDoiEyQkzWRd1coG1c3D96N-1JF-9i95y4oMiOJ4sKi6OJphbOg==', 1),
-('Adam', 'Sand', 'adam.sand@example.com', 'Patient', 'gAAAAABmdjX_36IDYNZ9fbTcvS0BQl9KytdjYlpGaG6Jkc9bUPiLpVsLuywQSmgMChMYhaqS0PeQsv5l2kMBehWIPQ3bdNuWLQ==', 1),
-('Emma', 'Park', 'ema.park@example.com', 'Doctor', 'gAAAAABmdjYNDrtOlybN0g1ELGj0G44hBiSEHD7zfc2X4MNWHCmp60UN9o_vDQnN3vdgK4m_94jRkr1IXLQ5P1Cyhexa_AR6tg==', 1),
-('Peter', 'Mel', 'peter.mel@example.com', 'Patient', 'gAAAAABmdjYdeq3QpFMxJgzQFsapBCIPQZZd3XcZjprX_a5g2u0gKlZcKfkPbGvHyd0CnVWUVIIWbw4WECfiAyvsUmv4TZwqhw==', 1),
-('Dina', 'Hank', 'dina.hank@example.com', 'Doctor', 'gAAAAABmdjYvvtC59OvcXMqsXRn3BEyilWCrre6PGLz76FVPjsJPsGf4LWYjkLF7todgaBcUMCApWN65nYJX9iiyNIenWMdQRg==', 1) ;
+('John', 'Doe', 'john.doe@example.com', 'Patient', 'gAAAAABmjFhohl9fnj3zOzITtFx8bfOR8cXEVab_Lfb-ppcMu5dEo-2hwlJzoDA29yTDQCY2ov_L4F205nxzQIhstP6lixc57Q==', 1),
+('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', 'gAAAAABmjFjHy_qCV_YdYN26gehW9GTpFU0yoUDuke0dc3ck4tKdskTvp2Hid_xZCmoAZUS1CN7jK0W7GHp4uT4l_gsqMXihPQ==', 1),
+('Emily', 'Johnson', 'emily.johnson@example.com', 'Patient', 'gAAAAABmjFjclLj-tfhXEPycoo08y7bPVdEdd41b5ubD3xDb3FhgnVd2VQlVEdYaTzEeCVRg-7ONvkyY_8YI-UulIzTyV2-CJA==', 1),
+('Michael', 'Brown', 'michael.brown@example.com', 'Doctor', 'gAAAAABmjFjyEj5f-NIsuYg7s2YCHpNXjPbTXmV40tfTtpevBlLQLKdb7qMSh4yBwTuyci3s-cNlODh39TWePcW_mnzXWbxiCQ==', 1),
+('Sarah', 'Wilson', 'sarah.wilson@example.com', 'Patient', 'gAAAAABmjFknXkAD-haeLWL6t45KWQdLViodlTceFqtgruCjKLRyg84zKt1f1K5f8MQylf9vv9ushJRO118VrSqhb2IWgLgb-A==', 1),
+('Tom', 'Brad', 'tom.brad@example.com', 'Doctor', 'gAAAAABmjFlV2ezsDdIzkkTjrqDKthtVBNzivJgA6CIUvduqiVbN2PlEn0TytNvbpzdM-q59wWxxDmSSd8WH7qXmPc64E9tizA==', 1),
+('Adam', 'Sand', 'adam.sand@example.com', 'Patient', 'gAAAAABmjFlndokfBnRgzrcP-nDq-svSpjYpjhU6-HuNbVte_Bpm8YymT2woxTYqv6qpnhvtJQZljye1F3SsG4XdHfaJzjPkFw==', 1),
+('Emma', 'Park', 'ema.park@example.com', 'Doctor', 'gAAAAABmjFmEtGz4ACW531XTPVWykWOxJd8vyiPQu4M5at_kqKmSCTyECTxqz4RcvW02BHRjj_YpL_PKTqyUFwQa7z-W1uRMJA==', 1),
+('Peter', 'Mel', 'peter.mel@example.com', 'Patient', 'gAAAAABmjFmzmrkxPRpDiqL6dctMC2ZLYUmwY6GQHEEzsjqsFhBLLvTKmUQlPW8hPJGDiMtXQrejvRVDhvW0ZyBRZOr2FeovSg==', 1),
+('Dina', 'Hank', 'dina.hank@example.com', 'Doctor', 'gAAAAABmjFnLAsTFwSifdMvftS1b1kGu4M3SqSfOkutydUoQgrld069T3eHwO8PW1eCoATnN96A84CPsE-08LIeHsrEL6j-YAg==', 1) ;
 
 
 -- -----------------------------------------------------
