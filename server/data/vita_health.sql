@@ -1,4 +1,4 @@
--- MySQL Database - hack_saude Script
+-- MySQL Database - vita_health Script
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -7,18 +7,18 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema hack_saude
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `hack_saude` ;
+DROP SCHEMA IF EXISTS `vita_health` ;
 
 -- -----------------------------------------------------
 -- Schema hack_saude
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `hack_saude` DEFAULT CHARACTER SET utf8mb4 ;
-USE `hack_saude` ;
+CREATE SCHEMA IF NOT EXISTS `vita_health` DEFAULT CHARACTER SET utf8mb4 ;
+USE `vita_health` ;
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`Users`
+-- Table `vita_health`.`Users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`Users` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`Users` (
   `userId` INT NOT NULL AUTO_INCREMENT,
   `firstName` VARCHAR(255) NOT NULL,
   `lastName` VARCHAR(255) NOT NULL,
@@ -32,9 +32,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`Patients`
+-- Table `vita_health`.`Patients`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`Patients` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`Patients` (
   `patientId` INT NOT NULL AUTO_INCREMENT,
   `dateOfBirth` DATE NULL,
   `gender` ENUM('male', 'female', 'other') NULL,
@@ -43,16 +43,16 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`Patients` (
   INDEX `patientsUserId_idx` (`userId` ASC) VISIBLE,
   CONSTRAINT `patientsUserId`
     FOREIGN KEY (`userId`)
-    REFERENCES `hack_saude`.`Users` (`userId`)
+    REFERENCES `vita_health`.`Users` (`userId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`Doctors`
+-- Table `vita_health`.`Doctors`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`Doctors` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`Doctors` (
   `doctorId` INT NOT NULL AUTO_INCREMENT,
   `specialty` VARCHAR(255) NULL,
   `licenseNumber` VARCHAR(255) NULL,
@@ -62,16 +62,16 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`Doctors` (
   INDEX `doctorsUserId_idx` (`userId` ASC) VISIBLE,
   CONSTRAINT `doctorsUserId`
     FOREIGN KEY (`userId`)
-    REFERENCES `hack_saude`.`Users` (`userId`)
+    REFERENCES `vita_health`.`Users` (`userId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`RecordTypes`
+-- Table `vita_health`.`RecordTypes`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`RecordTypes` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`RecordTypes` (
   `recordTypeId` INT NOT NULL AUTO_INCREMENT,
   `recordName` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`recordTypeId`),
@@ -80,9 +80,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`MedicalRecords`
+-- Table `vita_health`.`MedicalRecords`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`MedicalRecords` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
   `recordId` INT NOT NULL AUTO_INCREMENT,
   `patientId` INT NOT NULL,
   `recordTypeId` INT NOT NULL,
@@ -93,21 +93,21 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`MedicalRecords` (
   INDEX `medicalRecordsTypeId_idx` (`recordTypeId` ASC) VISIBLE,
   CONSTRAINT `medicalRecordsPatientId`
     FOREIGN KEY (`patientId`)
-    REFERENCES `hack_saude`.`Patients` (`patientId`)
+    REFERENCES `vita_health`.`Patients` (`patientId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `medicalRecordsTypeId`
     FOREIGN KEY (`recordTypeId`)
-    REFERENCES `hack_saude`.`RecordTypes` (`recordTypeId`)
+    REFERENCES `vita_health`.`RecordTypes` (`recordTypeId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`Tokens`
+-- Table `vita_health`.`Tokens`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`Tokens` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`Tokens` (
   `tokenId` INT NOT NULL AUTO_INCREMENT,
   `token` VARCHAR(255) NOT NULL,
   `patientId` INT NOT NULL,
@@ -117,16 +117,16 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`Tokens` (
   INDEX `tokensPatientId_idx` (`patientId` ASC) VISIBLE,
   CONSTRAINT `tokensPatientId`
     FOREIGN KEY (`patientId`)
-    REFERENCES `hack_saude`.`Patients` (`patientId`)
+    REFERENCES `vita_health`.`Patients` (`patientId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hack_saude`.`TokenAccess`
+-- Table `vita_health`.`TokenAccess`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hack_saude`.`TokenAccess` (
+CREATE TABLE IF NOT EXISTS `vita_health`.`TokenAccess` (
   `tokenAccessId` INT NOT NULL AUTO_INCREMENT,
   `tokenId` INT NOT NULL,
   `accessTime` DATETIME NOT NULL DEFAULT NOW(),
@@ -136,12 +136,12 @@ CREATE TABLE IF NOT EXISTS `hack_saude`.`TokenAccess` (
   INDEX `tokenAccessDoctorId_idx` (`doctorId` ASC) VISIBLE,
   CONSTRAINT `tokenAccessTokenId`
     FOREIGN KEY (`tokenId`)
-    REFERENCES `hack_saude`.`Tokens` (`tokenId`)
+    REFERENCES `vita_health`.`Tokens` (`tokenId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `tokenAccessDoctorId`
     FOREIGN KEY (`doctorId`)
-    REFERENCES `hack_saude`.`Doctors` (`doctorId`)
+    REFERENCES `vita_health`.`Doctors` (`doctorId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -152,9 +152,9 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`Users`
+-- Fill Table `vita_health`.`Users`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Users` (`firstName`, `lastName`, `email`,
+INSERT INTO `vita_health`.`Users` (`firstName`, `lastName`, `email`,
 `userType`, `password`, `acceptTerms`) VALUES
 ('John', 'Doe', 'john.doe@example.com', 'Patient', 'gAAAAABmdjVDuFGdiYvHpoIvF3IkEa6jiXsKx53JJv-ewfaVxzMVyW_pI9iJ31mrHE13-O851e1Y0HdN20C6UocVJrMIWn3R3A==', 1),
 ('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', 'gAAAAABmdjVJdsVXcoOUnbYsdxOhbhXuZKXTGXRF8ENp-x1GxV4xInNjjEf43krRd9qIWDRr4XW_LmQH4MuWq8FqjEs1gM_4SQ==', 1),
@@ -169,9 +169,9 @@ INSERT INTO `hack_saude`.`Users` (`firstName`, `lastName`, `email`,
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`Patients`
+-- Fill Table `vita_health`.`Patients`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Patients` (`dateOfBirth`, `gender`, `userId`)
+INSERT INTO `vita_health`.`Patients` (`dateOfBirth`, `gender`, `userId`)
 VALUES
 ('1980-05-15', 'male', 1),
 ('1992-09-23', 'female', 3),
@@ -181,9 +181,9 @@ VALUES
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`Doctors`
+-- Fill Table `vita_health`.`Doctors`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Doctors` (`specialty`, `licenseNumber`, `userId`)
+INSERT INTO `vita_health`.`Doctors` (`specialty`, `licenseNumber`, `userId`)
 VALUES
 ('Cardiology', 'CARD1234', 2),
 ('Neurology', 'NEUR5678', 4),
@@ -193,9 +193,9 @@ VALUES
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`RecordTypes`
+-- Fill Table `vita_health`.`RecordTypes`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`RecordTypes` (`recordName`)
+INSERT INTO `vita_health`.`RecordTypes` (`recordName`)
 VALUES
 ('Blood Test'),
 ('MRI Scan'),
@@ -205,9 +205,9 @@ VALUES
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`MedicalRecords`
+-- Fill Table `vita_health`.`MedicalRecords`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`)
+INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`)
 VALUES
 (1, 1, 'Blood test results: Hemoglobin: 14, WBC: 6.7'),
 (2, 2, 'MRI results: No abnormalities detected'),
@@ -217,9 +217,9 @@ VALUES
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`Tokens`
+-- Fill Table `vita_health`.`Tokens`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `expirationDate`)
+INSERT INTO `vita_health`.`Tokens` (`token`, `patientId`, `expirationDate`)
 VALUES
 ('token123', 1, '2024-07-01'),
 ('token456', 2, '2024-07-01'),
@@ -229,9 +229,9 @@ VALUES
 
 
 -- -----------------------------------------------------
--- Fill Table `hack_saude`.`TokenAccess`
+-- Fill Table `vita_health`.`TokenAccess`
 -- -----------------------------------------------------
-INSERT INTO `hack_saude`.`TokenAccess` (`tokenId`, `doctorId`)
+INSERT INTO `vita_health`.`TokenAccess` (`tokenId`, `doctorId`)
 VALUES
 (1, 1),
 (2, 2),
@@ -249,7 +249,7 @@ BEGIN
 DECLARE userConfirmation VARCHAR(45);
 DECLARE userError VARCHAR(45);
 PREPARE CountUsers FROM 'SELECT COUNT(`userId`) INTO @countUsers FROM `Users` WHERE `email` = ?' ;
-PREPARE InsertIntoUsers FROM 'INSERT INTO `hack_saude`.`Users` (`email`, `firstName`, `lastName`, `password`,
+PREPARE InsertIntoUsers FROM 'INSERT INTO `vita_health`.`Users` (`email`, `firstName`, `lastName`, `password`,
 `userType`, `acceptTerms`) VALUES (?, ?, ?, ?, ?, ?)' ;
 START TRANSACTION;
 SET @email = EMAIL;
@@ -260,20 +260,20 @@ SET @userType = USTY;
 SET @acceptTerms = ACTR;
 EXECUTE CountUsers USING @email ;
 IF  @countUsers > 0 THEN
-  ROLLBACK;
-	SET userError = 'Este e-mail já existe' ;
+  ROLLBACK ;
+	SET userError = 'This e-mail already exists' ;
 ELSEIF @acceptTerms != 1 THEN
-	ROLLBACK;
-  SET userError = 'É preciso aceitar os termos e condições' ;
+	ROLLBACK ;
+  SET userError = 'You must accept the terms and conditions' ;
 ELSE
 	EXECUTE InsertIntoUsers USING @email, @firstName, @lastName, @password, @userType, @acceptTerms ;
-	COMMIT;
   EXECUTE CountUsers USING @email ;
   IF @countUsers = 1 THEN
-		SET userConfirmation = 'Usuário criado!' ;
+    COMMIT ;
+		SET userConfirmation = 'User created!' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'Usuário NÃO criado' ;
+		SET userError = 'User NOT created' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -295,8 +295,8 @@ DECLARE userError VARCHAR(45);
 PREPARE CountUsers FROM 'SELECT COUNT(`userId`) INTO @countUsers FROM `Users` WHERE `userId` = ?' ;
 PREPARE CountPatients FROM 'SELECT COUNT(`userId`) INTO @countPatients FROM `Patients` WHERE `userId` = ?' ;
 PREPARE CountDoctors FROM 'SELECT COUNT(`userId`) INTO @countDoctors FROM `Doctors` WHERE `userId` = ?' ;
-PREPARE InsertIntoPatients FROM 'INSERT INTO `hack_saude`.`Patients` (`userId`) VALUES (?)' ;
-PREPARE InsertIntoDoctors FROM 'INSERT INTO `hack_saude`.`Doctors` (`userId`) VALUES (?)' ;
+PREPARE InsertIntoPatients FROM 'INSERT INTO `vita_health`.`Patients` (`userId`) VALUES (?)' ;
+PREPARE InsertIntoDoctors FROM 'INSERT INTO `vita_health`.`Doctors` (`userId`) VALUES (?)' ;
 START TRANSACTION;
 SET @userId = USID;
 SET @userType = USTY;
@@ -304,30 +304,30 @@ EXECUTE CountUsers USING @userId ;
 EXECUTE CountPatients USING @userId ;
 EXECUTE CountDoctors USING @userId ;
 IF @countUsers != 1 THEN
-	ROLLBACK;
-	SET userError = 'Usuário não existe' ;
+	ROLLBACK ;
+	SET userError = 'User does not exist' ;
 ELSEIF  @countPatients > 0 OR @countDoctors > 0 THEN
-  ROLLBACK;
-	SET userError = 'Este usuário já existe' ;
+  ROLLBACK ;
+	SET userError = 'This user already exists' ;
 ELSEIF @userType = 'Patient' THEN
 	EXECUTE InsertIntoPatients USING @userId ;
-	COMMIT;
-    EXECUTE CountPatients USING @userId ;
-    IF @countPatients = 1 THEN
-		SET userConfirmation = 'Usuário criado!' ;
+  EXECUTE CountPatients USING @userId ;
+  IF @countPatients = 1 THEN
+    COMMIT ;
+		SET userConfirmation = 'User created!' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'Usuário NÃO criado' ;
+		SET userError = 'User NOT created' ;
 	END IF ;
 ELSEIF @userType = 'Doctor' THEN
 	EXECUTE InsertIntoDoctors USING @userId ;
-    COMMIT;
-    EXECUTE CountDoctors USING @userId ;
-    IF @countDoctors = 1 THEN
-		SET userConfirmation = 'Usuário criado!' ;
+  EXECUTE CountDoctors USING @userId ;
+  IF @countDoctors = 1 THEN
+    COMMIT ;
+		SET userConfirmation = 'User created!' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'Usuário NÃO criado' ;
+		SET userError = 'User NOT created' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -346,11 +346,11 @@ CREATE PROCEDURE reserveTokenId(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);
-PREPARE CountPreviousToken FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousToken FROM `hack_saude`.`Tokens`
+PREPARE CountPreviousToken FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousToken FROM `vita_health`.`Tokens`
 	WHERE `token` = ? AND `patientId` = ? AND `expirationDate` = ?' ;
-PREPARE InsertIntoTokens FROM 'INSERT INTO `hack_saude`.`Tokens` (`token`, `patientId`, `expirationDate`)
+PREPARE InsertIntoTokens FROM 'INSERT INTO `vita_health`.`Tokens` (`token`, `patientId`, `expirationDate`)
 	VALUES (?, ?, ?)' ;
-PREPARE CountToken FROM 'SELECT COUNT(`tokenId`) INTO @countToken FROM `hack_saude`.`Tokens`
+PREPARE CountToken FROM 'SELECT COUNT(`tokenId`) INTO @countToken FROM `vita_health`.`Tokens`
 	WHERE `token` = ? AND `patientId` = ? AND `expirationDate` = ?' ;
 START TRANSACTION;
 SET @issuedToken = TK;
@@ -358,17 +358,17 @@ SET @patientId = PTID;
 SET @expirationDate = EXP;
 IF @expirationDate < NOW() THEN
 	ROLLBACK ;
-	SET tokenError = 'Data expirada' ;
+	SET tokenError = 'Expired date' ;
 ELSE
 	EXECUTE CountPreviousToken USING @issuedToken, @patientId, @expirationDate ;
 	EXECUTE InsertIntoTokens USING @issuedToken, @patientId, @expirationDate ;
   EXECUTE CountToken USING @issuedToken, @patientId, @expirationDate ;
   IF @countToken - @countPreviousToken = 1 THEN
     COMMIT ;
-    SET tokenConfirmation = 'TokenId reservado' ;
+    SET tokenConfirmation = 'Reserved TokenId' ;
 	ELSE
 		ROLLBACK ;
-    SET tokenError = 'TokenId NÃO reservado' ;
+    SET tokenError = 'TokenId NOT reserved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -388,8 +388,8 @@ CREATE PROCEDURE AddToken(IN TKID INT, IN TK LONGTEXT)
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);
-PREPARE UpdateToken FROM 'UPDATE `hack_saude`.`Tokens` SET `token` = ? WHERE `tokenId` = ?' ;
-PREPARE CountTokenId  FROM 'SELECT COUNT(`tokenId`) INTO @countTokenId FROM `hack_saude`.`Tokens`
+PREPARE UpdateToken FROM 'UPDATE `vita_health`.`Tokens` SET `token` = ? WHERE `tokenId` = ?' ;
+PREPARE CountTokenId  FROM 'SELECT COUNT(`tokenId`) INTO @countTokenId FROM `vita_health`.`Tokens`
 	WHERE `token` = ? AND `tokenId` = ?' ;
 START TRANSACTION;
 SET @reservedTokenId = TKID;
@@ -398,10 +398,10 @@ EXECUTE UpdateToken USING @issuedToken, @reservedTokenId ;
 EXECUTE CountTokenId USING @issuedToken, @reservedTokenId ;
 IF @countTokenId != 1 THEN
 	ROLLBACK ;
-  SET tokenError = 'Token NÃO registrado' ;
+  SET tokenError = 'Token NOT registered' ;
 ELSE
   COMMIT;
-	SET tokenConfirmation = 'Token registrado' ;
+	SET tokenConfirmation = 'Registered Token' ;
 END IF ;
 SELECT * FROM(
   (SELECT tokenConfirmation) tokenConfirmation,
@@ -419,11 +419,11 @@ CREATE PROCEDURE AddTokenAccess(IN TKID INT, IN DTID INT)
 BEGIN
 DECLARE accessConfirmation VARCHAR(45);
 DECLARE accessError VARCHAR(45);
-PREPARE CountPreviousTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousTokenAccess FROM `hack_saude`.`TokenAccess`
+PREPARE CountPreviousTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousTokenAccess FROM `vita_health`.`TokenAccess`
 	WHERE `tokenId` = ?' ;
-PREPARE InsertIntoTokenAccess FROM 'INSERT INTO `hack_saude`.`TokenAccess` (`tokenId`, `doctorId`)
+PREPARE InsertIntoTokenAccess FROM 'INSERT INTO `vita_health`.`TokenAccess` (`tokenId`, `doctorId`)
 	VALUES (?, ?)' ;
-PREPARE CountTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countTokenAccess FROM `hack_saude`.`TokenAccess`
+PREPARE CountTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countTokenAccess FROM `vita_health`.`TokenAccess`
 	WHERE `tokenId` = ?' ;
 START TRANSACTION;
 SET @tokenId = TKID;
@@ -433,10 +433,10 @@ EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
 EXECUTE CountTokenAccess USING @tokenId ;
 IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
 	COMMIT;
-	SET accessConfirmation = 'Acesso salvo' ;
+	SET accessConfirmation = 'Saved access' ;
 ELSE
 	ROLLBACK ;
-  SET accessError = 'Acesso NÃO salvo' ;
+  SET accessError = 'Access NOT saved' ;
 END IF ;
 SELECT * FROM(
   (SELECT accessConfirmation) accessConfirmation,
