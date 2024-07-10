@@ -74,7 +74,7 @@ def resolve_update_user(_, info, input):
         return { 'userError': 'First name must start with at least 2 word characters' }
     if not validate_name(lastName):
         return { 'userError': 'Last name must start with at least 2 word characters' }
-    res = update_user(email, firstName, lastName, userId)
+    res = update_user(email, nh3.clean(firstName), nh3.clean(lastName), userId)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
         res['token'] = handle_login(res['user'])
@@ -102,7 +102,7 @@ def resolve_update_doctor_user(_, info, input):
     doctor = get_users_doctor(info.context['user_detail']['userId'])
     if not doctor:
         return {'userError': 'Missing doctor credential'}
-    res = update_doctor_user(input['specialty'].strip().capitalize(), input['licenseNumber'], doctor['doctorId'])
+    res = update_doctor_user(nh3.clean(input['specialty'].strip().capitalize()), nh3.clean(input['licenseNumber'].strip()), doctor['doctorId'])
     if res['userConfirmation']:
         res['user'] = get_user(info.context['user_detail']['userId'])
     return res
