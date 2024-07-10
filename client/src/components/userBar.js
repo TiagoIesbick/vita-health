@@ -14,7 +14,8 @@ const UserBar = () => {
     const items = [
         {
             label: 'Edit Profile',
-            icon: 'pi pi-user-edit'
+            icon: 'pi pi-user-edit',
+            command: () => navigate("/edit-profile")
         },
         {
             label: 'My Tokens',

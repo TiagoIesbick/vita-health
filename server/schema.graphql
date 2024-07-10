@@ -43,6 +43,8 @@ type Doctors {
 type Mutation {
     createUser(input: CreateUserInput!): UserConfirmation
     createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
+    updateUser(input: UpdateUserInput!): UserConfirmation
+    updatePatientUser(input: UpdatePatientInput!): UserConfirmation
     login(email: String!, password: String!): LoginResult
     generateToken(expirationDate: String!): TokenResult
     saveTokenAccess(tokenId: ID!, doctorId: ID!): TokenAccessResult
@@ -57,10 +59,22 @@ input CreateUserInput {
     acceptTerms: Boolean!
 }
 
+input UpdateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+}
+
+input UpdatePatientInput {
+    dateOfBirth: String!
+    gender: String!
+}
+
 type UserConfirmation {
     userConfirmation: String
     userError: String
     user: Users
+    token: String
 }
 
 type LoginResult {

@@ -61,6 +61,40 @@ def resolve_create_patient_or_doctor_user(*_, userId, userType):
         res['user'] = get_user(userId)
     return res
 
+@mutation.field("updateUser")
+def resolve_update_user(_, info, input):
+    if not info.context['authenticated']:
+        return {'userError': 'Missing authentication'}
+    email, firstName, lastName, userId = \
+        input['email'], input['firstName'].strip().capitalize(), \
+        input['lastName'].strip().capitalize(), info.context['user_detail']['userId']
+    if not validate_email(email):
+        return { 'userError': 'Invalid e-mail'}
+    if not validate_name(firstName):
+        return { 'userError': 'First name must start with at least 2 word characters' }
+    if not validate_name(lastName):
+        return { 'userError': 'Last name must start with at least 2 word characters' }
+    res = update_user(email, firstName, lastName, userId)
+    if res['userConfirmation']:
+        res['user'] = get_user(userId)
+        res['token'] = handle_login(res['user'])
+    return res
+
+@mutation.field("updatePatientUser")
+def resolve_update_patient_user(_, info, input):
+    if not info.context['authenticated']:
+        return {'userError': 'Missing authentication'}
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return {'userError': 'Missing patient credential'}
+    # as my mysql database is recording dates in the Brazilian time zone, it is necessary to transform the date to my respective time zone,
+    # if your mysql database is recording dates in different time zone, transform the 'dateOfBirth' variable into your respective time zone
+    dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d")
+    res = update_patient_user(dateOfBirth, input['gender'], patient['patientId'])
+    if res['userConfirmation']:
+        res['user'] = get_user(info.context['user_detail']['userId'])
+    return res
+
 @mutation.field("login")
 def resolve_login(*_, email, password):
     user = get_user_by_email_password(email, password)

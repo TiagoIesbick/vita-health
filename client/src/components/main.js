@@ -2,6 +2,7 @@ import Home from "./home";
 import MedicalRecords from "./medicalRecords";
 import Login from "./login";
 import CreateUser from "./createUser";
+import EditProfile from "./editProfile";
 import GenerateAccessToken from "./generateAccessToken";
 import InsertToken from "./insertToken";
 import MedicalRecordsAccess from "./medicalRecordsAccess";
@@ -19,6 +20,7 @@ const Main = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/create-user" element={<CreateUser />} />
+                <Route path="/edit-profile" element={user ? <EditProfile /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records" element={user && user.userType === 'Patient' ? <MedicalRecords /> : <Navigate to="/" replace />} />
                 <Route path="/generate-access-token" element={user && user.userType === 'Patient' ? <GenerateAccessToken /> : <Navigate to="/" replace />} />
                 <Route path="/insert-token" element={user && user.userType === 'Doctor' ? <InsertToken /> : <Navigate to="/" replace />} />

@@ -339,10 +339,123 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- Create Procedure to update user
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE UpdateUser(IN EMAIL VARCHAR(255), IN FTNM VARCHAR(255), IN LTNM VARCHAR(255), IN USID INT)
+BEGIN
+DECLARE userConfirmation VARCHAR(45);
+DECLARE userError VARCHAR(45);
+PREPARE CountUsers FROM 'SELECT COUNT(`userId`) INTO @countUsers FROM `Users` WHERE `email` = ?
+	AND `userId` != ?' ;
+PREPARE UpdateUsers FROM 'UPDATE `vita_health`.`Users` SET `email` = ?, `firstName` = ?, `lastName` = ?
+	WHERE `userId` = ?' ;
+PREPARE CountUpdatedUser FROM 'SELECT COUNT(`userId`) INTO @countUpdatedUser FROM `Users` WHERE
+	`email` = ? AND `firstName` = ? AND `lastName` = ?' ;
+START TRANSACTION;
+SET @email = EMAIL;
+SET @firstName = FTNM;
+SET @lastName = LTNM;
+SET @userId = USID ;
+EXECUTE CountUsers USING @email, @userId ;
+IF  @countUsers > 0 THEN
+	ROLLBACK ;
+	SET userError = 'This e-mail already exists' ;
+ELSE
+	EXECUTE UpdateUsers USING @email, @firstName, @lastName, @userId ;
+  EXECUTE CountUpdatedUser USING @email, @firstName, @lastName ;
+  IF @countUpdatedUser = 1 THEN
+    COMMIT ;
+		SET userConfirmation = 'User updated!' ;
+	ELSE
+		ROLLBACK;
+		SET userError = 'User NOT updated' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT userConfirmation) userConfirmation,
+  (SELECT userError) userError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to update patient user
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE UpdatePatientUser(IN DOB DATE, IN GEDR ENUM('male','female','other'), IN PTID INT)
+BEGIN
+DECLARE userConfirmation VARCHAR(45);
+DECLARE userError VARCHAR(45);
+PREPARE UpdatePatientUsers FROM 'UPDATE `vita_health`.`Patients` SET `dateOfBirth` = ?, `gender` = ?
+	WHERE `patientId` = ?' ;
+PREPARE CountUpdatedPatientUser FROM 'SELECT COUNT(`patientId`) INTO @countUpdatedPatientUser FROM `Patients`
+	WHERE `dateOfBirth` = ? AND `gender` = ? AND `patientId` = ?' ;
+START TRANSACTION;
+SET @dateOfBirth = DOB ;
+SET @gender = GEDR ;
+SET @patientId = PTID ;
+IF  @dateOfBirth > NOW() THEN
+	ROLLBACK ;
+	SET userError = 'Date of birth cannot be in the future' ;
+ELSE
+	EXECUTE UpdatePatientUsers USING @dateOfBirth, @gender, @patientId ;
+    EXECUTE CountUpdatedPatientUser USING @dateOfBirth, @gender, @patientId ;
+    IF @CountUpdatedPatientUser = 1 THEN
+    COMMIT ;
+		SET userConfirmation = 'User updated!' ;
+	ELSE
+		ROLLBACK;
+		SET userError = 'User NOT updated' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT userConfirmation) userConfirmation,
+  (SELECT userError) userError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to update doctor user
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE UpdateDoctorUser(IN SPTY VARCHAR(255), IN LINU VARCHAR(255), IN DCID INT)
+BEGIN
+DECLARE userConfirmation VARCHAR(45);
+DECLARE userError VARCHAR(45);
+PREPARE UpdateDoctorUsers FROM 'UPDATE `vita_health`.`Doctors` SET `specialty` = ?, `licenseNumber` = ?
+	WHERE `doctorId` = ?' ;
+PREPARE CountUpdatedDoctorUser FROM 'SELECT COUNT(`doctorId`) INTO @countUpdatedDoctorUser FROM `Doctors`
+	WHERE `specialty` = ? AND `licenseNumber` = ? AND `doctorId` = ?' ;
+START TRANSACTION;
+SET @specialty = SPTY ;
+SET @licenceNumber = LINU ;
+SET @doctorId = DCID ;
+EXECUTE UpdateDoctorUsers USING @specialty, @licenceNumber, @doctorId ;
+EXECUTE CountUpdatedDoctorUser USING @specialty, @licenceNumber, @doctorId ;
+IF @countUpdatedDoctorUser = 1 THEN
+COMMIT ;
+	SET userConfirmation = 'User updated!' ;
+ELSE
+	ROLLBACK;
+	SET userError = 'User NOT updated' ;
+END IF ;
+SELECT * FROM(
+  (SELECT userConfirmation) userConfirmation,
+  (SELECT userError) userError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- Create Procedure to reserve tokenId
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE reserveTokenId(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
+CREATE PROCEDURE ReserveTokenId(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);

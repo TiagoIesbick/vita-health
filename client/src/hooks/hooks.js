@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess } from "../graphql/mutations";
+import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
@@ -17,7 +17,7 @@ export const useCreateUser = () => {
 
     const addUser = async (values) => {
         const { data: { createUser } } = await mutate({
-            variables: { input: values}
+            variables: { input: values }
         });
         console.log('[addUser]:', createUser);
         return createUser;
@@ -96,4 +96,36 @@ export const useSaveTokenAccess = () => {
 export const useUserQuery = (userId) => {
     const { data, loading, error } = useQuery(userQuery, { variables: { id: userId } });
     return {userDetail: data?.user, loadingUser: loading, errorUser: Boolean(error)};
+};
+
+export const useUpdateUser = () => {
+    const [mutate, { loading, error }] = useMutation(mutationUpdateUser);
+
+    const editUser = async (values) => {
+        const { data: { updateUser } } = await mutate({
+            variables: { input: values }
+        });
+        return updateUser;
+    };
+    return {
+        editUser,
+        loadingUpdateUser: loading,
+        errorUpdateUser: error
+    };
+};
+
+export const useUpdatePatientUser = () => {
+    const [mutate, { loading, error }] = useMutation(mutationUpdatePatientUser);
+
+    const editPatientUser = async (values) => {
+        const { data: { updatePatientUser } } = await mutate({
+            variables: { input: values }
+        });
+        return updatePatientUser;
+    };
+    return {
+        editPatientUser,
+        loadingUpdatePatientUser: loading,
+        errorUpdatePatientUser: error
+    };
 };

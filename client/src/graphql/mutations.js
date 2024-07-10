@@ -44,6 +44,33 @@ export const mutationCreatePatientOrDoctor = gql`
     ${userDetailFragment}
 `;
 
+export const mutationUpdateUser = gql`
+    mutation UpdateUser ($input: UpdateUserInput!) {
+        updateUser(input: $input) {
+            userConfirmation
+            userError
+            user {
+                ...UserDetail
+            }
+            token
+        }
+    }
+    ${userDetailFragment}
+`;
+
+export const mutationUpdatePatientUser = gql`
+    mutation UpdatePatientUser ($input: UpdatePatientInput!) {
+        updatePatientUser(input: $input) {
+            userConfirmation
+            userError
+            user {
+                ...UserDetail
+            }
+        }
+    }
+    ${userDetailFragment}
+`;
+
 export const mutationLogin = gql`
     mutation Login ($email: String!, $password: String!) {
         login(email: $email, password: $password) {
