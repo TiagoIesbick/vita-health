@@ -32,6 +32,14 @@ def update_patient_user(dateOfBirth: str, gender: str, patientId: int) -> (None 
         return None
     return confirmation[0]
 
+def update_doctor_user(specialty: str, licenseNumber: str, doctorId: int) -> (None | dict):
+    args = [specialty, licenseNumber, doctorId]
+    query = 'UpdateDoctorUser'
+    confirmation = mysql_results(query, type='procedure', args=args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]
+
 def reserve_token_id(patientId: int, expirationDate: str, token: str = 'reserve') -> (None | dict):
     args = [token, patientId, expirationDate]
     query = 'ReserveTokenId'

@@ -12,24 +12,46 @@ export const userDetailFragment = gql`
     }
 `;
 
+export const patientDetailFragment = gql`
+    fragment PatientDetail on Patients {
+        patientId
+        dateOfBirth
+        gender
+    }
+`;
+
+export const doctorDetailFragment = gql`
+    fragment DoctorDetail on Doctors {
+        doctorId
+        specialty
+        licenseNumber
+    }
+`;
+
+const userConfirmationFragment = gql`
+    fragment UserConfirmationDetail on UserConfirmation {
+        userConfirmation
+        userError
+    }
+`;
+
 export const mutationCreateUser = gql`
     mutation CreateUser ($input: CreateUserInput!) {
         createUser(input: $input) {
-            userConfirmation
-            userError
+            ...UserConfirmationDetail
             user {
                 ...UserDetail
             }
         }
     }
+    ${userConfirmationFragment}
     ${userDetailFragment}
 `;
 
 export const mutationCreatePatientOrDoctor = gql`
     mutation CreatePatientOrDoctorUser ($userId: ID!, $userType: String!) {
         createPatientOrDoctorUser(userId: $userId, userType: $userType) {
-            userConfirmation
-            userError
+            ...UserConfirmationDetail
             user {
                 ...UserDetail
                 patient {
@@ -41,34 +63,64 @@ export const mutationCreatePatientOrDoctor = gql`
             }
         }
     }
+    ${userConfirmationFragment}
     ${userDetailFragment}
 `;
 
 export const mutationUpdateUser = gql`
     mutation UpdateUser ($input: UpdateUserInput!) {
         updateUser(input: $input) {
-            userConfirmation
-            userError
+            ...UserConfirmationDetail
             user {
                 ...UserDetail
             }
             token
         }
     }
+    ${userConfirmationFragment}
     ${userDetailFragment}
 `;
 
 export const mutationUpdatePatientUser = gql`
     mutation UpdatePatientUser ($input: UpdatePatientInput!) {
         updatePatientUser(input: $input) {
-            userConfirmation
-            userError
+            ...UserConfirmationDetail
             user {
                 ...UserDetail
+                patient {
+                    ...PatientDetail
+                }
+                doctor {
+                    ...DoctorDetail
+                }
             }
         }
     }
+    ${userConfirmationFragment}
     ${userDetailFragment}
+    ${patientDetailFragment}
+    ${doctorDetailFragment}
+`;
+
+export const mutationUpdateDoctorUser = gql`
+    mutation UpdateDoctorUser ($input: UpdateDoctorInput!) {
+        updateDoctorUser(input: $input) {
+            ...UserConfirmationDetail
+            user {
+                ...UserDetail
+                patient {
+                    ...PatientDetail
+                }
+                doctor {
+                    ...DoctorDetail
+                }
+            }
+        }
+    }
+    ${userConfirmationFragment}
+    ${userDetailFragment}
+    ${patientDetailFragment}
+    ${doctorDetailFragment}
 `;
 
 export const mutationLogin = gql`

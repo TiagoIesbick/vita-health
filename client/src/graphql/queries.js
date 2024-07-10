@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { userDetailFragment } from './mutations';
+import { doctorDetailFragment, patientDetailFragment, userDetailFragment } from './mutations';
 
 const medicalRecordsFragment = gql`
     fragment MedicalRecordsDetail on MedicalRecords {
@@ -36,16 +36,14 @@ export const userQuery = gql`
         user(userId: $id) {
             ...UserDetail
             patient {
-                patientId
-                gender
-                dateOfBirth
+                ...PatientDetail
             }
             doctor {
-                doctorId
-                specialty
-                licenseNumber
+                ...DoctorDetail
             }
         }
     }
     ${userDetailFragment}
+    ${patientDetailFragment}
+    ${doctorDetailFragment}
 `;

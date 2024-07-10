@@ -4,9 +4,15 @@ import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useUpdateDoctorUser, useUpdateUser } from "../hooks/hooks";
+import { ACCESS_TOKEN_KEY, storeToken } from "../graphql/auth";
+import { useNavigate } from "react-router-dom";
 
 
-const EditDoctorProfile = ({ user, doctor }) => {
+const EditDoctorProfile = ({ user, setUser, doctor, showMessage }) => {
+    const navigate = useNavigate();
+    const { editUser, loadingUpdateUser, errorUpdateUser } = useUpdateUser();
+    const { editDoctorUser, loadingUpdateDoctorUser, errorUpdateDoctorUser } = useUpdateDoctorUser();
     const formik = useFormik({
         initialValues: {
             firstName: user.firstName,
@@ -15,7 +21,22 @@ const EditDoctorProfile = ({ user, doctor }) => {
             specialty: doctor.specialty,
             licenseNumber: doctor.licenseNumber,
         },
-        onSubmit: (values) => console.log(values),
+        onSubmit: async (values) => {
+            const { specialty: _, licenseNumber: __, ...userValues } = values;
+            const resUser = await editUser(userValues);
+            if (resUser.userError) {
+                showMessage('error', 'Error', resUser.userError);
+            } else if (resUser.token) {
+                storeToken(ACCESS_TOKEN_KEY, resUser.token);
+                const resDoctorUser = await editDoctorUser({ specialty: values.specialty, licenseNumber: values.licenseNumber});
+                if (resDoctorUser.userError) {
+                    showMessage('error', 'Error', resDoctorUser.userError);
+                } else {
+                    setUser(resDoctorUser.user);
+                    showMessage('success', 'Success', resDoctorUser.userConfirmation);
+                };
+            };
+        },
         validationSchema: Yup.object({
             firstName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
                 .matches(/^\s*?\w{2,}.*/, 'First name must start with at least 2 word characters'),
@@ -26,7 +47,12 @@ const EditDoctorProfile = ({ user, doctor }) => {
             licenseNumber: Yup.string().required('Required')
         }),
     });
-    console.log('[Edit Doctor Profile]:',formik.values);
+
+    if (errorUpdateUser || errorUpdateDoctorUser) {
+        navigate('/');
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+    };
+
     return (
         <Card
             title="Edit Profile"
@@ -84,7 +110,7 @@ const EditDoctorProfile = ({ user, doctor }) => {
                     <label htmlFor="license-number">License Number</label>
                     {formik.touched.licenseNumber && formik.errors.licenseNumber &&<div className="text-red-500 text-xs">{formik.errors.licenseNumber}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid } />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingUpdateUser || loadingUpdateDoctorUser } loading={loadingUpdateUser || loadingUpdateDoctorUser} />
             </form>
         </Card>
     );

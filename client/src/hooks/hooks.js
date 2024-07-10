@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
@@ -94,7 +94,9 @@ export const useSaveTokenAccess = () => {
 };
 
 export const useUserQuery = (userId) => {
-    const { data, loading, error } = useQuery(userQuery, { variables: { id: userId } });
+    const { data, loading, error } = useQuery(userQuery, {
+        variables: { id: userId }
+    });
     return {userDetail: data?.user, loadingUser: loading, errorUser: Boolean(error)};
 };
 
@@ -119,7 +121,16 @@ export const useUpdatePatientUser = () => {
 
     const editPatientUser = async (values) => {
         const { data: { updatePatientUser } } = await mutate({
-            variables: { input: values }
+            variables: { input: values },
+            update: (cache, { data: { updatePatientUser : { user }}}) => {
+                if (user) {
+                    cache.writeQuery({
+                        query: userQuery,
+                        variables: { id: user.userId },
+                        data: { user }
+                    });
+                };
+            },
         });
         return updatePatientUser;
     };
@@ -127,5 +138,30 @@ export const useUpdatePatientUser = () => {
         editPatientUser,
         loadingUpdatePatientUser: loading,
         errorUpdatePatientUser: error
+    };
+};
+
+export const useUpdateDoctorUser = () => {
+    const [mutate, { loading, error }] = useMutation(mutationUpdateDoctorUser);
+
+    const editDoctorUser = async (values) => {
+        const { data: { updateDoctorUser } } = await mutate({
+            variables: { input: values },
+            update: (cache, { data: { updateDoctorUser : { user }}}) => {
+                if (user) {
+                    cache.writeQuery({
+                        query: userQuery,
+                        variables: { id: user.userId },
+                        data: { user }
+                    });
+                };
+            },
+        });
+        return updateDoctorUser;
+    };
+    return {
+        editDoctorUser,
+        loadingUpdateDoctorUser: loading,
+        errorUpdateDoctorUser: error
     };
 };

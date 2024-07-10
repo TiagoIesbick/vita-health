@@ -25,7 +25,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
             dateOfBirth: new Date(patient.dateOfBirth + 'T03:00:00Z'), // As I am in the Brazilian time zone, it was necessary to add 3 hours to return the date as saved in the database
             gender: patient.gender,
         },
-        onSubmit: async (values, { resetForm }) => {
+        onSubmit: async (values) => {
             const { dateOfBirth: _, gender: __, ...userValues} = values;
             const resUser = await editUser(userValues);
             if (resUser.userError) {
@@ -36,8 +36,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                 if (resPatientUser.userError) {
                     showMessage('error', 'Error', resPatientUser.userError);
                 } else {
-                    setUser(resPatientUser.user);
-                    resetForm();
+                    setUser(resUser.user);
                     showMessage('success', 'SUCCESS', resPatientUser.userConfirmation);
                 };
             };

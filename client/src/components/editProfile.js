@@ -19,7 +19,7 @@ const EditProfile = () => {
     return (
         <>
             {user && user.userType === 'Patient' && <EditPatientProfile patient={userDetail.patient} user={user} setUser={setUser} showMessage={showMessage} />}
-            {user && user.userType === 'Doctor' && <EditDoctorProfile doctor={userDetail.doctor} user={user} />}
+            {user && user.userType === 'Doctor' && <EditDoctorProfile doctor={userDetail.doctor} user={user} setUser={setUser} showMessage={showMessage} />}
         </>
     );
 };

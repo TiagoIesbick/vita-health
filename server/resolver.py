@@ -95,6 +95,18 @@ def resolve_update_patient_user(_, info, input):
         res['user'] = get_user(info.context['user_detail']['userId'])
     return res
 
+@mutation.field("updateDoctorUser")
+def resolve_update_doctor_user(_, info, input):
+    if not info.context['authenticated']:
+        return {'userError': 'Missing authentication'}
+    doctor = get_users_doctor(info.context['user_detail']['userId'])
+    if not doctor:
+        return {'userError': 'Missing doctor credential'}
+    res = update_doctor_user(input['specialty'].strip().capitalize(), input['licenseNumber'], doctor['doctorId'])
+    if res['userConfirmation']:
+        res['user'] = get_user(info.context['user_detail']['userId'])
+    return res
+
 @mutation.field("login")
 def resolve_login(*_, email, password):
     user = get_user_by_email_password(email, password)
