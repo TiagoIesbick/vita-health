@@ -1,6 +1,24 @@
 import { gql } from '@apollo/client';
 import { doctorDetailFragment, patientDetailFragment, userDetailFragment } from './mutations';
 
+
+export const userQuery = gql`
+    query User($id: ID!) {
+        user(userId: $id) {
+            ...UserDetail
+            patient {
+                ...PatientDetail
+            }
+            doctor {
+                ...DoctorDetail
+            }
+        }
+    }
+    ${userDetailFragment}
+    ${patientDetailFragment}
+    ${doctorDetailFragment}
+`;
+
 const medicalRecordsFragment = gql`
     fragment MedicalRecordsDetail on MedicalRecords {
         recordId
@@ -31,19 +49,24 @@ export const medicalRecordsByPatientIdQuery = gql`
     ${medicalRecordsFragment}
 `;
 
-export const userQuery = gql`
-    query User($id: ID!) {
-        user(userId: $id) {
-            ...UserDetail
-            patient {
-                ...PatientDetail
-            }
-            doctor {
-                ...DoctorDetail
+export const activeTokensQuery = gql`
+    query ActiveTokens {
+        activeTokens {
+            tokenId
+            token
+            expirationDate
+            tokenAccess {
+                tokenAccessId
+                accessTime
+                doctor {
+                    ...DoctorDetail
+                    user {
+                        firstName
+                        lastName
+                    }
+                }
             }
         }
     }
-    ${userDetailFragment}
-    ${patientDetailFragment}
     ${doctorDetailFragment}
 `;
