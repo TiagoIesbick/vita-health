@@ -40,11 +40,23 @@ def resolve_patients_user(patients, *_):
         return None
     return get_user(patients['userId'])
 
+@patients.field("tokens")
+def resolve_patients_tokens(patients, info):
+    if not info.context['authenticated'] or not patients['patientId']:
+        return None
+    return get_patients_tokens(patients['patientId'])
+
 @doctors.field("user")
 def resolve_doctors_user(doctors, *_):
     if not doctors['userId']:
         return None
     return get_user(doctors['userId'])
+
+@doctors.field("tokensAccess")
+def resolve_doctors_user(doctors, info):
+    if not info.context['authenticated'] or not doctors['doctorId']:
+        return None
+    return get_doctors_tokens_access(doctors['userId'])
 
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
@@ -201,6 +213,12 @@ def resolve_save_token_access(_, info, tokenId, doctorId):
         return {'acessError': 'Missing healthcare professional credential'}
     return create_token_access(tokenId, doctorId)
 
+@tokens.field("patient")
+def resolve_tokens_patient(tokens, info):
+    if not info.context['authenticated'] or not tokens['patientId']:
+        return None
+    return get_patient(tokens['patientId'])
+
 @tokens.field("tokenAccess")
 def resolve_tokens_token_access(tokens, info):
     if not info.context['authenticated'] or not tokens['tokenId']:
@@ -217,4 +235,4 @@ def resolve_token_access_token(tokenAccess, info):
 def resolve_token_access_doctor(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
-    return get_token_access_doctor(tokenAccess['doctorId'])
+    return get_doctor(tokenAccess['doctorId'])
