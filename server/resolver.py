@@ -11,8 +11,12 @@ import nh3
 
 query = QueryType()
 users = ObjectType("Users")
+patients = ObjectType("Patients")
+doctors = ObjectType("Doctors")
 mutation = MutationType()
 medical_records = ObjectType("MedicalRecords")
+tokens = ObjectType("Tokens")
+token_access = ObjectType("TokenAccess")
 
 @query.field("user")
 def resolve_user(*_, userId):
@@ -29,6 +33,18 @@ def resolve_users_patient(users, *_):
     if not users['userId']:
         return None
     return get_users_doctor(users['userId'])
+
+@patients.field("user")
+def resolve_patients_user(patients, *_):
+    if not patients['userId']:
+        return None
+    return get_user(patients['userId'])
+
+@doctors.field("user")
+def resolve_doctors_user(doctors, *_):
+    if not doctors['userId']:
+        return None
+    return get_user(doctors['userId'])
 
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
@@ -184,3 +200,21 @@ def resolve_save_token_access(_, info, tokenId, doctorId):
     if info.context['user_detail']['userType'] != 'Doctor':
         return {'acessError': 'Missing healthcare professional credential'}
     return create_token_access(tokenId, doctorId)
+
+@tokens.field("tokenAccess")
+def resolve_tokens_token_access(tokens, info):
+    if not info.context['authenticated'] or not tokens['tokenId']:
+        return None
+    return get_tokens_token_access(tokens['tokenId'])
+
+@token_access.field("token")
+def resolve_token_access_token(tokenAccess, info):
+    if not info.context['authenticated'] or not tokenAccess['tokenId']:
+        return None
+    return get_token_access_token(tokenAccess['tokenId'])
+
+@token_access.field("doctor")
+def resolve_token_access_doctor(tokenAccess, info):
+    if not info.context['authenticated'] or not tokenAccess['tokenId']:
+        return None
+    return get_token_access_doctor(tokenAccess['doctorId'])

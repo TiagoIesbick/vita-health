@@ -2,9 +2,12 @@ from .mysql_results import mysql_results
 from utils.utils import decrypt
 from datetime import datetime
 
-def get_user(id: int) -> list[dict]:
+def get_user(id: int) -> (None | dict):
     query = rf'SELECT * FROM Users WHERE userId = {id};'
-    return mysql_results(query)[0]
+    user = mysql_results(query)
+    if len(user) == 0:
+        return None
+    return user[0]
 
 def get_users_patient(id: int) -> (None | dict):
     query = rf'SELECT * FROM Patients WHERE userId = {id};'
@@ -56,3 +59,24 @@ def get_active_tokens_by_patient(id: int) -> (None | list[dict]):
     if len(tokens) == 0:
         return None
     return tokens
+
+def get_tokens_token_access(id: int) -> (None | list[dict]):
+    query = rf'SELECT * FROM TokenAccess WHERE tokenId = {id};'
+    token_accesses = mysql_results(query)
+    if len(token_accesses) == 0:
+        return None
+    return token_accesses
+
+def get_token_access_token(id: int) -> (None | dict):
+    query = rf'SELECT * FROM Tokens WHERE tokenId = {id};'
+    token = mysql_results(query)
+    if len(token) == 0:
+        return None
+    return token[0]
+
+def get_token_access_doctor(id: int) -> (None | dict):
+    query = rf'SELECT * FROM Doctors WHERE doctorId = {id};'
+    doctor = mysql_results(query)
+    if len(doctor) == 0:
+        return None
+    return doctor[0]

@@ -33,12 +33,14 @@ type Patients {
     patientId: ID!
     dateOfBirth: String
     gender: String
+    user: Users
 }
 
 type Doctors {
     doctorId: ID!
     specialty: String
     licenseNumber: String
+    user: Users
 }
 
 type Mutation {
@@ -95,12 +97,20 @@ type Tokens {
     token: String!
     expirationDate: String!
     patientId: ID!
+    tokenAccess: [TokenAccess]
 }
 
 type TokenResult {
     token: Tokens
     tokenConfirmation: String
     tokenError: String
+}
+
+type TokenAccess {
+    tokenAccessId: ID!
+    accessTime: String!
+    token: Tokens
+    doctor: Doctors
 }
 
 type TokenAccessResult {
