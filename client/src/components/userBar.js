@@ -18,8 +18,9 @@ const UserBar = () => {
             command: () => navigate("/edit-profile")
         },
         {
-            label: 'My Tokens',
-            icon: 'pi pi-ticket'
+            label: 'Active Tokens',
+            icon: 'pi pi-ticket',
+            command: () => navigate("/active-tokens")
         },
         {
             separator: true

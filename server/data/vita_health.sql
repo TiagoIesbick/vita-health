@@ -455,7 +455,7 @@ DELIMITER ;
 -- Create Procedure to reserve tokenId
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE ReserveTokenId(IN TK LONGTEXT, IN PTID INT, IN EXP DATETIME)
+CREATE PROCEDURE ReserveTokenId(IN TK VARCHAR(255), IN PTID INT, IN EXP DATETIME)
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);
@@ -497,7 +497,7 @@ DELIMITER ;
 -- Create Procedure to add tokens
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddToken(IN TKID INT, IN TK LONGTEXT)
+CREATE PROCEDURE AddToken(IN TKID INT, IN TK VARCHAR(255))
 BEGIN
 DECLARE tokenConfirmation VARCHAR(45);
 DECLARE tokenError VARCHAR(45);

@@ -119,6 +119,8 @@ def resolve_login(*_, email, password):
 def resolve_medical_records(_, info):
     if not info.context['authenticated']:
         return None
+    if info.context['user_detail']['userType'] != 'Patient':
+        return None
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
         return None
@@ -135,6 +137,17 @@ def resolve_medical_records_by_patient_id(_, info, patientId):
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
     return get_medical_records_type(medicalRecords['recordTypeId'])
+
+@query.field("activeTokens")
+def resolve_patients_active_tokens(_, info):
+    if not info.context['authenticated']:
+        return None
+    if info.context['user_detail']['userType'] != 'Patient':
+        return None
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    return get_active_tokens_by_patient(patient['patientId'])
 
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):

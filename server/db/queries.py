@@ -1,5 +1,6 @@
 from .mysql_results import mysql_results
 from utils.utils import decrypt
+from datetime import datetime
 
 def get_user(id: int) -> list[dict]:
     query = rf'SELECT * FROM Users WHERE userId = {id};'
@@ -28,7 +29,7 @@ def get_user_by_email_password(email:str, password:str) -> (None | dict):
         return None
     return user[0]
 
-def get_medical_records_by_pacient(id: int) -> list[dict]:
+def get_medical_records_by_pacient(id: int) -> (None | list[dict]):
     query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id};'
     records = mysql_results(query)
     if len(records) == 0:
@@ -48,3 +49,10 @@ def get_token(id: int) -> (None | dict):
     if len(token) == 0:
         return None
     return token[0]
+
+def get_active_tokens_by_patient(id: int) -> (None | list[dict]):
+    query = rf"SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate > '{datetime.now()}';"
+    tokens = mysql_results(query)
+    if len(tokens) == 0:
+        return None
+    return tokens

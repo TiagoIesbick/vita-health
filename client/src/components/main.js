@@ -6,6 +6,7 @@ import EditProfile from "./editProfile";
 import GenerateAccessToken from "./generateAccessToken";
 import InsertToken from "./insertToken";
 import MedicalRecordsAccess from "./medicalRecordsAccess";
+import ActiveTokens from "./activeTokens";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
@@ -25,6 +26,7 @@ const Main = () => {
                 <Route path="/generate-access-token" element={user && user.userType === 'Patient' ? <GenerateAccessToken /> : <Navigate to="/" replace />} />
                 <Route path="/insert-token" element={user && user.userType === 'Doctor' ? <InsertToken /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records-access" element={user && user.userType === 'Doctor' && patient ? <MedicalRecordsAccess />: <Navigate to="/" replace />} />
+                <Route path="/active-tokens" element={user ? <ActiveTokens /> : <Navigate to="/" replace />} />
             </Routes>
         </main>
     );
