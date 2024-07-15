@@ -82,7 +82,7 @@ def get_token(id: int) -> (None | dict):
     return token[0]
 
 def get_active_tokens_by_patient(id: int) -> (None | list[dict]):
-    query = rf"SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate > '{datetime.now()}';"
+    query = rf"SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate > '{datetime.now()}' ORDER BY expirationDate;"
     tokens = mysql_results(query)
     if len(tokens) == 0:
         return None

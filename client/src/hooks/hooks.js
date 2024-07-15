@@ -167,6 +167,6 @@ export const useUpdateDoctorUser = () => {
 };
 
 export const useActiveTokens = () => {
-    const { data, loading, error } = useQuery(activeTokensQuery);
+    const { data, loading, error } = useQuery(activeTokensQuery, {fetchPolicy: 'network-only'});
     return {activeTokens: data?.activeTokens, loading, error: Boolean(error)};
 };

@@ -10,6 +10,7 @@ import { useGenerateToken } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import CopyButton from "./copyButton";
 
 
 const GenerateAccessToken = () => {
@@ -73,7 +74,10 @@ const GenerateAccessToken = () => {
                 style={{ width: '50vw' }}
                 onHide={() => {if (!visible) return; setVisible(false); setToken('');}}
             >
-                <p style={{ wordBreak: 'break-word' }} className="m-0">{token}</p>
+                <p style={{ wordBreak: 'break-word' }} className="my-1 text-center">{token}</p>
+                <div className="flex justify-content-end">
+                    <CopyButton txt={token} />
+                </div>
             </Dialog>
         </Card>
     );
