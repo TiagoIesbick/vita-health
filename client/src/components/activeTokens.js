@@ -64,14 +64,17 @@ const ActiveTokens = () => {
     const itemTemplate = (token, layout, index) => {
         if (!token) {
             return;
-        }
+        };
 
         if (layout === 'list') return listItem(token, index);
         else if (layout === 'grid') return gridItem(token);
     };
 
-    const listTemplate = (products, layout) => {
-        return <div className="grid grid-nogutter">{products.map((product, index) => itemTemplate(product, layout, index))}</div>;
+    const listTemplate = (tokens, layout) => {
+        if (!tokens) {
+            return;
+        };
+        return <div className="grid grid-nogutter">{tokens.map((token, index) => itemTemplate(token, layout, index))}</div>;
     };
 
     const header = () => {
