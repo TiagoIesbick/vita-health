@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { activeTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
 import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 export const useMedicalRecords = () => {
@@ -166,7 +166,12 @@ export const useUpdateDoctorUser = () => {
     };
 };
 
-export const useActiveTokens = () => {
-    const { data, loading, error } = useQuery(activeTokensQuery, {fetchPolicy: 'network-only'});
-    return {activeTokens: data?.activeTokens, loading, error: Boolean(error)};
+export const useActivePatientTokens = () => {
+    const { data, loading, error } = useQuery(activePatientTokensQuery, {fetchPolicy: 'network-only'});
+    return {activePatientTokens: data?.activePatientTokens, loadingActivePatientTokens: loading, errorActivePatientTokens: Boolean(error)};
+};
+
+export const useActiveDoctorTokens = () => {
+    const { data, loading, error } = useQuery(activeDoctorTokensQuery, {fetchPolicy: 'network-only'});
+    return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
 };

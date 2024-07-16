@@ -102,4 +102,11 @@ def get_token_access_token(id: int) -> (None | dict):
         return None
     return token[0]
 
-
+def get_active_tokens_by_doctor(id: int) -> (None | list[dict]):
+    query = rf'''SELECT a.tokenId, a.token, a.patientId, a.expirationDate from Tokens a INNER JOIN
+        (SELECT DISTINCT tokenId FROM TokenAccess WHERE doctorId = {id}) v ON a.tokenId = v.tokenId
+        WHERE expirationDate > '{datetime.now()}' ORDER BY expirationDate;'''
+    tokens = mysql_results(query)
+    if len(tokens) == 0:
+        return None
+    return tokens

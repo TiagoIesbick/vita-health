@@ -2,7 +2,8 @@ type Query {
     medicalRecords: [MedicalRecords]
     medicalRecordsByPatientId(patientId: ID!): [MedicalRecords]
     user(userId: ID!): Users
-    activeTokens: [Tokens]
+    activePatientTokens: [Tokens]
+    activeDoctorTokens: [Tokens]
 }
 
 type MedicalRecords {

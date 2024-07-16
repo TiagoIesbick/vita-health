@@ -49,9 +49,9 @@ export const medicalRecordsByPatientIdQuery = gql`
     ${medicalRecordsFragment}
 `;
 
-export const activeTokensQuery = gql`
-    query ActiveTokens {
-        activeTokens {
+export const activePatientTokensQuery = gql`
+    query ActivePatientTokens {
+        activePatientTokens {
             tokenId
             token
             expirationDate
@@ -69,4 +69,22 @@ export const activeTokensQuery = gql`
         }
     }
     ${doctorDetailFragment}
+`;
+
+export const activeDoctorTokensQuery = gql`
+    query ActiveDoctorTokens {
+        activeDoctorTokens {
+            tokenId
+            token
+            expirationDate
+            patient {
+                ...PatientDetail
+                user {
+                    firstName
+                    lastName
+                }
+            }
+        }
+    }
+    ${patientDetailFragment}
 `;
