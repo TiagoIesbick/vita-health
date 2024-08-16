@@ -1,6 +1,5 @@
 from ariadne import QueryType, ObjectType, MutationType
 from datetime import datetime
-from pytz import timezone
 from db.queries import *
 from db.mutations import *
 from utils.utils import encrypt, validate_email, validate_password, \
@@ -115,9 +114,7 @@ def resolve_update_patient_user(_, info, input):
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
         return {'userError': 'Missing patient credential'}
-    # as my mysql database is recording dates in the Brazilian time zone, it is necessary to transform the date to my respective time zone,
-    # if your mysql database is recording dates in different time zone, transform the 'dateOfBirth' variable into your respective time zone
-    dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d")
+    dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).strftime("%Y-%m-%d")
     res = update_patient_user(dateOfBirth, input['gender'], patient['patientId'])
     if res['userConfirmation']:
         res['user'] = get_user(info.context['user_detail']['userId'])
@@ -195,9 +192,7 @@ def resolve_generate_token(_, info, expirationDate):
     patient = get_users_patient(info.context['user_detail']['userId'])
     if not patient:
         return {'tokenError': 'Missing patient credential'}
-    # as my mysql database is recording dates in the Brazilian time zone, it is necessary to transform the date to my respective time zone,
-    # if your mysql database is recording dates in different time zone, transform the 'exp' variable into your respective time zone
-    exp = datetime.fromisoformat(expirationDate).astimezone(timezone('America/Sao_Paulo')).strftime("%Y-%m-%d %H:%M:%S")
+    exp = datetime.fromisoformat(expirationDate).strftime("%Y-%m-%d %H:%M:%S")
     reserve_tokenId = reserve_token_id(patient['patientId'], exp)
     if reserve_tokenId['tokenError']:
         return {'tokenError': reserve_tokenId['tokenError']}

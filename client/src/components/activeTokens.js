@@ -6,6 +6,7 @@ import { classNames } from 'primereact/utils';
 import { useState } from "react";
 import { useUser } from "../providers/userContext";
 import CopyButton from "./copyButton";
+import { localDateTime } from "../utils/utils";
 
 
 const ActiveTokens = () => {
@@ -42,6 +43,8 @@ const ActiveTokens = () => {
     };
 
     const gridItem = (token) => {
+        let date = localDateTime(token.expirationDate, 'minus');
+
         return (
             <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={token.tokenId}>
                 <div className="p-4 border-1 surface-border surface-card border-round">
@@ -55,7 +58,7 @@ const ActiveTokens = () => {
                     <div className={classNames('flex align-items-center', { 'justify-content-between': user.userType === 'Patient', 'justify-content-center': user.userType === 'Doctor' })}>
                         <div className='flex gap-1 text-sm'>
                             <i className="pi pi-hourglass"></i>
-                            <span>{token.expirationDate.slice(0, -3)}</span>
+                            <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                         </div>
                         {user.userType === 'Patient' &&
                             <Button text severity={'secondary'} className="gap-1 text-sm p-0">

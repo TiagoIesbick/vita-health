@@ -23,7 +23,7 @@ const InsertToken = () => {
             storeToken(ACCESS_MEDICAL_TOKEN_KEY, values.token);
             const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
             if (Date.parse(credentials.exp) <= Date.now()) {
-                showMessage('error', 'Error', 'Token expirado');
+                showMessage('error', 'Error', 'Expired token');
                 setPatient(null);
                 localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
             } else {

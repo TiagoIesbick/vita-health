@@ -3,7 +3,7 @@ import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { RadioButton } from 'primereact/radiobutton';
 import { Calendar } from "primereact/calendar";
-import { toDay } from "../utils/utils";
+import { localDateTime, toDay } from "../utils/utils";
 import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -22,7 +22,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            dateOfBirth: new Date(patient.dateOfBirth + 'T03:00:00Z'), // As I am in the Brazilian time zone, it was necessary to add 3 hours to return the date as saved in the database
+            dateOfBirth: localDateTime(patient.dateOfBirth),
             gender: patient.gender,
         },
         onSubmit: async (values) => {

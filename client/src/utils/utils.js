@@ -18,3 +18,10 @@ export const passwordFooter = (
 export const toDay = new Date();
 
 export const toDayPlus90 = new Date( Date.now() + 90 * 24 * 60 * 60 * 1000);
+
+export const localDateTime = (date, operation) => {
+    const timeZoneOffset = new Date().getTimezoneOffset() / 60;
+    let localDate = new Date(date);
+    if (operation === 'minus') return new Date(localDate.setHours(localDate.getHours() - timeZoneOffset));
+    return new Date(localDate.setHours(localDate.getHours() + timeZoneOffset));
+};
