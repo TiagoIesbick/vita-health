@@ -6,9 +6,9 @@ from mysql.connector import errorcode
 def get_connection() -> connector.connection_cext.CMySQLConnection:
     try:
         connection = connector.connect(
-            user=getenv('USER'),
-            password=getenv('PASSWORD'),
-            database=getenv('DATABASE'),
+            user=getenv('MYSQL_USER'),
+            password=getenv('MYSQL_PASSWORD'),
+            database=getenv('MYSQL_DATABASE'),
             host=getenv('HOST'),
             port=getenv('PORT')
             )
