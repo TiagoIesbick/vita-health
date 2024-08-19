@@ -1,6 +1,5 @@
 services:
   client:
-    container_name: client-vita-health
     restart: always
     build: ./client
     ports:
@@ -12,19 +11,17 @@ services:
       - WATCHPACK_POLLING=true
   database:
     image: mysql:8.0
-    container_name: mysql-vita-health
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: vita_health
-      MYSQL_DATABASE: vita_health
-      MYSQL_USER: vita_health
-      MYSQL_PASSWORD: vita_health
+      MYSQL_ROOT_PASSWORD: ${PASSWORD}
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${USER}
+      MYSQL_PASSWORD: ${PASSWORD}
       TZ: UTC
     volumes:
       - ./database:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
   server:
-    container_name: server-vita-health
     restart: always
     build: ./server
     ports:
@@ -35,6 +32,8 @@ services:
       - ./server:/server
     depends_on:
       - database
+    env_file:
+      - .env
 
 volumes:
   mysql_data:

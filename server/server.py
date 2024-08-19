@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from ariadne.asgi import GraphQL
 from ariadne import load_schema_from_path, make_executable_schema
 from starlette.applications import Starlette
@@ -11,7 +10,6 @@ from auth import BasicAuthBackend
 from resolver import query, users, patients, doctors, mutation, medical_records, \
     tokens, token_access
 
-load_dotenv()
 
 type_defs = load_schema_from_path("schema.graphql")
 

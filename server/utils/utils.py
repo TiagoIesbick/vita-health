@@ -1,10 +1,8 @@
 from cryptography.fernet import Fernet
-from dotenv import load_dotenv
 from os import getenv
 import re
 import jwt
 
-load_dotenv()
 
 fernet = Fernet(getenv('FERNET_KEY'))
 
