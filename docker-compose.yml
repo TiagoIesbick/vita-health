@@ -2,11 +2,9 @@ services:
   client:
     restart: always
     build: ./client
-    ports:
-      - '3000:3000'
-    environment:
-      WATCHPACK_POLLING: true
-      NODE_ENV: production
+    depends_on:
+      - server
+
   database:
     image: mysql:8.0
     restart: always
@@ -19,6 +17,7 @@ services:
     volumes:
       - ./database:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
+
   server:
     restart: always
     build: ./server
@@ -28,5 +27,15 @@ services:
       - database
     env_file:
       - .env
+
+  nginx:
+    restart: always
+    build: .
+    ports:
+      - '80:80'
+    depends_on:
+      - client
+      - server
+
 volumes:
   mysql_data:
