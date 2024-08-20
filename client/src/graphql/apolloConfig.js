@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink, concat } from '@apollo/client';
 import { getAccessToken, ACCESS_TOKEN_KEY } from './auth';
 
-const BASE_URL_SERVER = 'http://127.0.0.1:8000';
+const BASE_URL_SERVER = 'http://108.59.82.50:8000';
 
 const httpLink = createHttpLink({ uri: BASE_URL_SERVER + '/graphql/' })
 

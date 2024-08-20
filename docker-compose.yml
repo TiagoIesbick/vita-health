@@ -4,9 +4,6 @@ services:
     build: ./client
     ports:
       - '3000:3000'
-    volumes:
-      - /client/node_modules
-      - ./client:/client
     environment:
       - WATCHPACK_POLLING=true
   database:
@@ -26,14 +23,9 @@ services:
     build: ./server
     ports:
       - '8000:8000'
-    volumes:
-      - /server/__pycache__
-      - /server/db/__pycache__
-      - ./server:/server
     depends_on:
       - database
     env_file:
       - .env
-
 volumes:
   mysql_data:
