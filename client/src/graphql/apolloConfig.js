@@ -1,7 +1,9 @@
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink, concat } from '@apollo/client';
 import { getAccessToken, ACCESS_TOKEN_KEY } from './auth';
 
-const BASE_URL_SERVER = 'http://108.59.82.50:8000';
+const BASE_URL_SERVER = process.env.NODE_ENV === 'production'
+    ? 'http://108.59.82.50:8000'
+    : 'http://localhost:8000';
 
 const httpLink = createHttpLink({ uri: BASE_URL_SERVER + '/graphql/' })
 
