@@ -1,6 +1,5 @@
 services:
   client:
-    restart: always
     build: ./client
     volumes:
       - client-build:/client/build
