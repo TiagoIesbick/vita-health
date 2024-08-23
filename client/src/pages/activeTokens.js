@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { useState } from "react";
 import { useUser } from "../providers/userContext";
-import CopyButton from "./copyButton";
+import CopyButton from "../components/copyButton";
 import { localDateTime } from "../utils/utils";
 
 
@@ -16,12 +16,13 @@ const ActiveTokens = () => {
     const [layout, setLayout] = useState('grid');
 
     const listItem = (token, index) => {
+        let date = localDateTime(token.expirationDate, 'minus');
         return (
             <div className="col-12" key={token.tokenId}>
                 <div className={classNames('flex flex-column gap-3', { 'border-top-1 surface-border': index !== 0 })}>
                     <div className={classNames('flex font-semibold mt-3 justify-content-center', { 'gap-3': user.userType === 'Doctor' })} >
                         {user.userType === 'Doctor' && <span className="flex gap-1"><i className="pi pi-user"></i>{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>}
-                        <span className="flex gap-1"><i className="pi pi-hourglass"></i>{token.expirationDate.slice(0, -3)}</span>
+                        <span className="flex gap-1"><i className="pi pi-hourglass"></i>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                     </div>
                     <div className="flex align-items-center gap-3 mb-3 justify-content-between">
                         <span className="flex align-items-center gap-2">

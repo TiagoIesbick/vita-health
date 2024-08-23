@@ -1,12 +1,12 @@
-import Home from "./home";
-import MedicalRecords from "./medicalRecords";
-import Login from "./login";
+import Home from "../pages/home";
+import MedicalRecords from "../pages/medicalRecords";
+import Login from "../pages/login";
 import CreateUser from "./createUser";
 import EditProfile from "./editProfile";
-import GenerateAccessToken from "./generateAccessToken";
+import GenerateAccessToken from "../pages/generateAccessToken";
 import InsertToken from "./insertToken";
-import MedicalRecordsAccess from "./medicalRecordsAccess";
-import ActiveTokens from "./activeTokens";
+import MedicalRecordsAccess from "../pages/medicalRecordsAccess";
+import ActiveTokens from "../pages/activeTokens";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";

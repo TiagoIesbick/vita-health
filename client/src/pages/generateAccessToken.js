@@ -10,7 +10,7 @@ import { useGenerateToken } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import CopyButton from "./copyButton";
+import CopyButton from "../components/copyButton";
 
 
 const GenerateAccessToken = () => {
