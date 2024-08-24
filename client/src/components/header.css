@@ -15,4 +15,5 @@ header nav {
 a:link, a:visited {
     text-decoration: none;
     color: var(--primary-500);
+    font-weight: 500;
 }

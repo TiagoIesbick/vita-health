@@ -1,5 +1,5 @@
-import EditPatientProfile from "./editPatientProfile";
-import EditDoctorProfile from "./editDoctorProfile";
+import EditPatientProfile from "../components/editPatientProfile";
+import EditDoctorProfile from "../components/editDoctorProfile";
 import { useUser } from "../providers/userContext";
 import { useUserQuery } from "../hooks/hooks";
 import { useNavigate } from "react-router-dom";

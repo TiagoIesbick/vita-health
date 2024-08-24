@@ -1,10 +1,10 @@
 import Home from "../pages/home";
 import MedicalRecords from "../pages/medicalRecords";
 import Login from "../pages/login";
-import CreateUser from "./createUser";
-import EditProfile from "./editProfile";
+import CreateUser from "../pages/createUser";
+import EditProfile from "../pages/editProfile";
 import GenerateAccessToken from "../pages/generateAccessToken";
-import InsertToken from "./insertToken";
+import InsertToken from "../pages/insertToken";
 import MedicalRecordsAccess from "../pages/medicalRecordsAccess";
 import ActiveTokens from "../pages/activeTokens";
 import { Routes, Route, Navigate } from "react-router-dom";

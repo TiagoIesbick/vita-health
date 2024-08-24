@@ -43,8 +43,7 @@ const InsertToken = () => {
     return (
         <Card
             title="Insert Token"
-            className="flex justify-content-center align-items-center"
-            style={{minHeight: 'calc(100vh - 128px)'}}
+            className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>

@@ -13,8 +13,7 @@ const MedicalRecords = () => {
     return (
         <Card
             title="Medical Records"
-            className="flex justify-content-center align-items-center"
-            style={{minHeight: 'calc(100vh - 128px)'}}
+            className="flex justify-content-center align-items-center card-min-height"
         >
             <pre>
                 {JSON.stringify(medicalRecords, undefined, 2)}

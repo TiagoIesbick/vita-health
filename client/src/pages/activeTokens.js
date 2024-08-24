@@ -107,7 +107,7 @@ const ActiveTokens = () => {
     };
 
     return (
-        <Card style={{minHeight: 'calc(100vh - 128px)'}}>
+        <Card className="card-min-height">
             <DataView
                 value={user.userType === 'Patient' ? activePatientTokens: activeDoctorTokens}
                 listTemplate={listTemplate}
