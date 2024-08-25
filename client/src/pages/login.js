@@ -82,7 +82,7 @@ const Login = () => {
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">
                 Don't have an account?
-                <Link className='mt-1' to="/create-user">Create an Account</Link>
+                <Link className='mt-1' to="/sign-up">Sign up</Link>
             </div>
         </Card>
     );

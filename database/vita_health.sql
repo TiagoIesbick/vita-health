@@ -213,7 +213,8 @@ VALUES
 (2, 2, 'MRI results: No abnormalities detected'),
 (3, 3, 'X-Ray results: Fracture in left arm'),
 (4, 4, 'Ultrasound results: Normal'),
-(5, 5, 'ECG results: Sinus rhythm, no abnormalities') ;
+(5, 5, 'ECG results: Sinus rhythm, no abnormalities'),
+(1, 2, 'MRI results: No abnormalities detected') ;
 
 
 -- -----------------------------------------------------

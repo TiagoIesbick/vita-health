@@ -1,0 +1,21 @@
+.btn-nav {
+    background-color: var(--primary-100);
+    padding: 3px 5px 5px 5px;
+    border-radius: 6px;
+    width: 5rem;
+    text-align: center;
+    box-shadow: 2px 4px 6px var(--primary-500);
+    transition:
+        scale 0.25s ease-in,
+        opacity 0.25s ease-in,
+        filter 0.25s ease-in;
+    &:hover {
+        scale: 1.2;
+    }
+}
+
+ul:has(.btn-nav:hover) .btn-nav:not(:hover) {
+    scale: 0.8;
+    opacity: 0.8;
+    filter: blur(4px);
+}

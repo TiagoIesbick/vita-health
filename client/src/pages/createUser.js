@@ -76,7 +76,7 @@ const CreateUser = () => {
 
     return (
         <Card
-            title="Create an Account"
+            title="Sign Up"
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
@@ -146,7 +146,7 @@ const CreateUser = () => {
                     <label htmlFor="acceptTerms" className="ml-1 text-sm">Accept Terms</label>
                     {formik.touched.acceptTerms && formik.errors.acceptTerms &&<div className="text-red-500 text-xs">{formik.errors.acceptTerms}</div>}
                 </div>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
+                <Button type="submit" label="Sign Up" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
             </form>
         </Card>
     );

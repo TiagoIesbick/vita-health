@@ -20,7 +20,7 @@ const Main = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/create-user" element={<CreateUser />} />
+                <Route path="/sign-up" element={<CreateUser />} />
                 <Route path="/edit-profile" element={user ? <EditProfile /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records" element={user && user.userType === 'Patient' ? <MedicalRecords /> : <Navigate to="/" replace />} />
                 <Route path="/generate-access-token" element={user && user.userType === 'Patient' ? <GenerateAccessToken /> : <Navigate to="/" replace />} />
