@@ -19,14 +19,8 @@ services:
       - '8000:8000'
     depends_on:
       - database
-    environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      HOST: ${HOST}
-      PORT: ${PORT}
-      FERNET_KEY: ${FERNET_KEY}
-      SECRET: ${SECRET}
+    env_file:
+      - .env
 
   client:
     build: ./client
