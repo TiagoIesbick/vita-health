@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useUser } from "../providers/userContext";
 import CopyButton from "../components/copyButton";
 import { localDateTime } from "../utils/utils";
+import LoadingSkeleton from "../components/skeleton";
 
 
 const ActiveTokens = () => {
@@ -99,7 +100,7 @@ const ActiveTokens = () => {
 
     if ((user.userType === 'Patient' && loadingActivePatientTokens) ||
         (user.userType === 'Doctor' && loadingActiveDoctorTokens)) {
-        return <div>Loading...</div>
+        return <LoadingSkeleton />
     };
     if ((user.userType === 'Patient' && errorActivePatientTokens) ||
         (user.userType === 'Doctor' && errorActiveDoctorTokens)) {
