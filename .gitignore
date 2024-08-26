@@ -1,2 +1,4 @@
 *.yaml
 .env
+id_rsa_gcp.pub
+id_rsa_gcp.pub.pub

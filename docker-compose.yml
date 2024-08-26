@@ -1,11 +1,4 @@
 services:
-  client:
-    build: ./client
-    volumes:
-      - client-build:/client/build
-    depends_on:
-      - server
-
   database:
     image: mysql:8.0
     restart: always
@@ -28,6 +21,13 @@ services:
       - database
     env_file:
       - .env
+
+  client:
+    build: ./client
+    volumes:
+      - client-build:/client/build
+    depends_on:
+      - server
 
   nginx:
     image: nginx:alpine
