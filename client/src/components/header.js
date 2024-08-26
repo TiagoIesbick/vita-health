@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 
 const Header = () => {
     return (
-        <header>
+        <header className="h-5rem">
             <Link to="/"><motion.img src={logo} alt="logo" style={{width: 48}} whileHover={{scale: 1.2}} /></Link>
             <Navbar />
         </header>

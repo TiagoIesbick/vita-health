@@ -4,9 +4,9 @@ import logo from "../assets/logos/logo-vita-no-bg.png";
 
 const Footer = () => {
     return (
-        <footer className="flex justify-content-center align-items-center m-2">
+        <footer className="flex flex-column justify-content-center align-items-center overflow-hidden h-5rem">
             <Link to="/"><motion.img src={logo} alt="logo" style={{width: 48}} whileHover={{scale: 1.2}} /></Link>
-            <p>Empower Your Health: Take Control of Your Medical Data</p>
+            <small>Copyright &copy; 2024</small>
         </footer>
     );
 };
