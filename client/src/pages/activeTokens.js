@@ -8,6 +8,7 @@ import { useUser } from "../providers/userContext";
 import CopyButton from "../components/copyButton";
 import { localDateTime } from "../utils/utils";
 import LoadingSkeleton from "../components/skeleton";
+import './activeTokens.css';
 
 
 const ActiveTokens = () => {
@@ -102,6 +103,7 @@ const ActiveTokens = () => {
         (user.userType === 'Doctor' && loadingActiveDoctorTokens)) {
         return <LoadingSkeleton />
     };
+
     if ((user.userType === 'Patient' && errorActivePatientTokens) ||
         (user.userType === 'Doctor' && errorActiveDoctorTokens)) {
         return <div>Data Unavailable</div>

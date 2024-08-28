@@ -1,0 +1,9 @@
+.p-dataview .p-dataview-header {
+    background: revert;
+    border-width: 0 0 1px 0;
+    padding-top: 0;
+}
+
+.p-dataview .p-dataview-content {
+    background: revert;
+}

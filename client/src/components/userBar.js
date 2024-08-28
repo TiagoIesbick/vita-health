@@ -44,10 +44,17 @@ const UserBar = () => {
                 className="p-link"
                 whileHover={{scale: 1.2}}
                 onClick={(e) => userMenu?.current?.toggle(e)}
+                style={{gridColumn: '9', justifySelf: 'end'}}
             >
                 <Avatar
                     label={user.firstName[0]}
                     shape="circle"
+                    style={{
+                        backgroundColor: 'var(--primary-100)',
+                        color: 'var(--primary-500)',
+                        boxShadow: '2px 4px 6px var(--primary-500)',
+                        fontWeight: 'bold'
+                    }}
                 />
             </motion.button>
         </>

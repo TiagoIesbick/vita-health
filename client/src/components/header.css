@@ -10,6 +10,8 @@ header a {
 
 header nav {
     grid-column: 3 / span 9;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
 }
 
 a:link, a:visited {
