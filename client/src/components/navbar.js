@@ -9,20 +9,22 @@ const Navbar = () => {
     return (
         <nav>
             {user &&
-                <ul className="flex flex-row justify-content-around align-items-center p-0" style={{listStyle: "none"}}>
+                <>
+                <ul className="flex flex-row justify-content-evenly align-items-center p-0" style={{gridColumn: "1 / span 8"}}>
                     {user.userType === 'Patient' &&
                         <>
-                            <li className="btn-nav"><Link to="/medical-records">History</Link></li>
-                            <li className="btn-nav"><Link to="/generate-access-token">Token</Link></li>
+                            <li className="nav-button"><Link to="/medical-records">History</Link></li>
+                            <li className="nav-button"><Link to="/generate-access-token">Token</Link></li>
                         </>
                     }
-                    {user.userType === 'Doctor' && <li><Link to="/insert-token">Token</Link></li>}
-                    {user && user.userType === 'Doctor' && patient && <li><Link to="/medical-records-access">History</Link></li>}
-                    <li><UserBar /></li>
+                    {user.userType === 'Doctor' && <li className="nav-button"><Link to="/insert-token">Token</Link></li>}
+                    {user && user.userType === 'Doctor' && patient && <li className="nav-button"><Link to="/medical-records-access">History</Link></li>}
                 </ul>
+                <UserBar />
+                </>
             }
             {!user &&
-                <ul className="flex flex-row align-items-center justify-content-end gap-2">
+                <ul className="flex flex-row align-items-center justify-content-end gap-2 p-0" style={{gridColumn: "1 / span 9"}}>
                     <li className="btn-nav"><Link to="/login" >Login</Link></li>
                     <li className="btn-nav"><Link to="/sign-up" >Sign up</Link></li>
                 </ul>

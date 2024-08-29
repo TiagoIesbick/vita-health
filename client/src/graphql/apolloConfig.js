@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink, concat } from 
 import { getAccessToken, ACCESS_TOKEN_KEY } from './auth';
 
 const BASE_URL_SERVER = process.env.NODE_ENV === 'production'
-    ? 'https://vita-health.bjornvold.com'
+    ? 'https://vita-health.fr.to'
     : 'http://localhost:8000';
 
 const httpLink = createHttpLink({ uri: BASE_URL_SERVER + '/graphql/' })

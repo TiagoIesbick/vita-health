@@ -9,6 +9,7 @@ const MedicalRecordsAccess = () => {
     const { patient, showMessage } = useUser();
     const { medicalRecords, loading, error } = useMedicalRecordsByPatientId(patient.patientId);
 
+    console.log(patient);
     if (loading) {
         return <>Loading...</>
     };
