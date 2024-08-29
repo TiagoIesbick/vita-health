@@ -28,8 +28,7 @@ services:
     restart: always
     build:
       context: ./client
-      args:
-        ENVIRONMENT: development
+      dockerfile: Dockerfile.development
     ports:
       - '3000:3000'
     volumes:
@@ -37,7 +36,6 @@ services:
       - ./client:/client
     environment:
       WATCHPACK_POLLING: true
-      ENVIRONMENT: development
 
 volumes:
   mysql_data:
