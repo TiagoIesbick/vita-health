@@ -2,8 +2,6 @@ FROM python:3.12
 
 WORKDIR /server
 
-EXPOSE 8000
-
 COPY Pipfile Pipfile.lock ./
 
 RUN pip install pipenv
