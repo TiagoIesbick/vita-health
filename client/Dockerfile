@@ -1,3 +1,5 @@
+ARG ENVIRONMENT=development
+
 FROM node:20-alpine
 
 WORKDIR /client
@@ -8,4 +10,6 @@ RUN npm install --silent
 
 COPY . ./
 
-RUN npm run build
+RUN if [ "$ENVIRONMENT" = "production" ]; then npm run build; fi
+
+CMD if [ "$ENVIRONMENT" = "development" ]; then npm start; fi

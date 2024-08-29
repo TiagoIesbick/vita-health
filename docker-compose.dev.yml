@@ -1,0 +1,43 @@
+services:
+  database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: UTC
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+
+  server:
+    restart: always
+    build: ./server
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./server:/server
+    depends_on:
+      - database
+    env_file:
+      - .env
+
+  client:
+    restart: always
+    build:
+      context: ./client
+      args:
+        ENVIRONMENT: development
+    ports:
+      - '3000:3000'
+    volumes:
+      - /client/node_modules
+      - ./client:/client
+    environment:
+      WATCHPACK_POLLING: true
+      ENVIRONMENT: development
+
+volumes:
+  mysql_data:
