@@ -25,8 +25,7 @@ services:
   client:
     build:
       context: ./client
-      args:
-        ENVIRONMENT: production
+      dockerfile: Dockerfile.production
     volumes:
       - client-build:/client/build
     depends_on:
