@@ -23,7 +23,10 @@ services:
       - .env
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      args:
+        ENVIRONMENT: production
     volumes:
       - client-build:/client/build
     depends_on:
