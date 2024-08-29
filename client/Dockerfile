@@ -1,5 +1,3 @@
-ARG ENVIRONMENT=development
-
 FROM node:20-alpine
 
 WORKDIR /client
