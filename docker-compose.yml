@@ -17,23 +17,32 @@ services:
     build: ./server
     ports:
       - '8000:8000'
-    volumes:
-      - ./server:/server
     depends_on:
       - database
     env_file:
       - .env
 
   client:
-    restart: always
     build: ./client
-    ports:
-      - '3000:3000'
     volumes:
-      - /client/node_modules
-      - ./client:/client
-    environment:
-      - WATCHPACK_POLLING=true
+      - client-build:/client/build
+    depends_on:
+      - server
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - client-build:/usr/share/nginx/html
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - client
+      - server
 
 volumes:
   mysql_data:
+  client-build:
