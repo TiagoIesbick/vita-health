@@ -26,14 +26,18 @@ services:
 
   client:
     restart: always
-    build: ./client
+    build:
+      context: ./client
+      args:
+        ENVIRONMENT: development
     ports:
       - '3000:3000'
     volumes:
       - /client/node_modules
       - ./client:/client
     environment:
-      - WATCHPACK_POLLING=true
+      WATCHPACK_POLLING: true
+      ENVIRONMENT: development
 
 volumes:
   mysql_data:
