@@ -273,7 +273,7 @@ ELSE
     COMMIT ;
 		SET userConfirmation = 'User created!' ;
 	ELSE
-		ROLLBACK;
+		ROLLBACK ;
 		SET userError = 'User NOT created' ;
 	END IF ;
 END IF ;
@@ -555,6 +555,42 @@ END IF ;
 SELECT * FROM(
   (SELECT accessConfirmation) accessConfirmation,
   (SELECT accessError) accessError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to create record types
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddRecordType(IN RCNM VARCHAR(255))
+BEGIN
+DECLARE recordTypeConfirmation VARCHAR(45);
+DECLARE recordTypeError VARCHAR(45);
+PREPARE CountRecordName FROM 'SELECT COUNT(`recordTypeId`) INTO @countRecordName FROM `RecordTypes`
+	WHERE `recordName` = ?' ;
+PREPARE InsertRecordType FROM 'INSERT INTO `vita_health`.`RecordTypes` (`recordName`) VALUES (?)' ;
+START TRANSACTION;
+SET @recordName = RCNM ;
+EXECUTE CountRecordName USING @recordName ;
+IF @countRecordName > 0 THEN
+	ROLLBACK ;
+  SET recordTypeError = 'This category already exists' ;
+ELSE
+	EXECUTE InsertRecordType USING @recordName ;
+  EXECUTE CountRecordName USING @recordName ;
+  IF @countRecordName = 1 THEN
+    COMMIT ;
+    SET recordTypeConfirmation = 'Category created!' ;
+	ELSE
+		ROLLBACK ;
+    SET recordTypeError = 'Category NOT created!' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT recordTypeConfirmation) recordTypeConfirmation,
+  (SELECT recordTypeError) recordTypeError
 );
 END //
 DELIMITER ;

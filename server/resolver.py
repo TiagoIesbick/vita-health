@@ -185,6 +185,15 @@ def resolve_record_types(*_):
     return get_record_types()
 
 
+@mutation.field("createRecordType")
+def resolve_create_record_type(_, info, recordName):
+    if not info.context['authenticated']:
+        return {'recordTypeError': 'Missing authentication'}
+    recordName = ' '.join(nh3.clean(recordName).split()).title()
+    print(recordName)
+    return create_record_type(recordName)
+
+
 @query.field("activePatientTokens")
 def resolve_patients_active_tokens(_, info):
     if not info.context['authenticated']:
