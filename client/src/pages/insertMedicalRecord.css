@@ -1,0 +1,21 @@
+.tox-tinymce {
+    transition:
+        border 0.2s ease-in,
+        box-shadow 0.2s ease-in;
+    &:hover {
+        border: 1px solid var(--primary-500);
+    }
+}
+
+.tox-edit-focus {
+    box-shadow: 0 0 0 0.2rem #ddd6fe !important;
+    border: 1px solid var(--primary-500) !important;
+}
+
+.tox .tox-edit-area::before {
+    border: revert !important;
+}
+
+.dialog-custom-header .p-dialog-header {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+}

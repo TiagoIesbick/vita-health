@@ -1,39 +1,7 @@
 import { gql } from "@apollo/client";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment } from "./fragments";
 
-export const userDetailFragment = gql`
-    fragment UserDetail on Users {
-        userId
-        firstName
-        lastName
-        email
-        password
-        userType
-        acceptTerms
-    }
-`;
 
-export const patientDetailFragment = gql`
-    fragment PatientDetail on Patients {
-        patientId
-        dateOfBirth
-        gender
-    }
-`;
-
-export const doctorDetailFragment = gql`
-    fragment DoctorDetail on Doctors {
-        doctorId
-        specialty
-        licenseNumber
-    }
-`;
-
-const userConfirmationFragment = gql`
-    fragment UserConfirmationDetail on UserConfirmation {
-        userConfirmation
-        userError
-    }
-`;
 
 export const mutationCreateUser = gql`
     mutation CreateUser ($input: CreateUserInput!) {

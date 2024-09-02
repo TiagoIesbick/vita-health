@@ -1,16 +1,19 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
 };
 
+
 export const useMedicalRecordsByPatientId = (patientId) => {
     const { data, loading, error } = useQuery(medicalRecordsByPatientIdQuery, { variables: { patientId } });
     return {medicalRecords: data?.medicalRecordsByPatientId, loading, error: Boolean(error)};
 };
+
 
 export const useCreateUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationCreateUser);
@@ -29,6 +32,7 @@ export const useCreateUser = () => {
     };
 };
 
+
 export const useCreatePatientOrDoctor = () => {
     const [mutate, { loading, error }] = useMutation(mutationCreatePatientOrDoctor);
 
@@ -44,6 +48,7 @@ export const useCreatePatientOrDoctor = () => {
         errorPatientOrDoctor: error
     };
 };
+
 
 export const useLogin = () => {
     const [mutate, { loading, error }] = useMutation(mutationLogin);
@@ -61,6 +66,7 @@ export const useLogin = () => {
     };
 };
 
+
 export const useGenerateToken = () => {
     const [mutate, { loading, error }] = useMutation(mutationGenerateToken);
 
@@ -76,6 +82,7 @@ export const useGenerateToken = () => {
         error
     };
 };
+
 
 export const useSaveTokenAccess = () => {
     const [mutate, { loading, error }] = useMutation(mutationSaveTokenAccess);
@@ -93,12 +100,14 @@ export const useSaveTokenAccess = () => {
     };
 };
 
+
 export const useUserQuery = (userId) => {
     const { data, loading, error } = useQuery(userQuery, {
         variables: { id: userId }
     });
     return {userDetail: data?.user, loadingUser: loading, errorUser: Boolean(error)};
 };
+
 
 export const useUpdateUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdateUser);
@@ -115,6 +124,7 @@ export const useUpdateUser = () => {
         errorUpdateUser: error
     };
 };
+
 
 export const useUpdatePatientUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdatePatientUser);
@@ -141,6 +151,7 @@ export const useUpdatePatientUser = () => {
     };
 };
 
+
 export const useUpdateDoctorUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdateDoctorUser);
 
@@ -166,12 +177,20 @@ export const useUpdateDoctorUser = () => {
     };
 };
 
+
 export const useActivePatientTokens = () => {
     const { data, loading, error } = useQuery(activePatientTokensQuery, {fetchPolicy: 'network-only'});
     return {activePatientTokens: data?.activePatientTokens, loadingActivePatientTokens: loading, errorActivePatientTokens: Boolean(error)};
 };
 
+
 export const useActiveDoctorTokens = () => {
     const { data, loading, error } = useQuery(activeDoctorTokensQuery, {fetchPolicy: 'network-only'});
     return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
+};
+
+
+export const useRecordTypes = () => {
+    const { data, loading, error } = useQuery(recordTypesQuery);
+    return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
 };

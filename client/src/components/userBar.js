@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { logout } from "../graphql/auth";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../providers/userContext";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 
 const UserBar = () => {
@@ -13,14 +13,19 @@ const UserBar = () => {
     const userMenu = useRef(null);
     const items = [
         {
-            label: 'Edit Profile',
-            icon: 'pi pi-user-edit',
-            command: () => navigate("/edit-profile")
+            label: 'Add Health Data',
+            icon: 'pi pi-plus-circle',
+            command: () => navigate("/insert-medical-record")
         },
         {
             label: 'Active Tokens',
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
+        },
+        {
+            label: 'Edit Profile',
+            icon: 'pi pi-user-edit',
+            command: () => navigate("/edit-profile")
         },
         {
             separator: true
