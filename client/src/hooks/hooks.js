@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 
 export const useMedicalRecords = () => {
@@ -193,4 +193,39 @@ export const useActiveDoctorTokens = () => {
 export const useRecordTypes = () => {
     const { data, loading, error } = useQuery(recordTypesQuery);
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
+};
+
+
+export const useCreateRecordType = () => {
+    const [mutate, { loading, error }] = useMutation(mutationCreateRecordType);
+
+    const addRecordType = async ({ category }) => {
+        const { data: { createRecordType } } = await mutate({
+            variables: { recordName: category },
+            update: (cache, { data: { createRecordType }}) => {
+                if (createRecordType.recordTypeError) return;
+                const existingCacheData = cache.readQuery({ query: recordTypesQuery });
+                const newRecordType = {
+                    __typename: 'RecordTypes',
+                    recordTypeId: createRecordType.recordTypeId,
+                    recordName: createRecordType.recordName,
+                };
+                const updatedRecordTypes = [
+                    ...existingCacheData.recordTypes,
+                    newRecordType,
+                ];
+                updatedRecordTypes.sort((a, b) => a.recordName.localeCompare(b.recordName));
+                cache.writeQuery({
+                    query: recordTypesQuery,
+                    data: { recordTypes: updatedRecordTypes }
+                });
+            },
+        });
+        return createRecordType;
+    };
+    return {
+        addRecordType,
+        loadingRecordType: loading,
+        errorRecordType: error
+    };
 };

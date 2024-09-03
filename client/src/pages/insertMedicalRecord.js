@@ -6,10 +6,11 @@ import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import './insertMedicalRecord.css';
-import { useRecordTypes } from "../hooks/hooks";
-import { useEffect, useState } from "react";
+import { useCreateRecordType, useRecordTypes } from "../hooks/hooks";
+import { useEffect, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
+import { useUser } from "../providers/userContext";
 
 
 const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
@@ -17,14 +18,17 @@ const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
 const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
 
 const InsertMedicalRecord = () => {
+    const { showMessage } = useUser();
     const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
+    const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
+    const clickableWarning = useRef(null);
     const [visible, setVisible] = useState(false);
     const formik = useFormik({
         initialValues: {
             recordType: '',
             recordData: ''
         },
-        onSubmit: (values) => console.log(values),
+        onSubmit: () => {},
         validationSchema: Yup.object({
             recordType: Yup.string().required('Required').matches(/\d+$/, "Register new category"),
             recordData: Yup.string().required('Required')
@@ -38,21 +42,38 @@ const InsertMedicalRecord = () => {
         initialValues: {
             category: ''
         },
-        onSubmit: (values) => console.log(values),
+        onSubmit: async (values) => {
+            const resRecordType = await addRecordType(values);
+            if (resRecordType.recordTypeError) {
+                showMessage('error', 'Error', resRecordType.recordTypeError)
+            } else {
+                formik.setFieldValue("recordType", resRecordType.recordTypeId);
+                setVisible(false);
+            };
+        },
         validationSchema: Yup.object({
-            category: Yup.string().required('Required')
+            category: Yup.string().required('Required').min(3, 'Minimum 3 characters')
         })
     });
 
     useEffect(() => {
-        if (formik.values.recordType === 'Other') setVisible(true)
-    }, [formik.values.recordType])
+        if (formik.values.recordType === 'Other') setVisible(true);
+    }, [formik.values.recordType]);
 
-    if (errorRecordTypes) {
-        return <div>Data Unavailable</div>
+    useEffect(() => {
+        if (clickableWarning.current && clickableWarning.current.textContent === 'Register new category') {
+            clickableWarning.current.style.textDecoration = 'underline';
+            clickableWarning.current.style.cursor = 'pointer';
+        };
+    });
+
+    const handleClick = (e) => {
+        if (e.target.textContent === 'Register new category') setVisible(true);
     };
 
-    console.log(formik.values);
+    if (errorRecordTypes || errorRecordType) {
+        return <div>Data Unavailable</div>
+    };
 
     return (
         <Card title="Add Health Data" className="flex justify-content-center align-items-center card-min-height">
@@ -61,14 +82,14 @@ const InsertMedicalRecord = () => {
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": 'Other'}] : formik.initialValues.recordType }
+                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": 'Other...'}] : formik.initialValues.recordType }
                         optionValue="recordTypeId"
                         optionLabel="recordName"
                         className="w-full"
                         {...formik.getFieldProps("recordType")}
                     />
                     <label htmlFor="record-type">Health Data Category</label>
-                    {formik.touched.recordType && formik.errors.recordType &&<div className="text-red-500 text-xs">{formik.errors.recordType}</div>}
+                    {formik.touched.recordType && formik.errors.recordType &&<div ref={clickableWarning} onClick={handleClick} className="text-red-500 text-xs">{formik.errors.recordType}</div>}
                 </FloatLabel>
                 <div>
                     <Editor
@@ -106,20 +127,19 @@ const InsertMedicalRecord = () => {
                 style={{ width: '50vw' }}
                 onHide={() => {if (!visible) return; setVisible(false);}}
             >
-                <form className="flex flex-column pt-4 gap-4">
+                <form className="flex flex-column pt-4 gap-4" onSubmit={formikCategory.handleSubmit}>
                     <FloatLabel>
                         <InputText
                             id="category"
                             className="w-full"
                             {...formikCategory.getFieldProps("category")}
                         />
-                        <label htmlFor="category">Health Data Category</label>
+                        <label htmlFor="category">Category</label>
                         {formikCategory.touched.category && formikCategory.errors.category && <div className="text-red-500 text-xs">{formikCategory.errors.category}</div>}
                     </FloatLabel>
-                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid} />
+                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType} loading={loadingRecordType} />
                 </form>
             </Dialog>
-
         </Card>
     );
 };

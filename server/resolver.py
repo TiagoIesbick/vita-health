@@ -190,7 +190,6 @@ def resolve_create_record_type(_, info, recordName):
     if not info.context['authenticated']:
         return {'recordTypeError': 'Missing authentication'}
     recordName = ' '.join(nh3.clean(recordName).split()).title()
-    print(recordName)
     return create_record_type(recordName)
 
 

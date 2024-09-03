@@ -590,7 +590,9 @@ ELSE
 END IF ;
 SELECT * FROM(
   (SELECT recordTypeConfirmation) recordTypeConfirmation,
-  (SELECT recordTypeError) recordTypeError
+  (SELECT recordTypeError) recordTypeError,
+  (SELECT LAST_INSERT_ID() AS recordTypeId) recordTypeID,
+  (SELECT @recordName AS recordName) recordName
 );
 END //
 DELIMITER ;

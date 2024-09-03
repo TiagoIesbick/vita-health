@@ -1,9 +1,10 @@
 .tox-tinymce {
+    border: 1px solid #d1d5db !important;
     transition:
         border 0.2s ease-in,
         box-shadow 0.2s ease-in;
     &:hover {
-        border: 1px solid var(--primary-500);
+        border: 1px solid var(--primary-500) !important;
     }
 }
 

@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment } from "./fragments";
 
 
-
 export const mutationCreateUser = gql`
     mutation CreateUser ($input: CreateUserInput!) {
         createUser(input: $input) {
@@ -15,6 +14,7 @@ export const mutationCreateUser = gql`
     ${userConfirmationFragment}
     ${userDetailFragment}
 `;
+
 
 export const mutationCreatePatientOrDoctor = gql`
     mutation CreatePatientOrDoctorUser ($userId: ID!, $userType: String!) {
@@ -35,6 +35,7 @@ export const mutationCreatePatientOrDoctor = gql`
     ${userDetailFragment}
 `;
 
+
 export const mutationUpdateUser = gql`
     mutation UpdateUser ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -48,6 +49,7 @@ export const mutationUpdateUser = gql`
     ${userConfirmationFragment}
     ${userDetailFragment}
 `;
+
 
 export const mutationUpdatePatientUser = gql`
     mutation UpdatePatientUser ($input: UpdatePatientInput!) {
@@ -70,6 +72,7 @@ export const mutationUpdatePatientUser = gql`
     ${doctorDetailFragment}
 `;
 
+
 export const mutationUpdateDoctorUser = gql`
     mutation UpdateDoctorUser ($input: UpdateDoctorInput!) {
         updateDoctorUser(input: $input) {
@@ -91,6 +94,7 @@ export const mutationUpdateDoctorUser = gql`
     ${doctorDetailFragment}
 `;
 
+
 export const mutationLogin = gql`
     mutation Login ($email: String!, $password: String!) {
         login(email: $email, password: $password) {
@@ -103,6 +107,7 @@ export const mutationLogin = gql`
     }
     ${userDetailFragment}
 `;
+
 
 export const mutationGenerateToken = gql`
     mutation GenerateToken ($expirationDate: String!) {
@@ -118,6 +123,7 @@ export const mutationGenerateToken = gql`
     }
 `;
 
+
 export const mutationSaveTokenAccess = gql`
     mutation SaveTokenAccess ($tokenId: ID!, $doctorId: ID!) {
         saveTokenAccess(tokenId: $tokenId, doctorId: $doctorId) {
@@ -127,10 +133,23 @@ export const mutationSaveTokenAccess = gql`
     }
 `;
 
+
 export const mutationTokenId = gql`
     mutation TokenId($token: String!, $patientId: ID!, $expirationDate: String!) {
         token(token: $token, patientId: $patientId, expirationDate: $expirationDate) {
             tokenId
+        }
+    }
+`;
+
+
+export const mutationCreateRecordType = gql`
+    mutation CreateRacordType ($recordName: String!) {
+        createRecordType(recordName: $recordName) {
+            recordTypeError
+            recordTypeConfirmation
+            recordTypeId
+            recordName
         }
     }
 `;

@@ -127,4 +127,6 @@ type TokenAccessResult {
 type RecordTypeResult {
     recordTypeConfirmation: String
     recordTypeError: String
+    recordTypeId: ID
+    recordName: String
 }
