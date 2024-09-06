@@ -18,8 +18,8 @@ const EditDoctorProfile = ({ user, setUser, doctor, showMessage }) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            specialty: doctor.specialty,
-            licenseNumber: doctor.licenseNumber,
+            specialty: doctor.specialty || '',
+            licenseNumber: doctor.licenseNumber || '',
         },
         onSubmit: async (values) => {
             const { specialty: _, licenseNumber: __, ...userValues } = values;

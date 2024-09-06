@@ -23,6 +23,14 @@ def get_record_types() -> list[dict]:
     return mysql_results('SELECT * FROM RecordTypes;')
 
 
+def get_medical_record(id: int) -> (None | dict):
+    query = rf'SELECT * FROM MedicalRecords WHERE recordId = {id};'
+    medical_record = mysql_results(query)
+    if len(medical_record) == 0:
+        None
+    return medical_record[0]
+
+
 def get_users_patient(id: int) -> (None | dict):
     query = rf'SELECT * FROM Patients WHERE userId = {id};'
     patient = mysql_results(query)
@@ -74,7 +82,7 @@ def get_user_by_email_password(email:str, password:str) -> (None | dict):
 
 
 def get_medical_records_by_pacient(id: int) -> (None | list[dict]):
-    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id};'
+    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id} ORDER BY dateCreated DESC;'
     records = mysql_results(query)
     if len(records) == 0:
         return None

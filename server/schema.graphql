@@ -1,6 +1,7 @@
 type Query {
     medicalRecords: [MedicalRecords]
     medicalRecordsByPatientId(patientId: ID!): [MedicalRecords]
+    medicalRecord(recordId: ID!): MedicalRecords
     user(userId: ID!): Users
     activePatientTokens: [Tokens]
     activeDoctorTokens: [Tokens]
@@ -57,7 +58,7 @@ type Mutation {
     generateToken(expirationDate: String!): TokenResult
     saveTokenAccess(tokenId: ID!, doctorId: ID!): TokenAccessResult
     createRecordType(recordName: String!): RecordTypeResult
-    createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecords
+    createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
 }
 
 input CreateUserInput {
@@ -129,4 +130,10 @@ type RecordTypeResult {
     recordTypeError: String
     recordTypeId: ID
     recordName: String
+}
+
+type MedicalRecordResult {
+    medicalRecordConfirmation: String
+    medicalRecordError: String
+    medicalRecord: MedicalRecords
 }

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -144,7 +144,7 @@ export const mutationTokenId = gql`
 
 
 export const mutationCreateRecordType = gql`
-    mutation CreateRacordType ($recordName: String!) {
+    mutation CreateRecordType ($recordName: String!) {
         createRecordType(recordName: $recordName) {
             recordTypeError
             recordTypeConfirmation
@@ -152,4 +152,18 @@ export const mutationCreateRecordType = gql`
             recordName
         }
     }
+`;
+
+
+export const mutationCreateMedicalRecord = gql`
+    mutation CreateMedicalRecord ($recordTypeId: ID!, $recordData: String!) {
+        createMedicalRecord(recordTypeId: $recordTypeId, recordData: $recordData) {
+            medicalRecordConfirmation
+            medicalRecordError
+            medicalRecord {
+                ...MedicalRecordsDetail
+            }
+        }
+    }
+    ${medicalRecordsFragment}
 `;

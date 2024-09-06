@@ -20,3 +20,15 @@
 .dialog-custom-header .p-dialog-header {
     padding: 1.5rem 1.5rem 0 1.5rem;
 }
+
+.register-category {
+    text-decoration: underline;
+    cursor: pointer;
+    transition:
+        text-shadow 0.2s ease-in,
+        font-weight 0.2s ease-in;
+    &:hover {
+        text-shadow: 0 0 32px red;
+        font-weight: bold;
+    }
+}

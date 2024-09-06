@@ -596,3 +596,40 @@ SELECT * FROM(
 );
 END //
 DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to create medical records
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddMedicalRecord(IN PTID INT, IN RCTY INT, IN RCDT LONGTEXT)
+BEGIN
+DECLARE medicalRecordConfirmation VARCHAR(45);
+DECLARE medicalRecordError VARCHAR(45);
+PREPARE CountPreviousMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countPreviousMedicalRecord FROM `MedicalRecords`
+	WHERE `patientID` = ?' ;
+PREPARE InsertMedicalRecord FROM 'INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`)
+	VALUES (?, ?, ?)' ;
+PREPARE CountMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countMedicalRecord FROM `MedicalRecords`
+	WHERE `patientID` = ?' ;
+START TRANSACTION;
+SET @patientId = PTID ;
+SET @recordTypeId = RCTY ;
+SET @recordData = RCDT ;
+EXECUTE CountPreviousMedicalRecord USING @patientId ;
+EXECUTE InsertMedicalRecord USING @patientId, @recordTypeId, @recordData ;
+EXECUTE CountMedicalRecord USING @patientId ;
+IF @countMedicalRecord - @countPreviousMedicalRecord = 1 THEN
+	COMMIT ;
+    SET medicalRecordConfirmation = 'Health Data Created!' ;
+ELSE
+	ROLLBACK ;
+	SET medicalRecordError = 'Health Data NOT created!' ;
+END IF ;
+SELECT * FROM(
+  (SELECT medicalRecordConfirmation) medicalRecordConfirmation,
+  (SELECT medicalRecordError) medicalRecordError,
+  (SELECT LAST_INSERT_ID() AS medicalRecordId) medicalRecordId
+);
+END //
+DELIMITER ;

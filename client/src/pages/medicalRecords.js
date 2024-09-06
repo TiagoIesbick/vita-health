@@ -10,7 +10,6 @@ const MedicalRecords = () => {
     const { medicalRecords, loading, error } = useMedicalRecords();
 
     const customizedMarker = (item) => {
-        console.log(item);
         return (
             <span className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1" style={{ backgroundColor: 'var(--primary-500)' }}>
                 <i className={'pi pi-check'}></i>
@@ -21,7 +20,7 @@ const MedicalRecords = () => {
     const customizedContent = (item) => {
         return (
             <Card title={item.recordType.recordName} subTitle={item.dateCreated}>
-                <p>{item.recordData}</p>
+                <div dangerouslySetInnerHTML={{__html: item.recordData}} />
                 <Button label="Read more" className="p-button-text"></Button>
             </Card>
         );

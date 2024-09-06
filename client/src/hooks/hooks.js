@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 
 export const useMedicalRecords = () => {
@@ -22,7 +22,6 @@ export const useCreateUser = () => {
         const { data: { createUser } } = await mutate({
             variables: { input: values }
         });
-        console.log('[addUser]:', createUser);
         return createUser;
     };
     return {
@@ -227,5 +226,22 @@ export const useCreateRecordType = () => {
         addRecordType,
         loadingRecordType: loading,
         errorRecordType: error
+    };
+};
+
+
+export const useCreateMedicalRecord = () => {
+    const [mutate, { loading, error }] = useMutation(mutationCreateMedicalRecord);
+
+    const addMedicalRecord = async (values) => {
+        const { data: { createMedicalRecord } } = await mutate({
+            variables: values,
+            });
+        return createMedicalRecord;
+    };
+    return {
+        addMedicalRecord,
+        loadingMedicalRecord: loading,
+        errorMedicalRecord: error
     };
 };

@@ -166,6 +166,13 @@ def resolve_medical_records(_, info):
     return get_medical_records_by_pacient(patient['patientId'])
 
 
+@query.field("medicalRecord")
+def resolve_get_medical_record(_, info, recordId):
+    if not info.context['authenticated']:
+        return None
+    return get_medical_record(recordId)
+
+
 @query.field("medicalRecordsByPatientId")
 def resolve_medical_records_by_patient_id(_, info, patientId):
     if not info.context['authenticated']:
@@ -178,6 +185,21 @@ def resolve_medical_records_by_patient_id(_, info, patientId):
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
     return get_medical_records_type(medicalRecords['recordTypeId'])
+
+
+@mutation.field("createMedicalRecord")
+def resolve_create_medical_record(_, info, recordTypeId, recordData):
+    if not info.context['authenticated']:
+        return {'medicalRecordError': 'Missing authentication'}
+    if info.context['user_detail']['userType'] != 'Patient':
+        return {'medicalRecordError': 'Missing patient credential'}
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    if res['medicalRecordConfirmation']:
+        res['medicalRecord'] = get_medical_record(res['medicalRecordId'])
+    return res
 
 
 @query.field("recordTypes")
