@@ -12,10 +12,12 @@ import { useLogin } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
+import { useApolloClient } from "@apollo/client";
 
 
 const Login = () => {
     const navigate = useNavigate();
+    const client = useApolloClient();
     const { setUser, showMessage } = useUser();
     const { doLogin, loading, error } = useLogin();
     const formik = useFormik({
@@ -32,6 +34,7 @@ const Login = () => {
             } else if (login.token) {
                 storeToken(ACCESS_TOKEN_KEY, login.token);
                 setUser(login.user);
+                client.resetStore();
                 if (login.user.userType === 'Patient') navigate('/generate-access-token');
                 if (login.user.userType === 'Doctor') navigate('/insert-token');
                 showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
