@@ -30,6 +30,8 @@ services:
       - client-build:/client/build
     depends_on:
       - server
+    environment:
+      REACT_APP_TINYMCE_API_KEY: ${TINYMCE_API_KEY}
 
   nginx:
     image: nginx:alpine
