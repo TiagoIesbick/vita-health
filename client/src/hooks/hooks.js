@@ -1,16 +1,19 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, userQuery } from "../graphql/queries";
-import { mutationCreatePatientOrDoctor, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
 };
 
+
 export const useMedicalRecordsByPatientId = (patientId) => {
     const { data, loading, error } = useQuery(medicalRecordsByPatientIdQuery, { variables: { patientId } });
     return {medicalRecords: data?.medicalRecordsByPatientId, loading, error: Boolean(error)};
 };
+
 
 export const useCreateUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationCreateUser);
@@ -19,7 +22,6 @@ export const useCreateUser = () => {
         const { data: { createUser } } = await mutate({
             variables: { input: values }
         });
-        console.log('[addUser]:', createUser);
         return createUser;
     };
     return {
@@ -28,6 +30,7 @@ export const useCreateUser = () => {
         errorUser: error
     };
 };
+
 
 export const useCreatePatientOrDoctor = () => {
     const [mutate, { loading, error }] = useMutation(mutationCreatePatientOrDoctor);
@@ -45,6 +48,7 @@ export const useCreatePatientOrDoctor = () => {
     };
 };
 
+
 export const useLogin = () => {
     const [mutate, { loading, error }] = useMutation(mutationLogin);
 
@@ -60,6 +64,7 @@ export const useLogin = () => {
         error
     };
 };
+
 
 export const useGenerateToken = () => {
     const [mutate, { loading, error }] = useMutation(mutationGenerateToken);
@@ -77,6 +82,7 @@ export const useGenerateToken = () => {
     };
 };
 
+
 export const useSaveTokenAccess = () => {
     const [mutate, { loading, error }] = useMutation(mutationSaveTokenAccess);
 
@@ -93,12 +99,14 @@ export const useSaveTokenAccess = () => {
     };
 };
 
+
 export const useUserQuery = (userId) => {
     const { data, loading, error } = useQuery(userQuery, {
         variables: { id: userId }
     });
     return {userDetail: data?.user, loadingUser: loading, errorUser: Boolean(error)};
 };
+
 
 export const useUpdateUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdateUser);
@@ -115,6 +123,7 @@ export const useUpdateUser = () => {
         errorUpdateUser: error
     };
 };
+
 
 export const useUpdatePatientUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdatePatientUser);
@@ -141,6 +150,7 @@ export const useUpdatePatientUser = () => {
     };
 };
 
+
 export const useUpdateDoctorUser = () => {
     const [mutate, { loading, error }] = useMutation(mutationUpdateDoctorUser);
 
@@ -166,12 +176,85 @@ export const useUpdateDoctorUser = () => {
     };
 };
 
+
 export const useActivePatientTokens = () => {
     const { data, loading, error } = useQuery(activePatientTokensQuery, {fetchPolicy: 'network-only'});
     return {activePatientTokens: data?.activePatientTokens, loadingActivePatientTokens: loading, errorActivePatientTokens: Boolean(error)};
 };
 
+
 export const useActiveDoctorTokens = () => {
     const { data, loading, error } = useQuery(activeDoctorTokensQuery, {fetchPolicy: 'network-only'});
     return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
+};
+
+
+export const useRecordTypes = () => {
+    const { data, loading, error } = useQuery(recordTypesQuery);
+    return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
+};
+
+
+export const useCreateRecordType = () => {
+    const [mutate, { loading, error }] = useMutation(mutationCreateRecordType);
+
+    const addRecordType = async ({ category }) => {
+        const { data: { createRecordType } } = await mutate({
+            variables: { recordName: category },
+            update: (cache, { data: { createRecordType }}) => {
+                if (createRecordType.recordTypeError) return;
+                const existingCacheData = cache.readQuery({ query: recordTypesQuery });
+                const newRecordType = {
+                    __typename: 'RecordTypes',
+                    recordTypeId: createRecordType.recordTypeId,
+                    recordName: createRecordType.recordName,
+                };
+                const updatedRecordTypes = [
+                    ...existingCacheData.recordTypes,
+                    newRecordType,
+                ];
+                updatedRecordTypes.sort((a, b) => a.recordName.localeCompare(b.recordName));
+                cache.writeQuery({
+                    query: recordTypesQuery,
+                    data: { recordTypes: updatedRecordTypes }
+                });
+            },
+        });
+        return createRecordType;
+    };
+    return {
+        addRecordType,
+        loadingRecordType: loading,
+        errorRecordType: error
+    };
+};
+
+
+export const useCreateMedicalRecord = () => {
+    const [mutate, { loading, error }] = useMutation(mutationCreateMedicalRecord);
+
+    const addMedicalRecord = async (values) => {
+        const { data: { createMedicalRecord } } = await mutate({
+            variables: values,
+            update: (cache, { data: { createMedicalRecord }}) => {
+                if (createMedicalRecord.medicalRecordError) return;
+                const existingCacheData = cache.readQuery({ query: medicalRecordsQuery });
+                if (!existingCacheData) return;
+                const newMedicalRecord = createMedicalRecord.medicalRecord;
+                cache.writeQuery({
+                    query: medicalRecordsQuery,
+                    data: {
+                        medicalRecords: !existingCacheData.medicalRecords ?
+                        [newMedicalRecord] : [newMedicalRecord, ...existingCacheData.medicalRecords]
+                    }
+                });
+            },
+        });
+        return createMedicalRecord;
+    };
+    return {
+        addMedicalRecord,
+        loadingMedicalRecord: loading,
+        errorMedicalRecord: error
+    };
 };

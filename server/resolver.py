@@ -17,9 +17,11 @@ medical_records = ObjectType("MedicalRecords")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
 
+
 @query.field("user")
 def resolve_user(*_, userId):
     return get_user(userId)
+
 
 @users.field("patient")
 def resolve_users_patient(users, *_):
@@ -27,11 +29,13 @@ def resolve_users_patient(users, *_):
         return None
     return get_users_patient(users['userId'])
 
+
 @users.field("doctor")
 def resolve_users_patient(users, *_):
     if not users['userId']:
         return None
     return get_users_doctor(users['userId'])
+
 
 @patients.field("user")
 def resolve_patients_user(patients, *_):
@@ -39,11 +43,13 @@ def resolve_patients_user(patients, *_):
         return None
     return get_user(patients['userId'])
 
+
 @patients.field("tokens")
 def resolve_patients_tokens(patients, info):
     if not info.context['authenticated'] or not patients['patientId']:
         return None
     return get_patients_tokens(patients['patientId'])
+
 
 @doctors.field("user")
 def resolve_doctors_user(doctors, *_):
@@ -51,11 +57,13 @@ def resolve_doctors_user(doctors, *_):
         return None
     return get_user(doctors['userId'])
 
+
 @doctors.field("tokensAccess")
 def resolve_doctors_user(doctors, info):
     if not info.context['authenticated'] or not doctors['doctorId']:
         return None
     return get_doctors_tokens_access(doctors['userId'])
+
 
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
@@ -81,12 +89,14 @@ def resolve_create_user(*_, input):
         res['user'] = get_user_by_email_password(email, password)
     return res
 
+
 @mutation.field("createPatientOrDoctorUser")
 def resolve_create_patient_or_doctor_user(*_, userId, userType):
     res = create_patient_or_doctor_user(userId, userType)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
     return res
+
 
 @mutation.field("updateUser")
 def resolve_update_user(_, info, input):
@@ -107,6 +117,7 @@ def resolve_update_user(_, info, input):
         res['token'] = handle_login(res['user'])
     return res
 
+
 @mutation.field("updatePatientUser")
 def resolve_update_patient_user(_, info, input):
     if not info.context['authenticated']:
@@ -120,6 +131,7 @@ def resolve_update_patient_user(_, info, input):
         res['user'] = get_user(info.context['user_detail']['userId'])
     return res
 
+
 @mutation.field("updateDoctorUser")
 def resolve_update_doctor_user(_, info, input):
     if not info.context['authenticated']:
@@ -132,6 +144,7 @@ def resolve_update_doctor_user(_, info, input):
         res['user'] = get_user(info.context['user_detail']['userId'])
     return res
 
+
 @mutation.field("login")
 def resolve_login(*_, email, password):
     user = get_user_by_email_password(email, password)
@@ -139,6 +152,7 @@ def resolve_login(*_, email, password):
         token = handle_login(user)
         return { 'user': user, 'token': token }
     return { 'error': 'Invalid email or password' }
+
 
 @query.field("medicalRecords")
 def resolve_medical_records(_, info):
@@ -151,6 +165,14 @@ def resolve_medical_records(_, info):
         return None
     return get_medical_records_by_pacient(patient['patientId'])
 
+
+@query.field("medicalRecord")
+def resolve_get_medical_record(_, info, recordId):
+    if not info.context['authenticated']:
+        return None
+    return get_medical_record(recordId)
+
+
 @query.field("medicalRecordsByPatientId")
 def resolve_medical_records_by_patient_id(_, info, patientId):
     if not info.context['authenticated']:
@@ -159,9 +181,39 @@ def resolve_medical_records_by_patient_id(_, info, patientId):
         return None
     return get_medical_records_by_pacient(patientId)
 
+
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
     return get_medical_records_type(medicalRecords['recordTypeId'])
+
+
+@mutation.field("createMedicalRecord")
+def resolve_create_medical_record(_, info, recordTypeId, recordData):
+    if not info.context['authenticated']:
+        return {'medicalRecordError': 'Missing authentication'}
+    if info.context['user_detail']['userType'] != 'Patient':
+        return {'medicalRecordError': 'Missing patient credential'}
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    if res['medicalRecordConfirmation']:
+        res['medicalRecord'] = get_medical_record(res['medicalRecordId'])
+    return res
+
+
+@query.field("recordTypes")
+def resolve_record_types(*_):
+    return get_record_types()
+
+
+@mutation.field("createRecordType")
+def resolve_create_record_type(_, info, recordName):
+    if not info.context['authenticated']:
+        return {'recordTypeError': 'Missing authentication'}
+    recordName = ' '.join(nh3.clean(recordName).split()).title()
+    return create_record_type(recordName)
+
 
 @query.field("activePatientTokens")
 def resolve_patients_active_tokens(_, info):
@@ -174,6 +226,7 @@ def resolve_patients_active_tokens(_, info):
         return None
     return get_active_tokens_by_patient(patient['patientId'])
 
+
 @query.field("activeDoctorTokens")
 def resolve_doctors_active_tokens(_, info):
     if not info.context['authenticated']:
@@ -184,6 +237,7 @@ def resolve_doctors_active_tokens(_, info):
     if not doctor:
         return None
     return get_active_tokens_by_doctor(doctor['doctorId'])
+
 
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):
@@ -211,6 +265,7 @@ def resolve_generate_token(_, info, expirationDate):
         res['token'] = get_token(reserve_tokenId['tokenId'])
     return res
 
+
 @mutation.field("saveTokenAccess")
 def resolve_save_token_access(_, info, tokenId, doctorId):
     if not info.context['authenticated']:
@@ -219,11 +274,13 @@ def resolve_save_token_access(_, info, tokenId, doctorId):
         return {'acessError': 'Missing healthcare professional credential'}
     return create_token_access(tokenId, doctorId)
 
+
 @tokens.field("patient")
 def resolve_tokens_patient(tokens, info):
     if not info.context['authenticated'] or not tokens['patientId']:
         return None
     return get_patient(tokens['patientId'])
+
 
 @tokens.field("tokenAccess")
 def resolve_tokens_token_access(tokens, info):
@@ -231,11 +288,13 @@ def resolve_tokens_token_access(tokens, info):
         return None
     return get_tokens_token_access(tokens['tokenId'])
 
+
 @token_access.field("token")
 def resolve_token_access_token(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
     return get_token_access_token(tokenAccess['tokenId'])
+
 
 @token_access.field("doctor")
 def resolve_token_access_doctor(tokenAccess, info):

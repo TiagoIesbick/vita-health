@@ -3,6 +3,7 @@ import EditDoctorProfile from "../components/editDoctorProfile";
 import { useUser } from "../providers/userContext";
 import { useUserQuery } from "../hooks/hooks";
 import { useNavigate } from "react-router-dom";
+import LoadingSkeleton from "../components/skeleton";
 
 
 const EditProfile = () => {
@@ -10,7 +11,7 @@ const EditProfile = () => {
     const { user, setUser, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(user.userId);
     if (loadingUser) {
-        return <>Loading...</>
+        return <LoadingSkeleton />
     };
     if (errorUser) {
         navigate('/');

@@ -36,6 +36,7 @@ services:
       - ./client:/client
     environment:
       WATCHPACK_POLLING: true
+      REACT_APP_TINYMCE_API_KEY: ${TINYMCE_API_KEY}
 
 volumes:
   mysql_data:

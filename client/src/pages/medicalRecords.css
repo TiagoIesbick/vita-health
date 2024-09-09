@@ -1,3 +1,8 @@
+.medical-record .p-card-body {
+    width: 100%;
+    word-break: break-word;
+}
+
 @media screen and (max-width: 991px) {
     .customized-timeline .p-timeline-event:nth-child(even) {
         flex-direction: row !important;
