@@ -12,10 +12,12 @@ import { useCreatePatientOrDoctor, useCreateUser, useLogin } from "../hooks/hook
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
+import { useApolloClient } from "@apollo/client";
 
 
 const CreateUser = () => {
     const navigate = useNavigate();
+    const client = useApolloClient();
     const { setUser, showMessage } = useUser();
     const { addUser, loadingUser, errorUser } = useCreateUser();
     const { addPatientOrDoctor, loadingPatientOrDoctor, errorPatientOrDoctor } = useCreatePatientOrDoctor();
@@ -47,6 +49,7 @@ const CreateUser = () => {
                         storeToken(ACCESS_TOKEN_KEY, login.token);
                         setUser(login.user);
                         resetForm();
+                        client.resetStore();
                         navigate('/');
                         showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`)
                     };

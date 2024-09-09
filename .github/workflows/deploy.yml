@@ -35,6 +35,7 @@ jobs:
         echo "PORT=${{ secrets.PORT }}" >> .env
         echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
         echo "SECRET=${{ secrets.SECRET }}" >> .env
+        echo "TINYMCE_API_KEY=${{ secrets.TINYMCE_API_KEY }}" >> .env
         sudo docker compose -f docker-compose.prod.yml down
         sudo lsof -ti :80 | xargs sudo kill -9
         sudo docker volume rm vita-health_client-build

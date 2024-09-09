@@ -236,7 +236,20 @@ export const useCreateMedicalRecord = () => {
     const addMedicalRecord = async (values) => {
         const { data: { createMedicalRecord } } = await mutate({
             variables: values,
-            });
+            update: (cache, { data: { createMedicalRecord }}) => {
+                if (createMedicalRecord.medicalRecordError) return;
+                const existingCacheData = cache.readQuery({ query: medicalRecordsQuery });
+                if (!existingCacheData) return;
+                const newMedicalRecord = createMedicalRecord.medicalRecord;
+                cache.writeQuery({
+                    query: medicalRecordsQuery,
+                    data: {
+                        medicalRecords: !existingCacheData.medicalRecords ?
+                        [newMedicalRecord] : [newMedicalRecord, ...existingCacheData.medicalRecords]
+                    }
+                });
+            },
+        });
         return createMedicalRecord;
     };
     return {
