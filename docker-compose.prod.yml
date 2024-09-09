@@ -26,6 +26,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile.production
+      args:
+        REACT_APP_TINYMCE_API_KEY: ${TINYMCE_API_KEY}
     volumes:
       - client-build:/client/build
     depends_on:
