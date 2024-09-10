@@ -272,7 +272,10 @@ def resolve_save_token_access(_, info, tokenId, doctorId):
         return {'acessError': 'Missing authentication'}
     if info.context['user_detail']['userType'] != 'Doctor':
         return {'acessError': 'Missing healthcare professional credential'}
-    return create_token_access(tokenId, doctorId)
+    res = create_token_access(tokenId, doctorId)
+    if res['accessConfirmation']:
+        res['tokenAccess'] = get_token_access(res['tokenAccessId'])
+    return res
 
 
 @tokens.field("patient")
@@ -293,7 +296,7 @@ def resolve_tokens_token_access(tokens, info):
 def resolve_token_access_token(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
-    return get_token_access_token(tokenAccess['tokenId'])
+    return get_token(tokenAccess['tokenId'])
 
 
 @token_access.field("doctor")

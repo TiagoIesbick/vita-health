@@ -123,6 +123,7 @@ type TokenAccess {
 type TokenAccessResult {
     accessConfirmation: String
     accessError: String
+    tokenAccess: TokenAccess
 }
 
 type RecordTypeResult {

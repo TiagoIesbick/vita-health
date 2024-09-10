@@ -121,12 +121,12 @@ def get_tokens_token_access(id: int) -> (None | list[dict]):
     return token_accesses
 
 
-def get_token_access_token(id: int) -> (None | dict):
-    query = rf'SELECT * FROM Tokens WHERE tokenId = {id};'
-    token = mysql_results(query)
-    if len(token) == 0:
+def get_token_access(id: int) -> (None | dict):
+    query = rf'SELECT * FROM TokenAccess WHERE tokenAccessId = {id};'
+    token_access = mysql_results(query)
+    if len(token_access) == 0:
         return None
-    return token[0]
+    return token_access[0]
 
 
 def get_active_tokens_by_doctor(id: int) -> (None | list[dict]):

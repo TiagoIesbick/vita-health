@@ -71,7 +71,20 @@ export const useGenerateToken = () => {
 
     const addToken = async (tokenExpirationDateTime) => {
         const { data: { generateToken } } = await mutate({
-            variables: { expirationDate: tokenExpirationDateTime}
+            variables: { expirationDate: tokenExpirationDateTime},
+            update: (cache, { data: { generateToken }}) => {
+                if (generateToken.tokenError) return;
+                const existingCacheData = cache.readQuery({ query: activePatientTokensQuery });
+                if (!existingCacheData) return;
+                const newToken = generateToken.token;
+                cache.writeQuery({
+                    query: activePatientTokensQuery,
+                    data: {
+                        activePatientTokens: !existingCacheData.activePatientTokens ?
+                        [newToken] : [newToken, ...existingCacheData.activePatientTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
+                    }
+                });
+            },
         });
         return generateToken;
     };
@@ -88,7 +101,22 @@ export const useSaveTokenAccess = () => {
 
     const addTokenAccess = async (tokenId, doctorId) => {
         const { data: { saveTokenAccess } } = await mutate({
-            variables: { tokenId: tokenId, doctorId}
+            variables: { tokenId: tokenId, doctorId},
+            update: (cache, { data: { saveTokenAccess }}) => {
+                if (saveTokenAccess.accessError) return;
+                const existingCacheData = cache.readQuery({ query: activeDoctorTokensQuery });
+                if (!existingCacheData) return;
+                const newToken = saveTokenAccess.tokenAccess.token;
+                cache.writeQuery({
+                    query: activeDoctorTokensQuery,
+                    data: {
+                        activeDoctorTokens: !existingCacheData.activeDoctorTokens ?
+                        [newToken] : !existingCacheData.activeDoctorTokens.some(obj => obj.tokenId === newToken.tokenId) ?
+                        [newToken, ...existingCacheData.activeDoctorTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate)) :
+                        existingCacheData.activeDoctorTokens
+                    }
+                });
+            },
         });
         return saveTokenAccess;
     };
@@ -178,13 +206,13 @@ export const useUpdateDoctorUser = () => {
 
 
 export const useActivePatientTokens = () => {
-    const { data, loading, error } = useQuery(activePatientTokensQuery, {fetchPolicy: 'network-only'});
+    const { data, loading, error } = useQuery(activePatientTokensQuery);
     return {activePatientTokens: data?.activePatientTokens, loadingActivePatientTokens: loading, errorActivePatientTokens: Boolean(error)};
 };
 
 
 export const useActiveDoctorTokens = () => {
-    const { data, loading, error } = useQuery(activeDoctorTokensQuery, {fetchPolicy: 'network-only'});
+    const { data, loading, error } = useQuery(activeDoctorTokensQuery);
     return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
 };
 

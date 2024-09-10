@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -115,12 +115,11 @@ export const mutationGenerateToken = gql`
             tokenConfirmation
             tokenError
             token {
-                tokenId
-                token
-                expirationDate
+                ...TokenDetail
             }
         }
     }
+    ${tokenFragment}
 `;
 
 
@@ -129,8 +128,12 @@ export const mutationSaveTokenAccess = gql`
         saveTokenAccess(tokenId: $tokenId, doctorId: $doctorId) {
             accessConfirmation
             accessError
+            tokenAccess {
+                ...TokenAccessDetail
+            }
         }
     }
+    ${tokenAccessFragment}
 `;
 
 

@@ -28,7 +28,8 @@ const InsertToken = () => {
                 localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
             } else {
                 setPatient(credentials);
-                await addTokenAccess(credentials.tokenId, userDetail?.doctor.doctorId);
+                const res = await addTokenAccess(credentials.tokenId, userDetail?.doctor.doctorId);
+                console.log(res);
                 navigate("/medical-records-access");
                 showMessage('success', 'Sucess', 'Permission Granted');
             };

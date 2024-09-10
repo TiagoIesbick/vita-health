@@ -554,7 +554,8 @@ ELSE
 END IF ;
 SELECT * FROM(
   (SELECT accessConfirmation) accessConfirmation,
-  (SELECT accessError) accessError
+  (SELECT accessError) accessError,
+  (SELECT LAST_INSERT_ID() AS tokenAccessId) tokenAccessId
 );
 END //
 DELIMITER ;

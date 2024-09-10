@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { medicalRecordsFragment, doctorDetailFragment, patientDetailFragment, userDetailFragment, recordTypeFragment } from './fragments';
+import { medicalRecordsFragment, doctorDetailFragment, patientDetailFragment, userDetailFragment, recordTypeFragment, tokenFragment } from './fragments';
 
 
 export const userQuery = gql`
@@ -51,39 +51,17 @@ export const medicalRecordsByPatientIdQuery = gql`
 export const activePatientTokensQuery = gql`
     query ActivePatientTokens {
         activePatientTokens {
-            tokenId
-            token
-            expirationDate
-            tokenAccess {
-                tokenAccessId
-                accessTime
-                doctor {
-                    ...DoctorDetail
-                    user {
-                        firstName
-                        lastName
-                    }
-                }
-            }
+            ...TokenDetail
         }
     }
-    ${doctorDetailFragment}
+    ${tokenFragment}
 `;
 
 export const activeDoctorTokensQuery = gql`
     query ActiveDoctorTokens {
         activeDoctorTokens {
-            tokenId
-            token
-            expirationDate
-            patient {
-                ...PatientDetail
-                user {
-                    firstName
-                    lastName
-                }
-            }
+            ...TokenDetail
         }
     }
-    ${patientDetailFragment}
+    ${tokenFragment}
 `;
