@@ -26,7 +26,6 @@ const ActiveTokens = () => {
     useEffect(() => {
         const updateCache = (query, field) => {
             const cachedData = client.readQuery({ query });
-            console.log(cachedData);
             if (cachedData && cachedData[field]) {
                 const updatedTokens = cachedData[field].map((token) => {
                     const isExpired = localDateTime(token.expirationDate, 'minus') < new Date();
@@ -44,7 +43,7 @@ const ActiveTokens = () => {
             } else if (user.userType === 'Doctor') {
                 updateCache(activeDoctorTokensQuery, 'activeDoctorTokens');
             };
-        }, 6000);
+        }, 1000);
         return () => clearInterval(intervalId);
     }, [client, user.userType]);
 

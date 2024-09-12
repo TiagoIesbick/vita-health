@@ -1,17 +1,11 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
-};
-
-
-export const useMedicalRecordsByPatientId = (patientId) => {
-    const { data, loading, error } = useQuery(medicalRecordsByPatientIdQuery, { variables: { patientId } });
-    return {medicalRecords: data?.medicalRecordsByPatientId, loading, error: Boolean(error)};
 };
 
 
@@ -80,8 +74,9 @@ export const useGenerateToken = () => {
                 cache.writeQuery({
                     query: activePatientTokensQuery,
                     data: {
-                        activePatientTokens: !existingCacheData.activePatientTokens ?
-                        [newToken] : [newToken, ...existingCacheData.activePatientTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
+                        activePatientTokens: !existingCacheData.activePatientTokens
+                        ? [newToken]
+                        : [newToken, ...existingCacheData.activePatientTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
                     }
                 });
             },
@@ -99,9 +94,9 @@ export const useGenerateToken = () => {
 export const useSaveTokenAccess = () => {
     const [mutate, { loading, error }] = useMutation(mutationSaveTokenAccess);
 
-    const addTokenAccess = async (tokenId, doctorId) => {
+    const addTokenAccess = async (token) => {
         const { data: { saveTokenAccess } } = await mutate({
-            variables: { tokenId: tokenId, doctorId},
+            variables: { token },
             update: (cache, { data: { saveTokenAccess }}) => {
                 if (saveTokenAccess.accessError) return;
                 const existingCacheData = cache.readQuery({ query: activeDoctorTokensQuery });
@@ -110,10 +105,11 @@ export const useSaveTokenAccess = () => {
                 cache.writeQuery({
                     query: activeDoctorTokensQuery,
                     data: {
-                        activeDoctorTokens: !existingCacheData.activeDoctorTokens ?
-                        [newToken] : !existingCacheData.activeDoctorTokens.some(obj => obj.tokenId === newToken.tokenId) ?
-                        [newToken, ...existingCacheData.activeDoctorTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate)) :
-                        existingCacheData.activeDoctorTokens
+                        activeDoctorTokens: !existingCacheData.activeDoctorTokens
+                        ? [newToken]
+                        : !existingCacheData.activeDoctorTokens.some(obj => obj.tokenId === newToken.tokenId)
+                        ? [newToken, ...existingCacheData.activeDoctorTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
+                        : existingCacheData.activeDoctorTokens
                     }
                 });
             },
@@ -272,8 +268,9 @@ export const useCreateMedicalRecord = () => {
                 cache.writeQuery({
                     query: medicalRecordsQuery,
                     data: {
-                        medicalRecords: !existingCacheData.medicalRecords ?
-                        [newMedicalRecord] : [newMedicalRecord, ...existingCacheData.medicalRecords]
+                        medicalRecords: !existingCacheData.medicalRecords
+                        ? [newMedicalRecord]
+                        : [newMedicalRecord, ...existingCacheData.medicalRecords]
                     }
                 });
             },

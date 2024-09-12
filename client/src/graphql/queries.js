@@ -39,14 +39,6 @@ export const medicalRecordsQuery = gql`
     ${medicalRecordsFragment}
 `;
 
-export const medicalRecordsByPatientIdQuery = gql`
-    query MedicalRecordsByPatientId ($patientId: ID!) {
-        medicalRecordsByPatientId (patientId: $patientId) {
-            ...MedicalRecordsDetail
-        }
-    }
-    ${medicalRecordsFragment}
-`;
 
 export const activePatientTokensQuery = gql`
     query ActivePatientTokens {
@@ -56,6 +48,7 @@ export const activePatientTokensQuery = gql`
     }
     ${tokenFragment}
 `;
+
 
 export const activeDoctorTokensQuery = gql`
     query ActiveDoctorTokens {

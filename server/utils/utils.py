@@ -14,7 +14,7 @@ def decrypt(encrypted: bytes) -> str:
     decrypted = fernet.decrypt(encrypted).decode('utf-8')
     return decrypted
 
-def generate_token(exp: str, patient: dict) -> str:
+def generate_token(exp: int, patient: dict) -> str:
     token = jwt.encode({"exp": exp} | patient , getenv('SECRET'), algorithm="HS256")
     return token
 

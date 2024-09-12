@@ -28,6 +28,7 @@ async def get_context_value(request: Request):
         "request": request,
         "authenticated": request.user.is_authenticated,
         "user_detail": None if not request.user.is_authenticated else request.user.user_detail,
+        "medical_access": None if not request.user.is_authenticated else request.user.medical_access
     }
 
 graphql_app = GraphQL(

@@ -124,8 +124,8 @@ export const mutationGenerateToken = gql`
 
 
 export const mutationSaveTokenAccess = gql`
-    mutation SaveTokenAccess ($tokenId: ID!, $doctorId: ID!) {
-        saveTokenAccess(tokenId: $tokenId, doctorId: $doctorId) {
+    mutation SaveTokenAccess ($token: String!) {
+        saveTokenAccess(token: $token) {
             accessConfirmation
             accessError
             tokenAccess {
