@@ -17,7 +17,6 @@ const MedicalRecordsAccess = () => {
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient.userId);
     const { medicalRecords, loading, error } = useMedicalRecords();
 
-    console.log('[patient]:', patient);
     if (loading || loadingUser) {
         return <LoadingSkeleton />
     };
