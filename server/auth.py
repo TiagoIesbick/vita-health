@@ -6,15 +6,13 @@ from os import getenv
 from db.queries import get_user_by_email_password
 from utils.utils import decrypt
 
-def handle_login(user: dict) -> str:
-    token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
-    return token
 
 class UserDetail(SimpleUser):
     def __init__(self, user: dict, medical_access: (None | dict) = None) -> None:
         self.username = user['firstName']
         self.user_detail = user
         self.medical_access = medical_access
+
 
 class BasicAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn: starlette.requests.HTTPConnection) -> (None | starlette.authentication.AuthCredentials):

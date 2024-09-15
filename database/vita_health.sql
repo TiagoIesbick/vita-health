@@ -533,6 +533,8 @@ CREATE PROCEDURE AddTokenAccess(IN TKID INT, IN DTID INT)
 BEGIN
 DECLARE accessConfirmation VARCHAR(45);
 DECLARE accessError VARCHAR(45);
+PREPARE Expiration FROM 'SELECT `expirationDate` INTO @expirationToken FROM `vita_health`.`Tokens`
+	WHERE `tokenId` = ?' ;
 PREPARE CountPreviousTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousTokenAccess FROM `vita_health`.`TokenAccess`
 	WHERE `tokenId` = ?' ;
 PREPARE InsertIntoTokenAccess FROM 'INSERT INTO `vita_health`.`TokenAccess` (`tokenId`, `doctorId`)
@@ -542,15 +544,21 @@ PREPARE CountTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countTokenAccess FR
 START TRANSACTION;
 SET @tokenId = TKID;
 SET @doctorId = DTID;
-EXECUTE CountPreviousTokenAccess USING @tokenId ;
-EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
-EXECUTE CountTokenAccess USING @tokenId ;
-IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
-	COMMIT;
-	SET accessConfirmation = 'Saved access' ;
-ELSE
+EXECUTE Expiration USING @tokenId ;
+IF @expirationToken < NOW() THEN
 	ROLLBACK ;
-  SET accessError = 'Access NOT saved' ;
+  SET accessError = 'Access permission has expired.' ;
+ELSE
+	EXECUTE CountPreviousTokenAccess USING @tokenId ;
+	EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
+	EXECUTE CountTokenAccess USING @tokenId ;
+	IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
+		COMMIT;
+		SET accessConfirmation = 'Saved access' ;
+	ELSE
+		ROLLBACK ;
+		SET accessError = 'Access NOT saved' ;
+	END IF ;
 END IF ;
 SELECT * FROM(
   (SELECT accessConfirmation) accessConfirmation,

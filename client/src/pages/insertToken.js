@@ -37,7 +37,7 @@ const InsertToken = () => {
                 };
                 navigate("/medical-records-access");
                 showMessage('success', 'Sucess', 'Permission Granted');
-                resetForm()
+                resetForm();
             };
         },
         validationSchema: Yup.object({

@@ -1,13 +1,12 @@
+import nh3
+import jwt
+from os import getenv
 from ariadne import QueryType, ObjectType, MutationType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from utils.utils import encrypt, validate_email, validate_password, \
     validate_name, generate_token
-from auth import handle_login
-from os import getenv
-import nh3
-import jwt
 
 
 query = QueryType()
@@ -116,7 +115,7 @@ def resolve_update_user(_, info, input):
     res = update_user(email, nh3.clean(firstName), nh3.clean(lastName), userId)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
-        res['token'] = handle_login(res['user'])
+        res['token'] = jwt.encode(res['user'], getenv('SECRET'), algorithm="HS256")
     return res
 
 
@@ -151,7 +150,7 @@ def resolve_update_doctor_user(_, info, input):
 def resolve_login(*_, email, password):
     user = get_user_by_email_password(email, password)
     if user:
-        token = handle_login(user)
+        token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
         return { 'user': user, 'token': token }
     return { 'error': 'Invalid email or password' }
 
