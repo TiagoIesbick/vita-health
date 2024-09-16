@@ -1,6 +1,32 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+
+
+export const useBackgroundImageResize = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        const backgroundImageResize = () => {
+            const body = document.body
+            const bodyHeight = body.scrollHeight;
+            const windowHeight = window.innerHeight;
+            if (bodyHeight > 2*windowHeight) {
+                body.style.backgroundSize = 'auto';
+            } else {
+                body.style.backgroundSize = 'cover';
+            };
+        };
+        backgroundImageResize();
+        window.addEventListener('resize', backgroundImageResize);
+        backgroundImageResize();
+        return () => {
+            window.removeEventListener('resize', backgroundImageResize);
+        };
+    },[location])
+};
 
 
 export const useMedicalRecords = () => {

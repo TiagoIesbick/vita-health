@@ -12,11 +12,11 @@ const UserBar = () => {
     const { user, setUser, setPatient, showMessage } = useUser();
     const userMenu = useRef(null);
     const items = [
-        {
+        ...(user.userType === 'Patient' ? [{
             label: 'Add Health Data',
             icon: 'pi pi-plus-circle',
             command: () => navigate("/insert-medical-record")
-        },
+        }] : []),
         {
             label: 'Active Tokens',
             icon: 'pi pi-ticket',

@@ -62,7 +62,7 @@ export const customizedContent = (item) => {
     return (
         <Card title={item.recordType.recordName} subTitle={`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}>
             <div dangerouslySetInnerHTML={{__html: item.recordData}} />
-            <Button label="Read more" className="p-button-text"></Button>
+            <Button label="Read more" text></Button>
         </Card>
     );
 };

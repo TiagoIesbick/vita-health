@@ -2,6 +2,8 @@ import { useInterval } from 'primereact/hooks';
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHospitalUser } from '@fortawesome/free-solid-svg-icons';
 
 
 const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
@@ -29,13 +31,13 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
     }, 1000);
 
     return (
-        <div className='flex flex-wrap justify-content-center gap-3 mb-3'>
-            <span className='flex flex-1 gap-1'>
-                <i className='pi pi-user'></i>
+        <div className='flex flex-wrap gap-3 mb-4 text-xl font-semibold text-primary-900'>
+            <span className='flex md:flex-1 gap-1'>
+                <FontAwesomeIcon icon={faHospitalUser} />
                 {patientDetail.firstName + ' ' + patientDetail.lastName}
             </span>
-            <span className='flex flex-1 gap-1' ref={clock}>
-                <i className="pi pi-clock" style={{ fontSize: '1.25rem' }}></i>
+            <span className='flex md:flex-1 gap-1' ref={clock}>
+                <i className="pi pi-clock text-xl font-semibold"></i>
                 {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
             </span>
         </div>

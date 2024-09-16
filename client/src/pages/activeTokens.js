@@ -13,6 +13,8 @@ import CopyButton from "../components/copyButton";
 import LoadingSkeleton from "../components/skeleton";
 import './activeTokens.css';
 import { activeDoctorTokensQuery, activePatientTokensQuery } from "../graphql/queries";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHospitalUser, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 
 
 const ActiveTokens = () => {
@@ -86,8 +88,8 @@ const ActiveTokens = () => {
             <div className="col-12" key={token.tokenId}>
                 <div className={classNames('flex flex-column gap-3', { 'border-top-1 surface-border': index !== 0 })}>
                     <div className={classNames('flex font-semibold mt-3 justify-content-center', { 'gap-3': user.userType === 'Doctor' })} >
-                        {user.userType === 'Doctor' && <span className="flex gap-1"><i className="pi pi-user"></i>{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>}
-                        <span className="flex gap-1"><i className="pi pi-hourglass"></i>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
+                        {user.userType === 'Doctor' && <span className="flex gap-1"><FontAwesomeIcon icon={faHospitalUser} />{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>}
+                        <span className="flex gap-1"><FontAwesomeIcon icon={faHourglassHalf} />{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                     </div>
                     <div className="flex align-items-center gap-3 mb-3 justify-content-between">
                         <span className="flex align-items-center gap-2">

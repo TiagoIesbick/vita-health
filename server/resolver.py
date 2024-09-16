@@ -187,12 +187,15 @@ def resolve_medical_records_type(medicalRecords, *_):
 def resolve_create_medical_record(_, info, recordTypeId, recordData):
     if not info.context['authenticated']:
         return {'medicalRecordError': 'Missing authentication'}
-    if info.context['user_detail']['userType'] != 'Patient':
-        return {'medicalRecordError': 'Missing patient credential'}
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return None
-    res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    if info.context['user_detail']['userType'] == 'Patient':
+        patient = get_users_patient(info.context['user_detail']['userId'])
+        if not patient:
+            return {'medicalRecordError': 'Missing patient credential'}
+        res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    else:
+        if not info.context['medical_access']:
+            return {'medicalRecordError': 'Missing authorization'}
+        res = create_medical_record(info.context['medical_access']['patientId'], recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         res['medicalRecord'] = get_medical_record(res['medicalRecordId'])
     return res
