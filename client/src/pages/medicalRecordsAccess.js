@@ -9,9 +9,6 @@ import LoadingSkeleton from "../components/skeleton";
 import { customizedContent, customizedMarker } from "../utils/utils";
 import CountDown from "../components/countdown";
 import './medicalRecords.css';
-import { Button } from "primereact/button";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faNotesMedical } from '@fortawesome/free-solid-svg-icons';
 
 
 const MedicalRecordsAccess = () => {
@@ -40,10 +37,7 @@ const MedicalRecordsAccess = () => {
                     <p><span className="font-bold">{userDetail.firstName + ' ' + userDetail.lastName}</span> has no health history yet.</p>
                     <p>Start by adding new health data <Link to="/insert-medical-record" >here</Link> to begin building the patient’s medical records.</p>
                 </> :
-                <>
-                    <Button onClick={() => navigate("/insert-medical-record")}><FontAwesomeIcon className="pr-1" icon={faNotesMedical} /> Add Health Data</Button>
-                    <Timeline value={medicalRecords} align="alternate" className="customized-timeline" marker={customizedMarker} content={customizedContent} />
-                </>
+                <Timeline value={medicalRecords} align="alternate" className="customized-timeline" marker={customizedMarker} content={customizedContent} />
             }
         </Card>
     );

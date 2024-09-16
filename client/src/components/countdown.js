@@ -1,15 +1,19 @@
 import { useInterval } from 'primereact/hooks';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHospitalUser } from '@fortawesome/free-solid-svg-icons';
+import { faHospitalUser, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
+import { Button } from "primereact/button";
 
 
 const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const clock = useRef(null);
+    const addButton = useRef(null);
 
     useInterval(() => {
         const now = Math.floor(Date.now() / 1000);
@@ -30,8 +34,16 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
         };
     }, 1000);
 
+    useEffect(() => {
+        if (location.pathname === '/insert-medical-record') {
+            addButton.current.style.display = 'none';
+        } else {
+            addButton.current.style.display = 'flex';
+        };
+    },[location]);
+
     return (
-        <div className='flex flex-wrap gap-3 mb-4 text-xl font-semibold text-primary-900'>
+        <div className='flex flex-wrap gap-2 mb-4 text-xl font-semibold text-primary-900 align-items-center'>
             <span className='flex md:flex-1 gap-1'>
                 <FontAwesomeIcon icon={faHospitalUser} />
                 {patientDetail.firstName + ' ' + patientDetail.lastName}
@@ -40,6 +52,7 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
                 <i className="pi pi-clock text-xl font-semibold"></i>
                 {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
             </span>
+            <Button ref={addButton} onClick={() => navigate("/insert-medical-record")}><FontAwesomeIcon className="pr-1" icon={faNotesMedical} /> Add Health Data</Button>
         </div>
     );
 };
