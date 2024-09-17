@@ -22,6 +22,11 @@ const UserBar = () => {
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },
+        ...(user.userType === 'Patient' ? [{
+            label: 'Inactive Tokens',
+            icon: 'pi pi-eye-slash',
+            command: () => navigate("/inactive-tokens")
+        }] : []),
         {
             label: 'Edit Profile',
             icon: 'pi pi-user-edit',

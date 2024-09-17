@@ -6,6 +6,7 @@ import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
 import { Button } from "primereact/button";
+import './countdown.css';
 
 
 const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
@@ -44,11 +45,11 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
 
     return (
         <div className='flex flex-wrap gap-2 mb-4 text-xl font-semibold text-primary-900 align-items-center'>
-            <span className='flex md:flex-1 gap-1'>
+            <span className='flex sm:flex-1 gap-1 min-w-max'>
                 <FontAwesomeIcon icon={faHospitalUser} />
                 {patientDetail.firstName + ' ' + patientDetail.lastName}
             </span>
-            <span className='flex md:flex-1 gap-1' ref={clock}>
+            <span className='flex sm:flex-1 gap-1 countdown-width' ref={clock}>
                 <i className="pi pi-clock text-xl font-semibold"></i>
                 {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
             </span>

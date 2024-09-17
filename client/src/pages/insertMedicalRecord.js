@@ -44,6 +44,7 @@ const InsertMedicalRecord = () => {
             } else {
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
+                if (user.userType === 'Doctor') navigate('/medical-records-access');
             };
         },
         validationSchema: Yup.object({

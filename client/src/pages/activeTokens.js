@@ -11,10 +11,11 @@ import { Link } from "react-router-dom";
 import { localDateTime } from "../utils/utils";
 import CopyButton from "../components/copyButton";
 import LoadingSkeleton from "../components/skeleton";
-import './activeTokens.css';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { activeDoctorTokensQuery, activePatientTokensQuery } from "../graphql/queries";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
+import './activeTokens.css';
 
 
 const ActiveTokens = () => {
@@ -24,6 +25,18 @@ const ActiveTokens = () => {
     const { activePatientTokens, loadingActivePatientTokens, errorActivePatientTokens } = useActivePatientTokens();
     const { activeDoctorTokens, loadingActiveDoctorTokens, errorActiveDoctorTokens } = useActiveDoctorTokens();
     const [layout, setLayout] = useState('grid');
+
+    const confirm = () => {
+        confirmDialog({
+            message: 'Do you want to deactivate this token?',
+            header: 'Deactivation Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            // accept,
+            // reject
+        });
+    };
 
     useEffect(() => {
         const updateCache = (query, field) => {
@@ -87,9 +100,17 @@ const ActiveTokens = () => {
         return (
             <div className="col-12" key={token.tokenId}>
                 <div className={classNames('flex flex-column gap-3', { 'border-top-1 surface-border': index !== 0 })}>
-                    <div className={classNames('flex font-semibold mt-3 justify-content-center', { 'gap-3': user.userType === 'Doctor' })} >
+                    <div className='flex font-semibold mt-3 justify-content-center gap-3 align-items-center' >
                         {user.userType === 'Doctor' && <span className="flex gap-1"><FontAwesomeIcon icon={faHospitalUser} />{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>}
                         <span className="flex gap-1"><FontAwesomeIcon icon={faHourglassHalf} />{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
+                        {user.userType === 'Patient' &&
+                            <span className="xs:w-full pr-4">
+                                <Button text className="gap-1 p-0">
+                                    <i className="pi pi-eye"></i>
+                                    {token.tokenAccess?.length || 0}
+                                </Button>
+                            </span>
+                        }
                     </div>
                     <div className="flex align-items-center gap-3 mb-3 justify-content-between">
                         <span className="flex align-items-center gap-2">
@@ -98,9 +119,8 @@ const ActiveTokens = () => {
                         </span>
                         { user.userType === 'Patient' &&
                             <span className="xs:w-full pr-4">
-                                <Button text severity={'secondary'} className="gap-1 text-sm p-0">
-                                    <i className="pi pi-eye"></i>
-                                    {token.tokenAccess?.length || 0}
+                                <Button onClick={confirm} text severity={'danger'} className="p-0">
+                                    <i className="pi pi-eye-slash"></i>
                                 </Button>
                             </span>
                         }
@@ -116,23 +136,34 @@ const ActiveTokens = () => {
         return (
             <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={token.tokenId}>
                 <div className="p-4 border-1 surface-border surface-card border-round">
-                    <div className={classNames('flex flex-wrap align-items-center', { 'justify-content-end': user.userType === 'Patient', 'justify-content-between': user.userType === 'Doctor' })}>
-                        {user.userType === 'Doctor' && <span className="text-sm">{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>}
+                    <div className='flex flex-wrap align-items-center justify-content-between'>
+                        {user.userType === 'Doctor'
+                            ? <span className="text-sm">{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>
+                            : <div className='flex gap-1 text-sm'>
+                                <i className="pi pi-hourglass"></i>
+                                <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
+                              </div>
+                        }
                         <CopyButton txt={token.token} />
                     </div>
                     <div className="flex flex-column align-items-center py-2">
                         <p className="font-semibold text-xs text-center" style={{wordBreak: 'break-all'}}>{token.token}</p>
                     </div>
                     <div className={classNames('flex align-items-center', { 'justify-content-between': user.userType === 'Patient', 'justify-content-center': user.userType === 'Doctor' })}>
-                        <div className='flex gap-1 text-sm'>
-                            <i className="pi pi-hourglass"></i>
-                            <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
-                        </div>
-                        {user.userType === 'Patient' &&
-                            <Button text severity={'secondary'} className="gap-1 text-sm p-0">
-                                <i className="pi pi-eye"></i>
-                                {token.tokenAccess?.length || 0}
-                            </Button>
+                        {user.userType === 'Doctor'
+                            ? <div className='flex gap-1 text-sm'>
+                                <i className="pi pi-hourglass"></i>
+                                <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
+                              </div>
+                            : <>
+                                <Button onClick={confirm} text severity={'danger'} className="gap-1 text-sm p-0">
+                                    <i className="pi pi-eye-slash"></i>
+                                </Button>
+                                <Button text className="gap-1 text-sm p-0">
+                                    <i className="pi pi-eye"></i>
+                                    {token.tokenAccess?.length || 0}
+                                </Button>
+                              </>
                         }
                     </div>
                 </div>
@@ -172,6 +203,7 @@ const ActiveTokens = () => {
                 layout={layout}
                 header={header()}
             />
+            <ConfirmDialog />
         </Card>
     );
 };
