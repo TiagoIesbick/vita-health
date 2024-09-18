@@ -1,5 +1,6 @@
-import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink, concat } from '@apollo/client';
+import { ApolloClient, createHttpLink, ApolloLink, concat } from '@apollo/client';
 import { getAccessToken, ACCESS_TOKEN_KEY, ACCESS_MEDICAL_TOKEN_KEY } from './auth';
+import { cache } from './cache';
 
 
 const BASE_URL_SERVER = process.env.NODE_ENV === 'production'
@@ -25,5 +26,5 @@ const authLink = new ApolloLink((operation, forward) => {
 
 export const apolloClient = new ApolloClient({
     link: concat(authLink, httpLink),
-    cache: new InMemoryCache()
-})
+    cache: cache
+});

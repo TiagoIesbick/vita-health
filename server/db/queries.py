@@ -137,3 +137,20 @@ def get_active_tokens_by_doctor(id: int) -> (None | list[dict]):
     if len(tokens) == 0:
         return None
     return tokens
+
+
+def get_inactive_tokens(id: int, limit: int, offset: int) -> (None | list[dict]):
+    query = rf'''SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}'
+        ORDER BY expirationDate DESC LIMIT {limit} OFFSET {offset};'''
+    tokens = mysql_results(query)
+    if len(tokens) == 0:
+        return None
+    return tokens
+
+
+def count_inactive_tokens(id: int) -> dict:
+    query = rf"SELECT COUNT(tokenId) AS totalCount FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}';"
+    total_count= mysql_results(query)
+    if len(total_count) == 0:
+        return None
+    return total_count[0]

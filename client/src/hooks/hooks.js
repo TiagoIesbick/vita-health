@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 
@@ -102,7 +102,7 @@ export const useGenerateToken = () => {
                     data: {
                         activePatientTokens: !existingCacheData.activePatientTokens
                         ? [newToken]
-                        : [newToken, ...existingCacheData.activePatientTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
+                        : [newToken, ...existingCacheData.activePatientTokens]
                     }
                 });
             },
@@ -236,6 +236,14 @@ export const useActivePatientTokens = () => {
 export const useActiveDoctorTokens = () => {
     const { data, loading, error } = useQuery(activeDoctorTokensQuery);
     return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
+};
+
+
+export const useInactiveTokens = (limit, offset) => {
+    const { data, loading, error } = useQuery(inactiveTokensQuery, {
+        variables: {limit, offset}
+    });
+    return {inactiveTokens: data?.inactiveTokens, loadingInactiveTokens: loading, errorInactiveTokens: Boolean(error)};
 };
 
 

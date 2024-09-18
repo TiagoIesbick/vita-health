@@ -238,6 +238,23 @@ def resolve_doctors_active_tokens(_, info):
     return get_active_tokens_by_doctor(doctor['doctorId'])
 
 
+@query.field("inactiveTokens")
+def resolve_inactive_tokens(_, info, limit, offset):
+    if not info.context['authenticated']:
+        return None
+    if info.context['user_detail']['userType'] != 'Patient':
+        return None
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    items = get_inactive_tokens(patient['patientId'], limit, offset)
+    total_inactive_tokens = count_inactive_tokens(patient['patientId'])
+    if not total_inactive_tokens:
+        return None
+    total_inactive_tokens['items'] = items
+    return total_inactive_tokens
+
+
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):
     if not info.context['authenticated']:

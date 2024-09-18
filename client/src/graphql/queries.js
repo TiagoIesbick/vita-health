@@ -58,3 +58,16 @@ export const activeDoctorTokensQuery = gql`
     }
     ${tokenFragment}
 `;
+
+
+export const inactiveTokensQuery = gql`
+    query InactiveTokens ($limit: Int, $offset: Int) {
+        inactiveTokens (limit: $limit, offset: $offset) {
+            items {
+                ...TokenDetail
+            }
+            totalCount
+        }
+    }
+    ${tokenFragment}
+`;

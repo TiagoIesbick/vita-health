@@ -4,6 +4,7 @@ type Query {
     user(userId: ID!): Users
     activePatientTokens: [Tokens]
     activeDoctorTokens: [Tokens]
+    inactiveTokens(limit: Int, offset: Int): TokensSubList
     recordTypes: [RecordTypes]
 }
 
@@ -104,6 +105,11 @@ type Tokens {
     expirationDate: String!
     patient: Patients!
     tokenAccess: [TokenAccess]
+}
+
+type TokensSubList {
+    items: [Tokens]
+    totalCount: Int
 }
 
 type TokenResult {
