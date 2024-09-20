@@ -6,8 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 
 
-const ListItem = ({ user, token, index, confirm }) => {
+const ListItem = ({ user, token, index, setVisible, setTokenId }) => {
     let date = localDateTime(token.expirationDate, 'minus');
+
+    const handleClick = () => {
+        setTokenId(token.tokenId);
+        setVisible(true);
+    };
 
     return (
         <div className="col-12" key={token.tokenId}>
@@ -31,7 +36,7 @@ const ListItem = ({ user, token, index, confirm }) => {
                     </span>
                     { user.userType === 'Patient' &&
                         <span className="xs:w-full pr-4">
-                            <Button onClick={confirm} text severity={'danger'} className="p-0">
+                            <Button onClick={handleClick} text severity={'danger'} className="p-0">
                                 <i className="pi pi-eye-slash"></i>
                             </Button>
                         </span>

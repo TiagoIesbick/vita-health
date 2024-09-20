@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 
 
 export const useBackgroundImageResize = () => {
@@ -315,5 +315,23 @@ export const useCreateMedicalRecord = () => {
         addMedicalRecord,
         loadingMedicalRecord: loading,
         errorMedicalRecord: error
+    };
+};
+
+
+export const useDeactivateToken = () => {
+    const [mutate, { loading, error }] = useMutation(mutationDeactivateToken);
+
+    const inactivateToken = async (tokenId) => {
+        console.log('[inactivate]:', tokenId);
+        const { data: { deactivateToken } } = await mutate({
+            variables: { tokenId }
+        });
+        return deactivateToken;
+    };
+    return {
+        inactivateToken,
+        loadingDeactivateToken: loading,
+        errorDeactivateToken: error
     };
 };

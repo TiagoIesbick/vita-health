@@ -170,3 +170,13 @@ export const mutationCreateMedicalRecord = gql`
     }
     ${medicalRecordsFragment}
 `;
+
+
+export const mutationDeactivateToken = gql`
+    mutation DeactivateToken ($tokenId: ID!) {
+        deactivateToken(tokenId: $tokenId) {
+            deactivateTokenConfirmation
+            deactivateTokenError
+        }
+    }
+`;

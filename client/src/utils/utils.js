@@ -1,6 +1,7 @@
 import { Divider } from 'primereact/divider';
 import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
 
@@ -65,4 +66,17 @@ export const customizedContent = (item) => {
             <Button label="Read more" text></Button>
         </Card>
     );
+};
+
+
+export const confirmDeactivateToken = (accept) => {
+    confirmDialog({
+        message: 'Do you want to deactivate this token?',
+        header: 'Deactivation Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        defaultFocus: 'reject',
+        acceptClassName: 'p-button-danger',
+        accept,
+        // reject
+    });
 };

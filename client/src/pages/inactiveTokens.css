@@ -1,0 +1,13 @@
+.p-paginator {
+    background: revert;
+    border-top: 1px solid #e5e7eb;
+    border-radius: revert;
+}
+
+.card-pb-0 > .p-card-body {
+    padding: 1.25rem 1.25rem 0 1.25rem;
+}
+
+.card-pb-0 > .p-card-body > .p-card-content {
+    padding: 1.25rem 0 0 0;
+}

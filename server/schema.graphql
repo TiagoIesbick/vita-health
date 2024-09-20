@@ -59,6 +59,7 @@ type Mutation {
     saveTokenAccess(token: String!): TokenAccessResult
     createRecordType(recordName: String!): RecordTypeResult
     createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
+    deactivateToken(tokenId: ID!): DeactivateTokenResult
 }
 
 input CreateUserInput {
@@ -142,4 +143,9 @@ type MedicalRecordResult {
     medicalRecordConfirmation: String
     medicalRecordError: String
     medicalRecord: MedicalRecords
+}
+
+type DeactivateTokenResult {
+    deactivateTokenConfirmation: String
+    deactivateTokenError: String
 }

@@ -274,7 +274,7 @@ def resolve_generate_token(_, info, expirationDate):
             'userId': patient['userId'],
             'tokenId': reserve_tokenId['tokenId']
         }
-        )
+    )
     res = create_token(reserve_tokenId['tokenId'], token)
     if res['tokenError']:
         return {'tokenError': res['tokenError']}
@@ -328,3 +328,19 @@ def resolve_token_access_doctor(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
     return get_doctor(tokenAccess['doctorId'])
+
+
+@mutation.field("deactivateToken")
+def resolver_deactivate_token(_, info, tokenId):
+    if not info.context['authenticated']:
+        return {'deactivateTokenError': 'Missing authentication'}
+    if info.context['user_detail']['userType'] != 'Patient':
+        return {'deactivateTokenError': 'Missing patient credential'}
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return {'deactivateTokenError': 'Missing patient credential'}
+    tokens = get_active_tokens_by_patient(patient['patientId'])
+    token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
+    if not token_exists:
+        return {'deactivateTokenError': 'Token not found'}
+    return deactivate_token(tokenId)

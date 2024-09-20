@@ -8,11 +8,11 @@ import { useUser } from "../providers/userContext";
 import { Link } from "react-router-dom";
 import { localDateTime } from "../utils/utils";
 import LoadingSkeleton from "../components/skeleton";
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { activeDoctorTokensQuery, activePatientTokensQuery } from "../graphql/queries";
-import './activeTokens.css';
+import ConfirmDeactivateToken from "../components/confirmDeactivateToken";
 import DataViewHeader from "../components/dataViewHeader";
 import TokenTemplate from "../components/tokenTemplate";
+import './activeTokens.css';
 
 
 const ActiveTokens = () => {
@@ -22,18 +22,9 @@ const ActiveTokens = () => {
     const { activePatientTokens, loadingActivePatientTokens, errorActivePatientTokens } = useActivePatientTokens();
     const { activeDoctorTokens, loadingActiveDoctorTokens, errorActiveDoctorTokens } = useActiveDoctorTokens();
     const [layout, setLayout] = useState('grid');
+    const [visible, setVisible] = useState(false);
+    const [tokenId, setTokenId] = useState(0);
 
-    const confirm = () => {
-        confirmDialog({
-            message: 'Do you want to deactivate this token?',
-            header: 'Deactivation Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            defaultFocus: 'reject',
-            acceptClassName: 'p-button-danger',
-            // accept,
-            // reject
-        });
-    };
 
     useEffect(() => {
         const updateCache = (query, field) => {
@@ -98,20 +89,20 @@ const ActiveTokens = () => {
         };
         return (
             <div className="grid grid-nogutter">
-                {tokens.map((token, index) => <TokenTemplate user={user} token={token} index={index} confirm={confirm} layout={layout} key={token.tokenId}/>)}
+                {tokens.map((token, index) => <TokenTemplate user={user} token={token} index={index} layout={layout} key={token.tokenId} setVisible={setVisible} setTokenId={setTokenId} />)}
             </div>
         );
     };
 
     return (
-        <Card className="card-min-height">
+        <Card className="card-min-height" title="Active Tokens">
             <DataView
                 value={user.userType === 'Patient' ? activePatientTokens: activeDoctorTokens}
                 listTemplate={listTemplate}
                 layout={layout}
                 header={<DataViewHeader layout={layout} setLayout={setLayout} />}
             />
-            <ConfirmDialog />
+            <ConfirmDeactivateToken visible={visible} setVisible={setVisible} tokenId={tokenId} />
         </Card>
     );
 };

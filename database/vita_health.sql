@@ -642,3 +642,39 @@ SELECT * FROM(
 );
 END //
 DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to deactivate token
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE DeactivateToken(IN TKID INT)
+BEGIN
+DECLARE deactivateTokenConfirmation VARCHAR(45);
+DECLARE deactivateTokenError VARCHAR(45);
+SELECT COUNT(`tokenId`) INTO @countTokenId FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+START TRANSACTION;
+IF @countTokenId = 0 THEN
+	ROLLBACK ;
+  SET deactivateTokenError = 'Token not found' ;
+ELSEIF @expirationTokenDate < NOW() THEN
+	ROLLBACK ;
+  SET deactivateTokenError = 'Token already deactivated ' ;
+ELSE
+	UPDATE `vita_health`.`Tokens` SET `expirationDate` = NOW() WHERE `tokenId` = TKID ;
+  SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+  IF @expirationTokenDate > NOW() THEN
+    ROLLBACK ;
+    SET deactivateTokenError = 'Token not deactivated' ;
+  ELSE
+    COMMIT ;
+    SET deactivateTokenConfirmation = 'Token deactivated' ;
+  END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT deactivateTokenConfirmation) deactivateTokenConfirmation,
+  (SELECT deactivateTokenError) deactivateTokenError
+);
+END //
+DELIMITER ;

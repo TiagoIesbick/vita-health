@@ -4,8 +4,13 @@ import { Button } from 'primereact/button';
 import CopyButton from "../components/copyButton";
 
 
-const GridItem = ({ user, token, confirm }) => {
+const GridItem = ({ user, token, setVisible, setTokenId }) => {
     let date = localDateTime(token.expirationDate, 'minus');
+
+    const handleClick = () => {
+        setTokenId(token.tokenId);
+        setVisible(true);
+    };
 
     return (
         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={token.tokenId}>
@@ -30,7 +35,7 @@ const GridItem = ({ user, token, confirm }) => {
                             <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                           </div>
                         : <>
-                            <Button onClick={confirm} text severity={'danger'} className="gap-1 text-sm p-0">
+                            <Button onClick={handleClick} text severity={'danger'} className="gap-1 text-sm p-0">
                                 <i className="pi pi-eye-slash"></i>
                             </Button>
                             <Button text className="gap-1 text-sm p-0">

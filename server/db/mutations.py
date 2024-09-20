@@ -89,3 +89,12 @@ def create_medical_record(patientId: int, recordTypeId: int, recordData: str) ->
     if len(confirmation) == 0:
         return None
     return confirmation[0]
+
+
+def deactivate_token(tokenId: int) -> (None | dict):
+    args = [tokenId]
+    query = 'DeactivateToken'
+    confirmation = mysql_results(query, 'procedure', args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]
