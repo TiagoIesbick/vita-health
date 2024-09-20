@@ -1,11 +1,32 @@
 import { localDateTime } from "../utils/utils";
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
+import { useLocation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useTokenContext } from '../providers/tokenContext';
 import CopyButton from "../components/copyButton";
 
 
-const GridItem = ({ user, token, setVisible, setTokenId }) => {
+const GridItem = ({ user, token }) => {
+    const { setVisible, setTokenId } = useTokenContext();
+    const location = useLocation();
+    const deactivateButton = useRef(null);
+    const [copyButton, setCopyButton] = useState(location.pathname !== '/inactive-tokens');
+
     let date = localDateTime(token.expirationDate, 'minus');
+
+    useEffect(() => {
+        if (location.pathname === '/inactive-tokens' && user.userType === 'Patient') {
+            deactivateButton.current.style.display = 'none';
+            deactivateButton.current.parentNode.classList.remove('justify-content-between');
+            deactivateButton.current.parentNode.classList.add('justify-content-end');
+            setCopyButton(false);
+        } else if (location.pathname !== '/inactive-tokens' && user.userType === 'Patient') {
+            deactivateButton.current.style.display = 'inherit';
+            deactivateButton.current.parentNode.classList.add('justify-content-between');
+            setCopyButton(true);
+        }
+    },[location, user.userType])
 
     const handleClick = () => {
         setTokenId(token.tokenId);
@@ -23,7 +44,7 @@ const GridItem = ({ user, token, setVisible, setTokenId }) => {
                             <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                           </div>
                     }
-                    <CopyButton txt={token.token} />
+                    {copyButton && <CopyButton txt={token.token} />}
                 </div>
                 <div className="flex flex-column align-items-center py-2">
                     <p className="font-semibold text-xs text-center" style={{wordBreak: 'break-all'}}>{token.token}</p>
@@ -35,7 +56,7 @@ const GridItem = ({ user, token, setVisible, setTokenId }) => {
                             <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
                           </div>
                         : <>
-                            <Button onClick={handleClick} text severity={'danger'} className="gap-1 text-sm p-0">
+                            <Button ref={deactivateButton} onClick={handleClick} text severity={'danger'} className="gap-1 text-sm p-0">
                                 <i className="pi pi-eye-slash"></i>
                             </Button>
                             <Button text className="gap-1 text-sm p-0">

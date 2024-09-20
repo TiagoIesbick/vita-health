@@ -323,7 +323,6 @@ export const useDeactivateToken = () => {
     const [mutate, { loading, error }] = useMutation(mutationDeactivateToken);
 
     const inactivateToken = async (tokenId) => {
-        console.log('[inactivate]:', tokenId);
         const { data: { deactivateToken } } = await mutate({
             variables: { tokenId }
         });

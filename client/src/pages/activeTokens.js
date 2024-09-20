@@ -12,6 +12,7 @@ import { activeDoctorTokensQuery, activePatientTokensQuery } from "../graphql/qu
 import ConfirmDeactivateToken from "../components/confirmDeactivateToken";
 import DataViewHeader from "../components/dataViewHeader";
 import TokenTemplate from "../components/tokenTemplate";
+import { TokenProvider } from "../providers/tokenContext";
 import './activeTokens.css';
 
 
@@ -22,9 +23,6 @@ const ActiveTokens = () => {
     const { activePatientTokens, loadingActivePatientTokens, errorActivePatientTokens } = useActivePatientTokens();
     const { activeDoctorTokens, loadingActiveDoctorTokens, errorActiveDoctorTokens } = useActiveDoctorTokens();
     const [layout, setLayout] = useState('grid');
-    const [visible, setVisible] = useState(false);
-    const [tokenId, setTokenId] = useState(0);
-
 
     useEffect(() => {
         const updateCache = (query, field) => {
@@ -89,21 +87,23 @@ const ActiveTokens = () => {
         };
         return (
             <div className="grid grid-nogutter">
-                {tokens.map((token, index) => <TokenTemplate user={user} token={token} index={index} layout={layout} key={token.tokenId} setVisible={setVisible} setTokenId={setTokenId} />)}
+                {tokens.map((token, index) => <TokenTemplate user={user} token={token} index={index} layout={layout} key={token.tokenId} />)}
             </div>
         );
     };
 
     return (
-        <Card className="card-min-height" title="Active Tokens">
-            <DataView
-                value={user.userType === 'Patient' ? activePatientTokens: activeDoctorTokens}
-                listTemplate={listTemplate}
-                layout={layout}
-                header={<DataViewHeader layout={layout} setLayout={setLayout} />}
-            />
-            <ConfirmDeactivateToken visible={visible} setVisible={setVisible} tokenId={tokenId} />
-        </Card>
+        <TokenProvider>
+            <Card className="card-min-height" title="Active Tokens">
+                <DataView
+                    value={user.userType === 'Patient' ? activePatientTokens: activeDoctorTokens}
+                    listTemplate={listTemplate}
+                    layout={layout}
+                    header={<DataViewHeader layout={layout} setLayout={setLayout} />}
+                />
+                <ConfirmDeactivateToken />
+            </Card>
+        </TokenProvider>
     );
 };
 export default ActiveTokens;

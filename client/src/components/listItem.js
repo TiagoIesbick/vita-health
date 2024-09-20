@@ -1,13 +1,26 @@
 import { localDateTime } from "../utils/utils";
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import CopyButton from "../components/copyButton";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 
 
 const ListItem = ({ user, token, index, setVisible, setTokenId }) => {
+    const location = useLocation();
+    const [displayButtons, setDisplayButtons] = useState(location.pathname !== '/inactive-tokens');
+
     let date = localDateTime(token.expirationDate, 'minus');
+
+    useEffect(() => {
+        if (location.pathname === '/inactive-tokens' && user.userType === 'Patient') {
+            setDisplayButtons(false);
+        } else if (location.pathname !== '/inactive-tokens' && user.userType === 'Patient') {
+            setDisplayButtons(true);
+        }
+    },[location, user.userType])
 
     const handleClick = () => {
         setTokenId(token.tokenId);
@@ -31,10 +44,10 @@ const ListItem = ({ user, token, index, setVisible, setTokenId }) => {
                 </div>
                 <div className="flex align-items-center gap-3 mb-3 justify-content-between">
                     <span className="flex align-items-center gap-2">
-                        <span className="xs:w-full"><CopyButton txt={token.token}/></span>
+                        {displayButtons && <span className="xs:w-full"><CopyButton txt={token.token}/></span>}
                         <span className="text-xs xs:text-center" style={{wordBreak:'break-word'}}>{token.token}</span>
                     </span>
-                    { user.userType === 'Patient' &&
+                    { user.userType === 'Patient' && displayButtons &&
                         <span className="xs:w-full pr-4">
                             <Button onClick={handleClick} text severity={'danger'} className="p-0">
                                 <i className="pi pi-eye-slash"></i>

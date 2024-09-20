@@ -3,15 +3,16 @@ import { Button } from 'primereact/button';
 import { useDeactivateToken } from '../hooks/hooks';
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
+import { useTokenContext } from '../providers/tokenContext';
 
 
-const ConfirmDeactivateToken = ({visible, setVisible, tokenId}) => {
+const ConfirmDeactivateToken = () => {
     const navigate = useNavigate();
+    const { visible, setVisible, tokenId } = useTokenContext();
     const { showMessage } = useUser();
     const { inactivateToken, loadingDeactivateToken, errorDeactivateToken } = useDeactivateToken();
 
     const handleDeactivate = async () => {
-        console.log(tokenId);
         const res = await inactivateToken(tokenId);
         if (res.deactivateTokenError) {
             showMessage('error', 'Error', res.deactivateTokenError);
