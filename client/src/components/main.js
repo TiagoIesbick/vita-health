@@ -12,10 +12,13 @@ import InsertMedicalRecord from "../pages/insertMedicalRecord";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
+import { useRealTimeCacheUpdate } from "../hooks/hooks";
 
 
 const Main = () => {
     const { user, toast, patient } = useUser();
+    useRealTimeCacheUpdate(user);
+
     return (
         <main>
             <Toast ref={toast} position="top-center" />

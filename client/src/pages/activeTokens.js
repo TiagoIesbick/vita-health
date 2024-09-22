@@ -1,14 +1,11 @@
 import { useActiveDoctorTokens, useActivePatientTokens } from "../hooks/hooks";
-import { useApolloClient } from "@apollo/client";
 import { useNavigate } from 'react-router';
 import { Card } from "primereact/card";
 import { DataView } from 'primereact/dataview';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "../providers/userContext";
 import { Link } from "react-router-dom";
-import { localDateTime } from "../utils/utils";
 import LoadingSkeleton from "../components/skeleton";
-import { activeDoctorTokensQuery, activePatientTokensQuery } from "../graphql/queries";
 import ConfirmDeactivateToken from "../components/confirmDeactivateToken";
 import DataViewHeader from "../components/dataViewHeader";
 import TokenTemplate from "../components/tokenTemplate";
@@ -17,36 +14,12 @@ import './activeTokens.css';
 
 
 const ActiveTokens = () => {
-    const client = useApolloClient();
     const navigate = useNavigate();
     const { user, showMessage } = useUser();
     const { activePatientTokens, loadingActivePatientTokens, errorActivePatientTokens } = useActivePatientTokens();
     const { activeDoctorTokens, loadingActiveDoctorTokens, errorActiveDoctorTokens } = useActiveDoctorTokens();
     const [layout, setLayout] = useState('grid');
 
-    useEffect(() => {
-        const updateCache = (query, field) => {
-            const cachedData = client.readQuery({ query });
-            if (cachedData && cachedData[field]) {
-                const updatedTokens = cachedData[field].map((token) => {
-                    const isExpired = localDateTime(token.expirationDate, 'minus') < new Date();
-                    return isExpired ? null : token;
-                }).filter(Boolean);
-                client.writeQuery({
-                    query,
-                    data: { [field]: updatedTokens },
-                });
-            };
-        };
-        const intervalId = setInterval(() => {
-            if (user.userType === 'Patient') {
-                updateCache(activePatientTokensQuery, 'activePatientTokens');
-            } else if (user.userType === 'Doctor') {
-                updateCache(activeDoctorTokensQuery, 'activeDoctorTokens');
-            };
-        }, 1000);
-        return () => clearInterval(intervalId);
-    }, [client, user.userType]);
 
     if ((user.userType === 'Patient' && loadingActivePatientTokens) ||
         (user.userType === 'Doctor' && loadingActiveDoctorTokens)) {
