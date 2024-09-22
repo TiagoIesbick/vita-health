@@ -343,4 +343,7 @@ def resolver_deactivate_token(_, info, tokenId):
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:
         return {'deactivateTokenError': 'Token not found'}
-    return deactivate_token(tokenId)
+    res = deactivate_token(tokenId)
+    if res['deactivateTokenConfirmation']:
+        res['token'] = get_token(tokenId)
+    return res

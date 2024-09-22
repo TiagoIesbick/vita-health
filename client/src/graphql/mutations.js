@@ -177,6 +177,10 @@ export const mutationDeactivateToken = gql`
         deactivateToken(tokenId: $tokenId) {
             deactivateTokenConfirmation
             deactivateTokenError
+            token {
+                tokenId
+                expirationDate
+            }
         }
     }
 `;

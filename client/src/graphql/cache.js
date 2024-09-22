@@ -18,6 +18,23 @@ export const cache = new InMemoryCache({
                         return mergeTokens(existing, incoming, readField);
                     }
                 },
+                inactiveTokens: {
+                    keyArgs: ['limit', 'offset'],
+                    merge(existing =  { items: [], totalCount: 0}, incoming, { args }) {
+                        const mergedItems = existing.items ? existing.items.slice(0) : [];
+                        const incomingItems = incoming.items ? incoming.items.slice(0) : [];
+                        const offset = args?.offset ?? 0;
+                        for (let i = 0; i < incomingItems.length; ++i) {
+                            mergedItems[offset + i] = incomingItems[i];
+                        }
+                        return {
+                            ...existing,
+                            items: mergedItems,
+                            totalCount: incoming.totalCount,
+                            pagination: { offset: args.offset, limit: args.limit }
+                        };
+                    }
+                },
             }
         },
         Users: {
@@ -47,8 +64,8 @@ export const cache = new InMemoryCache({
 
 const mergeTokens = (existing = [], incoming, readField) => {
     const existingTokensMap = new Map(existing.map(token => [readField('tokenId', token), token]));
-    if (!incoming) return;
-    incoming.forEach(token => {
+    const incomingData = incoming ? incoming.slice(0) : [];
+    incomingData.forEach(token => {
         existingTokensMap.set(readField('tokenId', token), token);
     });
     const now = new Date();

@@ -45,7 +45,7 @@ const ListItem = ({ user, token, index, setVisible, setTokenId }) => {
                 <div className="flex align-items-center gap-3 mb-3 justify-content-between">
                     <span className="flex align-items-center gap-2">
                         {displayButtons && <span className="xs:w-full"><CopyButton txt={token.token}/></span>}
-                        <span className="text-xs xs:text-center" style={{wordBreak:'break-word'}}>{token.token}</span>
+                        <span className="text-xs xs:text-center" style={{wordBreak:'break-all'}}>{token.token}</span>
                     </span>
                     { user.userType === 'Patient' && displayButtons &&
                         <span className="xs:w-full pr-4">

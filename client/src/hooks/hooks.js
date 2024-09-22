@@ -324,7 +324,62 @@ export const useDeactivateToken = () => {
 
     const inactivateToken = async (tokenId) => {
         const { data: { deactivateToken } } = await mutate({
-            variables: { tokenId }
+            variables: { tokenId },
+            update: (cache, { data: { deactivateToken }}) => {
+                if (deactivateToken.deactivateTokenError) return;
+                let removedToken;
+                cache.modify({
+                    fields: {
+                        activePatientTokens(existing = [], { readField }) {
+                            removedToken = existing.find(
+                                tokenRef => readField('tokenId', tokenRef) === deactivateToken.token.tokenId
+                            );
+                            return existing.filter(
+                                tokenRef => readField('tokenId', tokenRef) !== deactivateToken.token.tokenId
+                            );
+                        }
+                    }
+                });
+                if (removedToken) {
+                    removedToken = {
+                        ...removedToken,
+                        expirationDate: deactivateToken.token.expirationDate
+                    };
+                };
+                let lastToken;
+                let lastTokenNewPosition;
+                cache.modify({
+                    fields: {
+                        inactiveTokens(existing = { items: [], totalCount: 0 }, { readField }) {
+                            const pagination = existing.pagination;
+                            const mergedItems = existing.items ? existing.items.slice(0) : [];
+                            if (pagination) {
+                                if(pagination.offset === 0) {
+                                    const limit = pagination.limit;
+                                    mergedItems.unshift(removedToken);
+                                    if (mergedItems.length > limit) {
+                                        lastToken = mergedItems.pop();
+                                        lastTokenNewPosition = mergedItems.length;
+                                    };
+                                }
+                                else if (pagination.offset === lastTokenNewPosition) {
+                                    const limit = pagination.limit + pagination.offset;
+                                    mergedItems.splice(lastTokenNewPosition, 0, lastToken)
+                                    if (mergedItems.length > limit) {
+                                        lastToken = mergedItems.pop();
+                                        lastTokenNewPosition = mergedItems.length;
+                                    };
+                                }
+                            };
+                            return {
+                                ...existing,
+                                items: mergedItems,
+                                totalCount: existing.totalCount + 1
+                            };
+                        }
+                    }
+                });
+            },
         });
         return deactivateToken;
     };
