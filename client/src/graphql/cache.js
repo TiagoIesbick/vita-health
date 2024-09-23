@@ -82,3 +82,44 @@ const mergeTokens = (existing = [], incoming, readField) => {
         });
     return filteredTokens;
 };
+
+
+export const updateInactiveTokensCache = (cache, newToken) => {
+    let lastToken;
+    let lastTokenNewPosition;
+
+    cache.modify({
+        fields: {
+            inactiveTokens(existing = { items: [], totalCount: 0 }) {
+                const pagination = existing.pagination;
+                const mergedItems = existing.items ? existing.items.slice(0) : [];
+
+                if (pagination) {
+                    if (pagination.offset === 0) {
+                        const limit = pagination.limit;
+                        mergedItems.unshift(newToken);
+
+                        if (mergedItems.length > limit) {
+                            lastToken = mergedItems.pop();
+                            lastTokenNewPosition = mergedItems.length;
+                        };
+                    } else if (pagination.offset === lastTokenNewPosition) {
+                        const limit = pagination.limit + pagination.offset;
+                        mergedItems.splice(lastTokenNewPosition, 0, lastToken);
+
+                        if (mergedItems.length > limit) {
+                            lastToken = mergedItems.pop();
+                            lastTokenNewPosition = mergedItems.length;
+                        }
+                    };
+                };
+
+                return {
+                    ...existing,
+                    items: mergedItems,
+                    totalCount: existing.totalCount + 1,
+                };
+            },
+        },
+    });
+};

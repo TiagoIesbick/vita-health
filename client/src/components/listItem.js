@@ -3,12 +3,14 @@ import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTokenContext } from '../providers/tokenContext';
 import CopyButton from "../components/copyButton";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 
 
-const ListItem = ({ user, token, index, setVisible, setTokenId }) => {
+const ListItem = ({ user, token, index }) => {
+    const { setVisible, setTokenId } = useTokenContext();
     const location = useLocation();
     const [displayButtons, setDisplayButtons] = useState(location.pathname !== '/inactive-tokens');
 

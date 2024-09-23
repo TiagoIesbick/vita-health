@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { localDateTime } from "../utils/utils";
+import { updateInactiveTokensCache } from "../graphql/cache";
 
 
 export const useBackgroundImageResize = () => {
@@ -56,41 +57,9 @@ export const useRealTimeCacheUpdate = (user) => {
             if (user?.userType === 'Patient') {
                 updateCache(activePatientTokensQuery, 'activePatientTokens');
                 if (expiredTokens.length > 0) {
-                    for (let i = 0; i < expiredTokens.length; i++) {
-                        let lastToken;
-                        let lastTokenNewPosition;
-                        client.cache.modify({
-                            fields: {
-                                inactiveTokens(existing = { items: [], totalCount: 0 }) {
-                                    const pagination = existing.pagination;
-                                    const mergedItems = existing.items ? existing.items.slice(0) : [];
-                                    if (pagination) {
-                                        if(pagination.offset === 0) {
-                                            const limit = pagination.limit;
-                                            mergedItems.unshift(expiredTokens[i]);
-                                            if (mergedItems.length > limit) {
-                                                lastToken = mergedItems.pop();
-                                                lastTokenNewPosition = mergedItems.length;
-                                            };
-                                        }
-                                        else if (pagination.offset === lastTokenNewPosition) {
-                                            const limit = pagination.limit + pagination.offset;
-                                            mergedItems.splice(lastTokenNewPosition, 0, lastToken)
-                                            if (mergedItems.length > limit) {
-                                                lastToken = mergedItems.pop();
-                                                lastTokenNewPosition = mergedItems.length;
-                                            };
-                                        }
-                                    };
-                                    return {
-                                        ...existing,
-                                        items: mergedItems,
-                                        totalCount: existing.totalCount + 1
-                                    };
-                                }
-                            }
-                        });
-                    };
+                    expiredTokens.forEach(token => {
+                        updateInactiveTokensCache(client.cache, token);
+                    });
                     expiredTokens.length = 0;
                 };
             } else if (user?.userType === 'Doctor') {
@@ -418,40 +387,8 @@ export const useDeactivateToken = () => {
                         ...removedToken,
                         expirationDate: deactivateToken.token.expirationDate
                     };
+                    updateInactiveTokensCache(cache, removedToken);
                 };
-                let lastToken;
-                let lastTokenNewPosition;
-                cache.modify({
-                    fields: {
-                        inactiveTokens(existing = { items: [], totalCount: 0 }) {
-                            const pagination = existing.pagination;
-                            const mergedItems = existing.items ? existing.items.slice(0) : [];
-                            if (pagination) {
-                                if(pagination.offset === 0) {
-                                    const limit = pagination.limit;
-                                    mergedItems.unshift(removedToken);
-                                    if (mergedItems.length > limit) {
-                                        lastToken = mergedItems.pop();
-                                        lastTokenNewPosition = mergedItems.length;
-                                    };
-                                }
-                                else if (pagination.offset === lastTokenNewPosition) {
-                                    const limit = pagination.limit + pagination.offset;
-                                    mergedItems.splice(lastTokenNewPosition, 0, lastToken)
-                                    if (mergedItems.length > limit) {
-                                        lastToken = mergedItems.pop();
-                                        lastTokenNewPosition = mergedItems.length;
-                                    };
-                                }
-                            };
-                            return {
-                                ...existing,
-                                items: mergedItems,
-                                totalCount: existing.totalCount + 1
-                            };
-                        }
-                    }
-                });
             },
         });
         return deactivateToken;
