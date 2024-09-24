@@ -71,24 +71,23 @@ const GenerateAccessToken = () => {
             <Dialog
                 visible={visible}
                 onHide={() => {if (!visible) return; setVisible(false); }}
-                style={{ width: '50vw' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                style={{ width: '30vw' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                 content={({ hide }) => (
-                    <div className="flex flex-column align-items-center p-5 surface-overlay border-round">
+                    <div className="flex flex-column align-items-center px-5 pt-5 pb-3 surface-overlay border-round">
                         <motion.div
                             animate={{
                                 scale: [1, 2, 2, 1, 1],
                                 rotate: [0, 0, 270, 270, 0],
-                                borderRadius: ["20%", "20%", "50%", "50%", "20%"],
                             }}
                             className="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
                         >
                             <i className="pi pi-ticket text-5xl"></i>
                         </motion.div>
                         <Button icon="pi pi-times" onClick={(e) => {hide(e); setToken('');}} rounded text severity="secondary" aria-label="Close" className="absolute top-0 right-0 focus:border-none focus:shadow-none"/>
-                        <span className="font-bold text-2xl block mb-2 mt-4" >
+                        <span className="font-bold text-2xl block mt-3 mb-2" >
                             Token
                         </span>
-                        <p style={{ wordBreak: 'break-all' }} className="mt-1 mb-3 text-center">{token}</p>
+                        <p style={{ wordBreak: 'break-all' }} className="my-1 text-center">{token}</p>
                         <CopyButton txt={token} />
                     </div>
                 )}
