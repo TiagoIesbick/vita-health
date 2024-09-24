@@ -1,11 +1,12 @@
+import nh3
+import jwt
+from os import getenv
 from ariadne import QueryType, ObjectType, MutationType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from utils.utils import encrypt, validate_email, validate_password, \
     validate_name, generate_token
-from auth import handle_login
-import nh3
 
 
 query = QueryType()
@@ -114,7 +115,7 @@ def resolve_update_user(_, info, input):
     res = update_user(email, nh3.clean(firstName), nh3.clean(lastName), userId)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
-        res['token'] = handle_login(res['user'])
+        res['token'] = jwt.encode(res['user'], getenv('SECRET'), algorithm="HS256")
     return res
 
 
@@ -149,7 +150,7 @@ def resolve_update_doctor_user(_, info, input):
 def resolve_login(*_, email, password):
     user = get_user_by_email_password(email, password)
     if user:
-        token = handle_login(user)
+        token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
         return { 'user': user, 'token': token }
     return { 'error': 'Invalid email or password' }
 
@@ -158,12 +159,16 @@ def resolve_login(*_, email, password):
 def resolve_medical_records(_, info):
     if not info.context['authenticated']:
         return None
-    if info.context['user_detail']['userType'] != 'Patient':
-        return None
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return None
-    return get_medical_records_by_pacient(patient['patientId'])
+    if info.context['user_detail']['userType'] == 'Patient':
+        patient = get_users_patient(info.context['user_detail']['userId'])
+        if not patient:
+            return None
+        patient_id = patient['patientId']
+    elif info.context['user_detail']['userType'] == 'Doctor':
+        if not info.context['medical_access']:
+            return None
+        patient_id = info.context['medical_access']['patientId']
+    return get_medical_records_by_pacient(patient_id)
 
 
 @query.field("medicalRecord")
@@ -171,15 +176,6 @@ def resolve_get_medical_record(_, info, recordId):
     if not info.context['authenticated']:
         return None
     return get_medical_record(recordId)
-
-
-@query.field("medicalRecordsByPatientId")
-def resolve_medical_records_by_patient_id(_, info, patientId):
-    if not info.context['authenticated']:
-        return None
-    if info.context['user_detail']['userType'] != 'Doctor':
-        return None
-    return get_medical_records_by_pacient(patientId)
 
 
 @medical_records.field("recordType")
@@ -191,12 +187,15 @@ def resolve_medical_records_type(medicalRecords, *_):
 def resolve_create_medical_record(_, info, recordTypeId, recordData):
     if not info.context['authenticated']:
         return {'medicalRecordError': 'Missing authentication'}
-    if info.context['user_detail']['userType'] != 'Patient':
-        return {'medicalRecordError': 'Missing patient credential'}
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return None
-    res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    if info.context['user_detail']['userType'] == 'Patient':
+        patient = get_users_patient(info.context['user_detail']['userId'])
+        if not patient:
+            return {'medicalRecordError': 'Missing patient credential'}
+        res = create_medical_record(patient['patientId'], recordTypeId, recordData)
+    else:
+        if not info.context['medical_access']:
+            return {'medicalRecordError': 'Missing authorization'}
+        res = create_medical_record(info.context['medical_access']['patientId'], recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         res['medicalRecord'] = get_medical_record(res['medicalRecordId'])
     return res
@@ -239,6 +238,23 @@ def resolve_doctors_active_tokens(_, info):
     return get_active_tokens_by_doctor(doctor['doctorId'])
 
 
+@query.field("inactiveTokens")
+def resolve_inactive_tokens(_, info, limit, offset):
+    if not info.context['authenticated']:
+        return None
+    if info.context['user_detail']['userType'] != 'Patient':
+        return None
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return None
+    items = get_inactive_tokens(patient['patientId'], limit, offset)
+    total_inactive_tokens = count_inactive_tokens(patient['patientId'])
+    if not total_inactive_tokens:
+        return None
+    total_inactive_tokens['items'] = items
+    return total_inactive_tokens
+
+
 @mutation.field("generateToken")
 def resolve_generate_token(_, info, expirationDate):
     if not info.context['authenticated']:
@@ -247,17 +263,18 @@ def resolve_generate_token(_, info, expirationDate):
     if not patient:
         return {'tokenError': 'Missing patient credential'}
     exp = datetime.fromisoformat(expirationDate).strftime("%Y-%m-%d %H:%M:%S")
+    unix_timestamp = int(datetime.fromisoformat(expirationDate.replace("Z", "+00:00")).timestamp())
     reserve_tokenId = reserve_token_id(patient['patientId'], exp)
     if reserve_tokenId['tokenError']:
         return {'tokenError': reserve_tokenId['tokenError']}
     token = generate_token(
-        expirationDate,
+        unix_timestamp,
         {
             'patientId': patient['patientId'],
             'userId': patient['userId'],
             'tokenId': reserve_tokenId['tokenId']
         }
-        )
+    )
     res = create_token(reserve_tokenId['tokenId'], token)
     if res['tokenError']:
         return {'tokenError': res['tokenError']}
@@ -267,12 +284,22 @@ def resolve_generate_token(_, info, expirationDate):
 
 
 @mutation.field("saveTokenAccess")
-def resolve_save_token_access(_, info, tokenId, doctorId):
+def resolve_save_token_access(_, info, token):
     if not info.context['authenticated']:
-        return {'acessError': 'Missing authentication'}
+        return {'accessError': 'Missing authentication'}
     if info.context['user_detail']['userType'] != 'Doctor':
-        return {'acessError': 'Missing healthcare professional credential'}
-    return create_token_access(tokenId, doctorId)
+        return {'accessError': 'Missing healthcare professional credential'}
+    try:
+        jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
+    except jwt.exceptions.PyJWTError as exc:
+        return {'accessError': str(exc)}
+    if not info.context['medical_access']:
+        return {'accessError': 'Missing authorization'}
+    doctor = get_users_doctor(info.context['user_detail']['userId'])
+    res = create_token_access(info.context['medical_access']['tokenId'], doctor['doctorId'])
+    if res['accessConfirmation']:
+        res['tokenAccess'] = get_token_access(res['tokenAccessId'])
+    return res
 
 
 @tokens.field("patient")
@@ -293,7 +320,7 @@ def resolve_tokens_token_access(tokens, info):
 def resolve_token_access_token(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
-    return get_token_access_token(tokenAccess['tokenId'])
+    return get_token(tokenAccess['tokenId'])
 
 
 @token_access.field("doctor")
@@ -301,3 +328,22 @@ def resolve_token_access_doctor(tokenAccess, info):
     if not info.context['authenticated'] or not tokenAccess['tokenId']:
         return None
     return get_doctor(tokenAccess['doctorId'])
+
+
+@mutation.field("deactivateToken")
+def resolver_deactivate_token(_, info, tokenId):
+    if not info.context['authenticated']:
+        return {'deactivateTokenError': 'Missing authentication'}
+    if info.context['user_detail']['userType'] != 'Patient':
+        return {'deactivateTokenError': 'Missing patient credential'}
+    patient = get_users_patient(info.context['user_detail']['userId'])
+    if not patient:
+        return {'deactivateTokenError': 'Missing patient credential'}
+    tokens = get_active_tokens_by_patient(patient['patientId'])
+    token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
+    if not token_exists:
+        return {'deactivateTokenError': 'Token not found'}
+    res = deactivate_token(tokenId)
+    if res['deactivateTokenConfirmation']:
+        res['token'] = get_token(tokenId)
+    return res

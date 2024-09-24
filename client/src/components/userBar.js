@@ -9,19 +9,24 @@ import { motion } from "framer-motion";
 
 const UserBar = () => {
     const navigate = useNavigate();
-    const { user, setUser, showMessage } = useUser();
+    const { user, setUser, setPatient, showMessage } = useUser();
     const userMenu = useRef(null);
     const items = [
-        {
+        ...(user.userType === 'Patient' ? [{
             label: 'Add Health Data',
             icon: 'pi pi-plus-circle',
             command: () => navigate("/insert-medical-record")
-        },
+        }] : []),
         {
             label: 'Active Tokens',
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },
+        ...(user.userType === 'Patient' ? [{
+            label: 'Inactive Tokens',
+            icon: 'pi pi-eye-slash',
+            command: () => navigate("/inactive-tokens")
+        }] : []),
         {
             label: 'Edit Profile',
             icon: 'pi pi-user-edit',
@@ -37,6 +42,7 @@ const UserBar = () => {
                 logout();
                 showMessage('info', 'Logged Out', `Bye ${user.firstName}`);
                 setUser(null);
+                setPatient(null);
                 navigate("/");
             }
         }

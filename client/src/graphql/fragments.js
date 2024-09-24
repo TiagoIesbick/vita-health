@@ -59,3 +59,55 @@ export const medicalRecordsFragment = gql`
     }
     ${recordTypeFragment}
 `;
+
+
+export const tokenFragment = gql`
+    fragment TokenDetail on Tokens {
+        tokenId
+        token
+        expirationDate
+        patient {
+            ...PatientDetail
+            user {
+                userId
+                firstName
+                lastName
+            }
+        }
+        tokenAccess {
+            tokenAccessId
+            accessTime
+            doctor {
+                ...DoctorDetail
+                user {
+                    userId
+                    firstName
+                    lastName
+                }
+            }
+        }
+    }
+    ${patientDetailFragment}
+    ${doctorDetailFragment}
+`;
+
+
+export const tokenAccessFragment = gql`
+    fragment TokenAccessDetail on TokenAccess {
+        tokenAccessId
+        accessTime
+        token {
+            ...TokenDetail
+        }
+        doctor {
+            ...DoctorDetail
+            user {
+                userId
+                firstName
+                lastName
+            }
+        }
+    }
+    ${tokenFragment}
+    ${doctorDetailFragment}
+`;

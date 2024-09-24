@@ -1,17 +1,79 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useApolloClient } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, medicalRecordsByPatientIdQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { localDateTime } from "../utils/utils";
+import { updateInactiveTokensCache } from "../graphql/cache";
+
+
+export const useBackgroundImageResize = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        const backgroundImageResize = () => {
+            const body = document.body
+            const bodyHeight = body.scrollHeight;
+            const windowHeight = window.innerHeight;
+            if (bodyHeight > 2*windowHeight) {
+                body.style.backgroundSize = 'auto';
+            } else {
+                body.style.backgroundSize = 'cover';
+            };
+        };
+        backgroundImageResize();
+        window.addEventListener('resize', backgroundImageResize);
+        backgroundImageResize();
+        return () => {
+            window.removeEventListener('resize', backgroundImageResize);
+        };
+    },[location])
+};
+
+
+export const useRealTimeCacheUpdate = (user) => {
+    const client = useApolloClient();
+
+    useEffect(() => {
+        const expiredTokens = [];
+        const updateCache = (query, field) => {
+            const cachedData = client.readQuery({ query });
+            if (cachedData && cachedData[field]) {
+                const updatedTokens = cachedData[field].map((token) => {
+                    const isExpired = localDateTime(token.expirationDate, 'minus') < new Date();
+                    if (isExpired) {
+                        if (user?.userType === 'Patient') expiredTokens.push(token);
+                        return null;
+                    } else {return token;};
+                }).filter(Boolean);
+                client.writeQuery({
+                    query,
+                    data: { [field]: updatedTokens },
+                });
+            };
+        };
+        const intervalId = setInterval(() => {
+            if (user?.userType === 'Patient') {
+                updateCache(activePatientTokensQuery, 'activePatientTokens');
+                if (expiredTokens.length > 0) {
+                    expiredTokens.forEach(token => {
+                        updateInactiveTokensCache(client.cache, token);
+                    });
+                    expiredTokens.length = 0;
+                };
+            } else if (user?.userType === 'Doctor') {
+                updateCache(activeDoctorTokensQuery, 'activeDoctorTokens');
+            };
+        }, 1000);
+        return () => clearInterval(intervalId);
+    }, [client, user?.userType]);
+};
 
 
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
-};
-
-
-export const useMedicalRecordsByPatientId = (patientId) => {
-    const { data, loading, error } = useQuery(medicalRecordsByPatientIdQuery, { variables: { patientId } });
-    return {medicalRecords: data?.medicalRecordsByPatientId, loading, error: Boolean(error)};
 };
 
 
@@ -71,7 +133,21 @@ export const useGenerateToken = () => {
 
     const addToken = async (tokenExpirationDateTime) => {
         const { data: { generateToken } } = await mutate({
-            variables: { expirationDate: tokenExpirationDateTime}
+            variables: { expirationDate: tokenExpirationDateTime},
+            update: (cache, { data: { generateToken }}) => {
+                if (generateToken.tokenError) return;
+                const existingCacheData = cache.readQuery({ query: activePatientTokensQuery });
+                if (!existingCacheData) return;
+                const newToken = generateToken.token;
+                cache.writeQuery({
+                    query: activePatientTokensQuery,
+                    data: {
+                        activePatientTokens: !existingCacheData.activePatientTokens
+                        ? [newToken]
+                        : [newToken, ...existingCacheData.activePatientTokens]
+                    }
+                });
+            },
         });
         return generateToken;
     };
@@ -86,9 +162,25 @@ export const useGenerateToken = () => {
 export const useSaveTokenAccess = () => {
     const [mutate, { loading, error }] = useMutation(mutationSaveTokenAccess);
 
-    const addTokenAccess = async (tokenId, doctorId) => {
+    const addTokenAccess = async (token) => {
         const { data: { saveTokenAccess } } = await mutate({
-            variables: { tokenId: tokenId, doctorId}
+            variables: { token },
+            update: (cache, { data: { saveTokenAccess }}) => {
+                if (saveTokenAccess.accessError) return;
+                const existingCacheData = cache.readQuery({ query: activeDoctorTokensQuery });
+                if (!existingCacheData) return;
+                const newToken = saveTokenAccess.tokenAccess.token;
+                cache.writeQuery({
+                    query: activeDoctorTokensQuery,
+                    data: {
+                        activeDoctorTokens: !existingCacheData.activeDoctorTokens
+                        ? [newToken]
+                        : !existingCacheData.activeDoctorTokens.some(obj => obj.tokenId === newToken.tokenId)
+                        ? [newToken, ...existingCacheData.activeDoctorTokens].sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
+                        : existingCacheData.activeDoctorTokens
+                    }
+                });
+            },
         });
         return saveTokenAccess;
     };
@@ -178,14 +270,22 @@ export const useUpdateDoctorUser = () => {
 
 
 export const useActivePatientTokens = () => {
-    const { data, loading, error } = useQuery(activePatientTokensQuery, {fetchPolicy: 'network-only'});
+    const { data, loading, error } = useQuery(activePatientTokensQuery);
     return {activePatientTokens: data?.activePatientTokens, loadingActivePatientTokens: loading, errorActivePatientTokens: Boolean(error)};
 };
 
 
 export const useActiveDoctorTokens = () => {
-    const { data, loading, error } = useQuery(activeDoctorTokensQuery, {fetchPolicy: 'network-only'});
+    const { data, loading, error } = useQuery(activeDoctorTokensQuery);
     return {activeDoctorTokens: data?.activeDoctorTokens, loadingActiveDoctorTokens: loading, errorActiveDoctorTokens: Boolean(error)};
+};
+
+
+export const useInactiveTokens = (limit, offset) => {
+    const { data, loading, error } = useQuery(inactiveTokensQuery, {
+        variables: {limit, offset}
+    });
+    return {inactiveTokens: data?.inactiveTokens, loadingInactiveTokens: loading, errorInactiveTokens: Boolean(error)};
 };
 
 
@@ -244,8 +344,9 @@ export const useCreateMedicalRecord = () => {
                 cache.writeQuery({
                     query: medicalRecordsQuery,
                     data: {
-                        medicalRecords: !existingCacheData.medicalRecords ?
-                        [newMedicalRecord] : [newMedicalRecord, ...existingCacheData.medicalRecords]
+                        medicalRecords: !existingCacheData.medicalRecords
+                        ? [newMedicalRecord]
+                        : [newMedicalRecord, ...existingCacheData.medicalRecords]
                     }
                 });
             },
@@ -256,5 +357,45 @@ export const useCreateMedicalRecord = () => {
         addMedicalRecord,
         loadingMedicalRecord: loading,
         errorMedicalRecord: error
+    };
+};
+
+
+export const useDeactivateToken = () => {
+    const [mutate, { loading, error }] = useMutation(mutationDeactivateToken);
+
+    const inactivateToken = async (tokenId) => {
+        const { data: { deactivateToken } } = await mutate({
+            variables: { tokenId },
+            update: (cache, { data: { deactivateToken }}) => {
+                if (deactivateToken.deactivateTokenError) return;
+                let removedToken;
+                cache.modify({
+                    fields: {
+                        activePatientTokens(existing = [], { readField }) {
+                            removedToken = existing.find(
+                                tokenRef => readField('tokenId', tokenRef) === deactivateToken.token.tokenId
+                            );
+                            return existing.filter(
+                                tokenRef => readField('tokenId', tokenRef) !== deactivateToken.token.tokenId
+                            );
+                        }
+                    }
+                });
+                if (removedToken) {
+                    removedToken = {
+                        ...removedToken,
+                        expirationDate: deactivateToken.token.expirationDate
+                    };
+                    updateInactiveTokensCache(cache, removedToken);
+                };
+            },
+        });
+        return deactivateToken;
+    };
+    return {
+        inactivateToken,
+        loadingDeactivateToken: loading,
+        errorDeactivateToken: error
     };
 };

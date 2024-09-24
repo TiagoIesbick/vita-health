@@ -7,14 +7,18 @@ import GenerateAccessToken from "../pages/generateAccessToken";
 import InsertToken from "../pages/insertToken";
 import MedicalRecordsAccess from "../pages/medicalRecordsAccess";
 import ActiveTokens from "../pages/activeTokens";
+import InactiveTokens from "../pages/inactiveTokens";
 import InsertMedicalRecord from "../pages/insertMedicalRecord";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
+import { useRealTimeCacheUpdate } from "../hooks/hooks";
 
 
 const Main = () => {
     const { user, toast, patient } = useUser();
+    useRealTimeCacheUpdate(user);
+
     return (
         <main>
             <Toast ref={toast} position="top-center" />
@@ -28,6 +32,7 @@ const Main = () => {
                 <Route path="/insert-token" element={user && user.userType === 'Doctor' ? <InsertToken /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records-access" element={user && user.userType === 'Doctor' && patient ? <MedicalRecordsAccess />: <Navigate to="/" replace />} />
                 <Route path="/active-tokens" element={user ? <ActiveTokens /> : <Navigate to="/" replace />} />
+                <Route path="/inactive-tokens" element={user && user.userType === 'Patient' ? <InactiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/insert-medical-record" element={user ? <InsertMedicalRecord /> : <Navigate to="/" replace />} />
             </Routes>
         </main>

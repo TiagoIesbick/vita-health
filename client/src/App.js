@@ -4,9 +4,12 @@ import { apolloClient } from './graphql/apolloConfig';
 import Header from './components/header';
 import Main from './components/main';
 import Footer from './components/footer';
+import { useBackgroundImageResize } from './hooks/hooks';
 
 
 function App() {
+  useBackgroundImageResize();
+
   return (
     <ApolloProvider client={apolloClient}>
       <UserProvider>

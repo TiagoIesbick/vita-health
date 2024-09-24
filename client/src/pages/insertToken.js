@@ -4,41 +4,51 @@ import { FloatLabel } from "primereact/floatlabel";
 import { Card } from 'primereact/card';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from "primereact/button";
-import { ACCESS_MEDICAL_TOKEN_KEY, getCredentials, storeToken } from "../graphql/auth";
+import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
-import { useSaveTokenAccess, useUserQuery } from "../hooks/hooks";
+import { useSaveTokenAccess } from "../hooks/hooks";
+import { useApolloClient } from "@apollo/client";
+import { medicalRecordsQuery } from "../graphql/queries";
 
 
 const InsertToken = () => {
     const navigate = useNavigate();
-    const { user, setPatient, showMessage } = useUser();
-    const { userDetail } = useUserQuery(user.userId);
-    const { addTokenAccess } = useSaveTokenAccess();
+    const client = useApolloClient();
+    const { setPatient, showMessage } = useUser();
+    const { addTokenAccess, loadingTokenAccess, errorTokenAccess } = useSaveTokenAccess();
     const formik = useFormik({
         initialValues: {
             token: ''
         },
         onSubmit: async (values, { resetForm }) => {
             storeToken(ACCESS_MEDICAL_TOKEN_KEY, values.token);
-            const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
-            if (Date.parse(credentials.exp) <= Date.now()) {
-                showMessage('error', 'Error', 'Expired token');
+            const resTokenAccess = await addTokenAccess(values.token);
+            if (resTokenAccess.accessError) {
+                showMessage('error', 'Error', resTokenAccess.accessError);
                 setPatient(null);
-                localStorage.removeItem(ACCESS_MEDICAL_TOKEN_KEY);
+                deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
             } else {
+                const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
                 setPatient(credentials);
-                await addTokenAccess(credentials.tokenId, userDetail?.doctor.doctorId);
+                const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
+                if (cachedData) {
+                    client.refetchQueries({ include: ["medicalRecords"] });
+                };
                 navigate("/medical-records-access");
                 showMessage('success', 'Sucess', 'Permission Granted');
+                resetForm();
             };
-            resetForm();
         },
         validationSchema: Yup.object({
             token: Yup.string().required('Required').min(83, 'Minimum 83 characters')
         })
     });
 
+    if (errorTokenAccess) {
+        navigate('/');
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+    };
 
     return (
         <Card
@@ -57,7 +67,7 @@ const InsertToken = () => {
                     <label htmlFor="token">Token</label>
                     {formik.touched.token && formik.errors.token &&<div className="text-red-500 text-xs">{formik.errors.token}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingTokenAccess} loading={loadingTokenAccess} />
             </form>
         </Card>
     );

@@ -533,6 +533,8 @@ CREATE PROCEDURE AddTokenAccess(IN TKID INT, IN DTID INT)
 BEGIN
 DECLARE accessConfirmation VARCHAR(45);
 DECLARE accessError VARCHAR(45);
+PREPARE Expiration FROM 'SELECT `expirationDate` INTO @expirationToken FROM `vita_health`.`Tokens`
+	WHERE `tokenId` = ?' ;
 PREPARE CountPreviousTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countPreviousTokenAccess FROM `vita_health`.`TokenAccess`
 	WHERE `tokenId` = ?' ;
 PREPARE InsertIntoTokenAccess FROM 'INSERT INTO `vita_health`.`TokenAccess` (`tokenId`, `doctorId`)
@@ -542,19 +544,26 @@ PREPARE CountTokenAccess FROM 'SELECT COUNT(`tokenId`) INTO @countTokenAccess FR
 START TRANSACTION;
 SET @tokenId = TKID;
 SET @doctorId = DTID;
-EXECUTE CountPreviousTokenAccess USING @tokenId ;
-EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
-EXECUTE CountTokenAccess USING @tokenId ;
-IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
-	COMMIT;
-	SET accessConfirmation = 'Saved access' ;
-ELSE
+EXECUTE Expiration USING @tokenId ;
+IF @expirationToken < NOW() THEN
 	ROLLBACK ;
-  SET accessError = 'Access NOT saved' ;
+  SET accessError = 'Access permission has expired.' ;
+ELSE
+	EXECUTE CountPreviousTokenAccess USING @tokenId ;
+	EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
+	EXECUTE CountTokenAccess USING @tokenId ;
+	IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
+		COMMIT;
+		SET accessConfirmation = 'Saved access' ;
+	ELSE
+		ROLLBACK ;
+		SET accessError = 'Access NOT saved' ;
+	END IF ;
 END IF ;
 SELECT * FROM(
   (SELECT accessConfirmation) accessConfirmation,
-  (SELECT accessError) accessError
+  (SELECT accessError) accessError,
+  (SELECT LAST_INSERT_ID() AS tokenAccessId) tokenAccessId
 );
 END //
 DELIMITER ;
@@ -630,6 +639,42 @@ SELECT * FROM(
   (SELECT medicalRecordConfirmation) medicalRecordConfirmation,
   (SELECT medicalRecordError) medicalRecordError,
   (SELECT LAST_INSERT_ID() AS medicalRecordId) medicalRecordId
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to deactivate token
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE DeactivateToken(IN TKID INT)
+BEGIN
+DECLARE deactivateTokenConfirmation VARCHAR(45);
+DECLARE deactivateTokenError VARCHAR(45);
+SELECT COUNT(`tokenId`) INTO @countTokenId FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+START TRANSACTION;
+IF @countTokenId = 0 THEN
+	ROLLBACK ;
+  SET deactivateTokenError = 'Token not found' ;
+ELSEIF @expirationTokenDate < NOW() THEN
+	ROLLBACK ;
+  SET deactivateTokenError = 'Token already deactivated ' ;
+ELSE
+	UPDATE `vita_health`.`Tokens` SET `expirationDate` = NOW() WHERE `tokenId` = TKID ;
+  SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
+  IF @expirationTokenDate > NOW() THEN
+    ROLLBACK ;
+    SET deactivateTokenError = 'Token not deactivated' ;
+  ELSE
+    COMMIT ;
+    SET deactivateTokenConfirmation = 'Token deactivated' ;
+  END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT deactivateTokenConfirmation) deactivateTokenConfirmation,
+  (SELECT deactivateTokenError) deactivateTokenError
 );
 END //
 DELIMITER ;

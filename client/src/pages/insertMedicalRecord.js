@@ -7,18 +7,26 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import './insertMedicalRecord.css';
 import { useCreateMedicalRecord, useCreateRecordType, useRecordTypes } from "../hooks/hooks";
+import { useUserQuery } from '../hooks/hooks';
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
 import { useUser } from "../providers/userContext";
+import CountDown from "../components/countdown";
+import LoadingSkeleton from "../components/skeleton";
 
 
 const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
 
+
 const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
 
+
 const InsertMedicalRecord = () => {
-    const { showMessage } = useUser();
+    const navigate = useNavigate();
+    const { user, patient, setPatient, showMessage } = useUser();
+    const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId);
     const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
     const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
     const { addMedicalRecord, loadingMedicalRecord, errorMedicalRecord } = useCreateMedicalRecord();
@@ -36,6 +44,7 @@ const InsertMedicalRecord = () => {
             } else {
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
+                if (user.userType === 'Doctor') navigate('/medical-records-access');
             };
         },
         validationSchema: Yup.object({
@@ -81,12 +90,18 @@ const InsertMedicalRecord = () => {
         if (e.target.textContent === 'Register new category') setVisible(true);
     };
 
-    if (errorRecordTypes || errorRecordType || errorMedicalRecord) {
-        return <div>Data Unavailable</div>
+    if (user.userType === 'Doctor' && loadingUser) {
+        return <LoadingSkeleton />;
+    };
+
+    if (errorRecordTypes || errorRecordType || errorMedicalRecord || (user.userType === 'Doctor' && errorUser)) {
+        navigate('/');
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
     return (
         <Card title="Add Health Data" className="flex justify-content-center align-items-center card-min-height">
+            {user.userType === 'Doctor' && <CountDown patient={patient} setPatient={setPatient} showMessage={showMessage} patientDetail={userDetail} />}
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>
                     <Dropdown
