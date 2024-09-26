@@ -3,7 +3,8 @@ import jwt
 import starlette.authentication
 import starlette.requests
 from os import getenv
-from db.queries import get_user_by_email_password
+from datetime import datetime
+from db.queries import get_user_by_email_password, get_token
 from utils.utils import decrypt
 
 
@@ -42,6 +43,10 @@ class BasicAuthBackend(AuthenticationBackend):
             except jwt.exceptions.PyJWTError as exc:
                 print('[JWT Error]:', exc)
                 return AuthCredentials(["authenticated"]), UserDetail(user)
-            return AuthCredentials(["authenticated"]), UserDetail(user, medical_access)
+
+            # As the token may have been deactivated by the user, something that would not be detected by jwt, we need to compare the initial expiration date with the current date
+            token = get_token(medical_access['tokenId'])
+            if token['expirationDate'] and token['expirationDate'] == datetime.fromtimestamp(medical_access['exp']):
+                return AuthCredentials(["authenticated"]), UserDetail(user, medical_access)
 
         return AuthCredentials(["authenticated"]), UserDetail(user)

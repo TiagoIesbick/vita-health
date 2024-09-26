@@ -13,8 +13,11 @@ import { useEffect, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
 import { useUser } from "../providers/userContext";
+import { useApolloClient } from "@apollo/client";
 import CountDown from "../components/countdown";
 import LoadingSkeleton from "../components/skeleton";
+import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
+import { delTokenFromActiveDoctorTokensCache } from "../graphql/cache";
 
 
 const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
@@ -25,6 +28,7 @@ const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
 
 const InsertMedicalRecord = () => {
     const navigate = useNavigate();
+    const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId);
     const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
@@ -41,6 +45,13 @@ const InsertMedicalRecord = () => {
             const resMedicalRecord = await addMedicalRecord(values);
             if (resMedicalRecord.medicalRecordError) {
                 showMessage('error', 'Error', resMedicalRecord.medicalRecordError);
+                if (resMedicalRecord.medicalRecordError === 'Missing authorization') {
+                    delTokenFromActiveDoctorTokensCache(client.cache, patient.tokenId);
+                    setPatient(null);
+                    deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
+                    resetForm();
+                    navigate('/');
+                };
             } else {
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);

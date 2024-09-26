@@ -9,7 +9,7 @@ import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { useSaveTokenAccess } from "../hooks/hooks";
 import { useApolloClient } from "@apollo/client";
-import { medicalRecordsQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
 
 
 const InsertToken = () => {
@@ -26,6 +26,12 @@ const InsertToken = () => {
             const resTokenAccess = await addTokenAccess(values.token);
             if (resTokenAccess.accessError) {
                 showMessage('error', 'Error', resTokenAccess.accessError);
+                if (resTokenAccess.accessError === 'Missing authorization') {
+                    const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
+                    if (cachedData) {
+                        client.refetchQueries({ include: ["ActiveDoctorTokens"] });
+                    };
+                };
                 setPatient(null);
                 deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
             } else {

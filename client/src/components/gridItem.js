@@ -6,13 +6,14 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useTokenContext } from '../providers/tokenContext';
 import CopyButton from "../components/copyButton";
+import AccessButton from "./accessButton";
 
 
 const GridItem = ({ user, token }) => {
     const { setVisible, setTokenId } = useTokenContext();
     const location = useLocation();
     const deactivateButton = useRef(null);
-    const [copyButton, setCopyButton] = useState(location.pathname !== '/inactive-tokens');
+    const [copyButton, setCopyButton] = useState(location.pathname === '/active-tokens' && user.userType === 'Patient');
 
     let date = localDateTime(token.expirationDate, 'minus');
 
@@ -39,13 +40,18 @@ const GridItem = ({ user, token }) => {
             <div className="p-3 border-1 surface-border surface-card border-round min-h-full flex flex-column justify-content-between">
                 <div className='flex flex-wrap align-items-center justify-content-between h-3rem'>
                     {user.userType === 'Doctor'
-                        ? <span className="text-sm">{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>
-                        : <div className='flex gap-1 text-sm'>
-                            <i className="pi pi-hourglass"></i>
-                            <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
-                          </div>
+                        ?   <>
+                                <span className="text-sm">{token.patient.user.firstName + ' ' + token.patient.user.lastName}</span>
+                                <AccessButton token={token.token} />
+                            </>
+                        :   <>
+                                <div className='flex gap-1 text-sm'>
+                                    <i className="pi pi-hourglass"></i>
+                                    <span>{`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}</span>
+                                </div>
+                                {copyButton && <CopyButton txt={token.token} />}
+                            </>
                     }
-                    {copyButton && <CopyButton txt={token.token} />}
                 </div>
                 <div className="flex flex-column align-items-center">
                     <p className="font-semibold text-xs text-center" style={{wordBreak: 'break-all'}}>{token.token}</p>

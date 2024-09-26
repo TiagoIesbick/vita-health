@@ -123,3 +123,16 @@ export const updateInactiveTokensCache = (cache, newToken) => {
         },
     });
 };
+
+
+export const delTokenFromActiveDoctorTokensCache = (cache, deletedToken) => {
+    cache.modify({
+        fields: {
+            activeDoctorTokens(existing = [], { readField }) {
+                return existing.filter(
+                    tokenRef => readField('tokenId', tokenRef) !== String(deletedToken)
+                );
+            }
+        }
+    });
+};
