@@ -4,14 +4,24 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Badge } from 'primereact/badge';
+import { localDateTime } from '../utils/utils';
 
 
 const ViewsButton = ({ token }) => {
     const op = useRef(null);
 
-    const doctorName = (rowData) => {
-        return rowData.doctor.user.firstName + ' ' + rowData.doctor.user.lastName;
+    const tokenAccess = token.tokenAccess ? token.tokenAccess.slice(0) : [];
+
+    const accessTime = (rowData) => {
+        let date = localDateTime(rowData.accessTime, 'minus');
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`;
     };
+
+    const mapTokenAccess = tokenAccess.map(tokenRef => ({
+        doctorName: tokenRef.doctor.user.firstName + ' ' + tokenRef.doctor.user.lastName,
+        specialty: tokenRef.doctor.specialty,
+        accessTime: accessTime(tokenRef),
+    }));
 
     return (
         <div className="card flex flex-column align-items-center gap-3">
@@ -21,15 +31,15 @@ const ViewsButton = ({ token }) => {
                 onClick={(e) => op.current.toggle(e)}
             >
                 <i className="pi pi-eye p-overlay-badge">
-                    <Badge className="bg-primary-100" value={token.tokenAccess?.length || 0}></Badge>
+                    <Badge className="bg-primary-100" value={tokenAccess.length}></Badge>
                 </i>
             </Button>
             <OverlayPanel ref={op} closeOnEscape className='max-w-full'>
-                    <DataTable value={token.tokenAccess} paginator rows={5}>
-                        <Column header="Name" body={doctorName} sortable />
-                        <Column field="doctor.specialty" header="Specialty" />
-                        <Column field="accessTime" header="Access Time" sortable />
-                    </DataTable>
+                <DataTable value={mapTokenAccess} paginator rows={5} sortField="accessTime" sortOrder={-1}>
+                    <Column header="Name" field="doctorName" sortable />
+                    <Column header="Specialty" field="specialty" />
+                    <Column header="Access Time" field="accessTime" sortable />
+                </DataTable>
             </OverlayPanel>
         </div>
     );
