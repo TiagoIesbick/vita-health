@@ -4,12 +4,11 @@ import { FloatLabel } from "primereact/floatlabel";
 import { Card } from 'primereact/card';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from "primereact/button";
-import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { useSaveTokenAccess } from "../hooks/hooks";
 import { useApolloClient } from "@apollo/client";
-import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
+import { handleTokenAccess } from "../utils/utils";
 
 
 const InsertToken = () => {
@@ -21,30 +20,8 @@ const InsertToken = () => {
         initialValues: {
             token: ''
         },
-        onSubmit: async (values, { resetForm }) => {
-            storeToken(ACCESS_MEDICAL_TOKEN_KEY, values.token);
-            const resTokenAccess = await addTokenAccess(values.token);
-            if (resTokenAccess.accessError) {
-                showMessage('error', 'Error', resTokenAccess.accessError);
-                if (resTokenAccess.accessError === 'Missing authorization') {
-                    const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
-                    if (cachedData) {
-                        client.refetchQueries({ include: ["ActiveDoctorTokens"] });
-                    };
-                };
-                setPatient(null);
-                deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
-            } else {
-                const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
-                setPatient(credentials);
-                const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
-                if (cachedData) {
-                    client.refetchQueries({ include: ["medicalRecords"] });
-                };
-                navigate("/medical-records-access");
-                showMessage('success', 'Sucess', 'Permission Granted');
-                resetForm();
-            };
+        onSubmit: (values, { resetForm }) => {
+            handleTokenAccess(values.token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm);
         },
         validationSchema: Yup.object({
             token: Yup.string().required('Required').min(83, 'Minimum 83 characters')

@@ -3,6 +3,8 @@ import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
+import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
+import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
 
 
 export const passwordHeader = <div className="font-bold mb-3">Pick a password</div>;
@@ -65,4 +67,32 @@ export const customizedContent = (item) => {
             <Button label="Read more" text></Button>
         </Card>
     );
+};
+
+
+export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm) => {
+    storeToken(ACCESS_MEDICAL_TOKEN_KEY, token);
+    const resTokenAccess = await addTokenAccess(token);
+
+    if (resTokenAccess.accessError) {
+        showMessage('error', 'Error', resTokenAccess.accessError);
+        if (resTokenAccess.accessError === 'Missing authorization') {
+            const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
+            if (cachedData) {
+                client.refetchQueries({ include: ["ActiveDoctorTokens"] });
+            }
+        }
+        setPatient(null);
+        deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
+    } else {
+        const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
+        setPatient(credentials);
+        const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
+        if (cachedData) {
+            client.refetchQueries({ include: ["medicalRecords"] });
+        }
+        showMessage('success', 'Success', 'Permission Granted');
+        navigate("/medical-records-access");
+        if (resetForm) resetForm();
+    }
 };

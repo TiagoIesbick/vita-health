@@ -1,12 +1,12 @@
 import { localDateTime } from "../utils/utils";
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
-import { Badge } from 'primereact/badge';
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useTokenContext } from '../providers/tokenContext';
 import CopyButton from "../components/copyButton";
 import AccessButton from "./accessButton";
+import ViewsButton from "./viewsButton";
 
 
 const GridItem = ({ user, token }) => {
@@ -72,14 +72,7 @@ const GridItem = ({ user, token }) => {
                                 severity={'danger'}
                             >
                             </Button>
-                            <Button
-                                rounded
-                                text
-                            >
-                                <i className="pi pi-eye p-overlay-badge">
-                                    <Badge className="bg-primary-100" value={token.tokenAccess?.length || 0}></Badge>
-                                </i>
-                            </Button>
+                            <ViewsButton token={token} />
                           </>
                     }
                 </div>

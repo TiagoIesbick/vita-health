@@ -1,10 +1,9 @@
 import { Button } from "primereact/button";
-import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { useUser } from "../providers/userContext";
 import { useSaveTokenAccess } from "../hooks/hooks";
 import { useApolloClient } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
+import { handleTokenAccess } from "../utils/utils";
 
 
 const AccessButton = ({ token }) => {
@@ -13,29 +12,13 @@ const AccessButton = ({ token }) => {
     const { setPatient, showMessage } = useUser();
     const { addTokenAccess, loadingTokenAccess, errorTokenAccess } = useSaveTokenAccess();
 
-    const handleClick = async () => {
-        storeToken(ACCESS_MEDICAL_TOKEN_KEY, token);
-        const resTokenAccess = await addTokenAccess(token);
-        if (resTokenAccess.accessError) {
-            showMessage('error', 'Error', resTokenAccess.accessError);
-            if (resTokenAccess.accessError === 'Missing authorization') {
-                const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
-                if (cachedData) {
-                    client.refetchQueries({ include: ["ActiveDoctorTokens"] });
-                };
-            };
-            setPatient(null);
-            deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
-        } else {
-            const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
-            setPatient(credentials);
-            const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
-            if (cachedData) {
-                client.refetchQueries({ include: ["medicalRecords"] });
-            };
-            navigate("/medical-records-access");
-            showMessage('success', 'Sucess', 'Permission Granted');
-        };
+    const handleClick = () => {
+        handleTokenAccess(token, client, addTokenAccess, setPatient, showMessage, navigate);
+    };
+
+    if (errorTokenAccess) {
+        navigate('/');
+        showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
     return (
