@@ -4,6 +4,8 @@ import re
 import jwt
 
 
+UPLOAD_DIR = "uploads"
+
 fernet = Fernet(getenv('FERNET_KEY'))
 
 def encrypt(msg: str) -> bytes:

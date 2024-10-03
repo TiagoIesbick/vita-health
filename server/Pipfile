@@ -5,12 +5,14 @@ name = "pypi"
 
 [packages]
 mysql-connector-python = "*"
-ariadne = "*"
 uvicorn = "*"
 cryptography = "*"
 pyjwt = "*"
 nh3 = "*"
 pytz = "*"
+aiofiles = "*"
+ariadne = {extras = ["asgi"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 

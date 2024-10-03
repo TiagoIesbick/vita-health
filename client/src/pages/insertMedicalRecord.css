@@ -1,5 +1,6 @@
 .tox-tinymce {
     border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
     transition:
         border 0.2s ease-in,
         box-shadow 0.2s ease-in;

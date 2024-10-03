@@ -1,10 +1,15 @@
 import nh3
 import jwt
+import aiofiles
+import uuid
+import os
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
+from utils.utils import UPLOAD_DIR
+from pathlib import Path
 from utils.utils import encrypt, validate_email, validate_password, \
     validate_name, generate_token
 
@@ -183,6 +188,11 @@ def resolve_medical_records_type(medicalRecords, *_):
     return get_medical_records_type(medicalRecords['recordTypeId'])
 
 
+@medical_records.field("files")
+def resolve_medical_records_files(medicalRecords, info):
+    return get_medical_records_files(medicalRecords['recordId'])
+
+
 @mutation.field("createMedicalRecord")
 def resolve_create_medical_record(_, info, recordTypeId, recordData):
     if not info.context['authenticated']:
@@ -331,7 +341,7 @@ def resolve_token_access_doctor(tokenAccess, info):
 
 
 @mutation.field("deactivateToken")
-def resolver_deactivate_token(_, info, tokenId):
+def resolve_deactivate_token(_, info, tokenId):
     if not info.context['authenticated']:
         return {'deactivateTokenError': 'Missing authentication'}
     if info.context['user_detail']['userType'] != 'Patient':
@@ -347,3 +357,32 @@ def resolver_deactivate_token(_, info, tokenId):
     if res['deactivateTokenConfirmation']:
         res['token'] = get_token(tokenId)
     return res
+
+
+@mutation.field("multipleUpload")
+async def resolve_multiple_upload(_, info, recordId, files):
+    file_infos = []
+    file_errors = []
+    for file in files:
+        filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
+        content_type = file.content_type
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
+        file_url = f"/uploads/{filename}"
+        res = add_file_info(recordId, filename, content_type, file_url)
+        if res['fileError']:
+            file_errors.append({
+                'fileError': rf"{file.filename}: {res['fileError']}"
+            })
+        else:
+            file_infos.append({
+                "fileId": res['fileId'],
+                "fileName": filename,
+                "mimeType": content_type,
+                "url": file_url
+            })
+    if len(file_errors) > 0:
+        return { 'fileError': file_errors, 'files': file_infos }
+    return { 'fileConfirmation': 'Saved files!', 'files': file_infos }

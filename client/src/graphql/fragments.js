@@ -56,6 +56,12 @@ export const medicalRecordsFragment = gql`
         recordType {
             ...RecordTypeDetail
         }
+        files {
+            fileId
+            fileName
+            mimeType
+            url
+        }
     }
     ${recordTypeFragment}
 `;

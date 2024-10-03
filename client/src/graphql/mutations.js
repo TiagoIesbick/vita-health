@@ -184,3 +184,19 @@ export const mutationDeactivateToken = gql`
         }
     }
 `;
+
+
+export const mutationMultipleUpload = gql`
+    mutation MultipleUpload ($recordId: ID!, $files: [Upload!]) {
+        multipleUpload(recordId: $recordId, files: $files) {
+            fileConfirmation
+            fileError
+            files {
+                fileId
+                fileName
+                mimeType
+                url
+            }
+        }
+    }
+`;

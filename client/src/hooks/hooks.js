@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useApolloClient } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
 
@@ -397,5 +397,24 @@ export const useDeactivateToken = () => {
         inactivateToken,
         loadingDeactivateToken: loading,
         errorDeactivateToken: error
+    };
+};
+
+
+export const useMultipleUpload = () => {
+    const [mutate, { loading, error }] = useMutation(mutationMultipleUpload);
+
+    const addFiles = async (recordId, files) => {
+        console.log('[hook files]:', files);
+        console.log('[hook recordId]:', recordId);
+        const { data: { multipleUpload } } = await mutate({
+            variables: { recordId, files }
+        });
+        return multipleUpload;
+    };
+    return {
+        addFiles,
+        loadingFiles: loading,
+        errorFiles: error
     };
 };

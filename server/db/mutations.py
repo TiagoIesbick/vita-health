@@ -98,3 +98,12 @@ def deactivate_token(tokenId: int) -> (None | dict):
     if len(confirmation) == 0:
         return None
     return confirmation[0]
+
+
+def add_file_info(recordId: int, fileName: str, mimeType: str, url: str) -> (None | dict):
+    args = [recordId, fileName, mimeType, url]
+    query = 'AddFiles'
+    confirmation = mysql_results(query, 'procedure', args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]

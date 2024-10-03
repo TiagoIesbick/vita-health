@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import './insertMedicalRecord.css';
-import { useCreateMedicalRecord, useCreateRecordType, useRecordTypes } from "../hooks/hooks";
+import { useCreateMedicalRecord, useCreateRecordType, useMultipleUpload, useRecordTypes } from "../hooks/hooks";
 import { useUserQuery } from '../hooks/hooks';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
@@ -14,35 +14,34 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
 import { useUser } from "../providers/userContext";
 import { useApolloClient } from "@apollo/client";
-import CountDown from "../components/countdown";
-import LoadingSkeleton from "../components/skeleton";
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { delTokenFromActiveDoctorTokensCache } from "../graphql/cache";
-
-
-const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
-
-
-const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
+import { TINYMCE_API_KEY, stripHtmlTags, supportedFileFormats } from "../utils/utils";
+import CountDown from "../components/countdown";
+import LoadingSkeleton from "../components/skeleton";
+import MultipleUpload from "../components/multipleUpload";
 
 
 const InsertMedicalRecord = () => {
     const navigate = useNavigate();
     const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
-    const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId);
+    const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId || 0);
     const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
     const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
     const { addMedicalRecord, loadingMedicalRecord, errorMedicalRecord } = useCreateMedicalRecord();
+    const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
     const clickableWarning = useRef(null);
     const [visible, setVisible] = useState(false);
     const formik = useFormik({
         initialValues: {
             recordTypeId: '',
-            recordData: ''
+            recordData: '',
+            files: []
         },
         onSubmit: async (values, { resetForm }) => {
-            const resMedicalRecord = await addMedicalRecord(values);
+            const { files: _, ...recordValues } = values;
+            const resMedicalRecord = await addMedicalRecord(recordValues);
             if (resMedicalRecord.medicalRecordError) {
                 showMessage('error', 'Error', resMedicalRecord.medicalRecordError);
                 if (resMedicalRecord.medicalRecordError === 'Missing authorization') {
@@ -53,6 +52,9 @@ const InsertMedicalRecord = () => {
                     navigate('/');
                 };
             } else {
+                console.log(resMedicalRecord);
+                const resAddFiles = await addFiles(resMedicalRecord.medicalRecord.recordId, values.files);
+                console.log('[resAddFiles]', resAddFiles);
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
                 if (user.userType === 'Doctor') navigate('/medical-records-access');
@@ -64,7 +66,14 @@ const InsertMedicalRecord = () => {
                 .test('min-length-no-html', 'Minimum 3 characters', (value) => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
+                }),
+            files: Yup.array().nullable().notRequired().of(Yup.mixed()
+                .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
+                    return file ? supportedFileFormats.includes(file.type) : true;
                 })
+                .test('FILE_SIZE', "Uploaded file is too big (max 1000kb)", (file) => {
+                    return file ? file.size <= 1000 * 1024 : true;
+                }))
         })
     });
     const formikCategory = useFormik({
@@ -155,6 +164,7 @@ const InsertMedicalRecord = () => {
                     />
                     {formik.touched.recordData && formik.errors.recordData && <div className="text-red-500 text-xs">{formik.errors.recordData}</div>}
                 </div>
+                <MultipleUpload formik={formik} />
                 <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord} loading={loadingRecordTypes || loadingMedicalRecord} />
             </form>
             <Dialog
@@ -173,7 +183,7 @@ const InsertMedicalRecord = () => {
                         <label htmlFor="category">Category</label>
                         {formikCategory.touched.category && formikCategory.errors.category && <div className="text-red-500 text-xs">{formikCategory.errors.category}</div>}
                     </FloatLabel>
-                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType} loading={loadingRecordType} />
+                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType || loadingFiles} loading={loadingRecordType || loadingFiles} />
                 </form>
             </Dialog>
         </Card>

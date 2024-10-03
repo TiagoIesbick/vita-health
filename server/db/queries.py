@@ -148,9 +148,25 @@ def get_inactive_tokens(id: int, limit: int, offset: int) -> (None | list[dict])
     return tokens
 
 
-def count_inactive_tokens(id: int) -> dict:
+def count_inactive_tokens(id: int) -> None | dict:
     query = rf"SELECT COUNT(tokenId) AS totalCount FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}';"
     total_count= mysql_results(query)
     if len(total_count) == 0:
         return None
     return total_count[0]
+
+
+def get_medical_records_files(id: int) -> list[dict]:
+    query = rf'SELECT * FROM Files WHERE recordId = {id};'
+    return mysql_results(query)
+
+
+def get_filename_by_user(fileName: str, userId: int) -> dict:
+    query = rf'''
+    SELECT f.fileName, u.userId FROM Files f
+    INNER JOIN MedicalRecords mr ON f.recordId = mr.recordId
+    INNER JOIN Patients p ON mr.patientId = p.patientId
+    INNER JOIN Users u ON p.userId = u.userId
+    WHERE f.fileName = '{fileName}' and u.userId = {userId};
+    '''
+    return mysql_results(query)

@@ -5,6 +5,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
+import { Link } from "react-router-dom";
+import { BASE_URL_SERVER } from '../graphql/apolloConfig';
+
+
+export const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
+
+
+export const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
+
+
+export const supportedFileFormats = ["image/jpeg", "image/png", "image/svg+xml", "image/webp", "application/pdf"];
 
 
 export const passwordHeader = <div className="font-bold mb-3">Pick a password</div>;
@@ -61,9 +72,12 @@ export const customizedMarker = (item) => {
 
 export const customizedContent = (item) => {
     let date = localDateTime(item.dateCreated, 'minus');
+    console.log(item);
     return (
         <Card title={item.recordType.recordName} subTitle={`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}>
             <div dangerouslySetInnerHTML={{__html: item.recordData}} />
+            <span>Files</span>
+            {item.files.length > 0 && <Link to={`${BASE_URL_SERVER}${item.files[0].url}`} target='_blank'>{item.files[0].fileName}</Link>}
             <Button label="Read more" text></Button>
         </Card>
     );

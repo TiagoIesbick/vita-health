@@ -5,12 +5,12 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema hack_saude
+-- Schema vita_health
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `vita_health` ;
 
 -- -----------------------------------------------------
--- Schema hack_saude
+-- Schema vita_health
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `vita_health` DEFAULT CHARACTER SET utf8mb4 ;
 USE `vita_health` ;
@@ -144,6 +144,27 @@ CREATE TABLE IF NOT EXISTS `vita_health`.`TokenAccess` (
     REFERENCES `vita_health`.`Doctors` (`doctorId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `vita_health`.`Files`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vita_health`.`Files` (
+  `fileId` INT NOT NULL AUTO_INCREMENT,
+  `recordId` INT NOT NULL,
+  `fileName` VARCHAR(255) NOT NULL,
+  `mimeType` VARCHAR(255) NOT NULL,
+  `url` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`fileId`),
+  UNIQUE INDEX `fileName_UNIQUE` (`fileName` ASC) VISIBLE,
+  INDEX `filesRecordId_idx` (`recordId` ASC) VISIBLE,
+  UNIQUE INDEX `url_UNIQUE` (`url` ASC) VISIBLE,
+  CONSTRAINT `filesRecordId`
+    FOREIGN KEY (`recordId`)
+    REFERENCES `vita_health`.`MedicalRecords` (`recordId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -675,6 +696,47 @@ END IF ;
 SELECT * FROM(
   (SELECT deactivateTokenConfirmation) deactivateTokenConfirmation,
   (SELECT deactivateTokenError) deactivateTokenError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to insert files
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE AddFiles(IN RCID INT, IN FINM VARCHAR(255), IN MMTP VARCHAR(255), IN URL VARCHAR(255))
+BEGIN
+DECLARE fileConfirmation VARCHAR(45);
+DECLARE fileError VARCHAR(45);
+PREPARE CountFileName FROM 'SELECT COUNT(`fileId`) INTO @countFileName FROM `Files`
+	WHERE `fileName` = ?' ;
+PREPARE InsertFile FROM 'INSERT INTO `vita_health`.`Files` (`recordId`, `fileName`, `mimeType`, `url`)
+	VALUES (?, ?, ?, ?)' ;
+START TRANSACTION;
+SET @recordId = RCID ;
+SET @fileName = FINM ;
+SET @mimeType = MMTP ;
+SET @url = URL ;
+EXECUTE CountFileName USING @fileName ;
+IF @countFileName > 0 THEN
+	ROLLBACK ;
+    SET fileError = 'The file name already exists' ;
+ELSE
+	EXECUTE InsertFile USING @recordId, @fileName, @mimeType, @url ;
+    EXECUTE CountFileName USING @fileName ;
+    IF @countFileName = 1 THEN
+		COMMIT ;
+		SET fileConfirmation = 'Saved file!' ;
+	ELSE
+		ROLLBACK ;
+        SET fileError = 'File not saved' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT fileConfirmation) fileConfirmation,
+  (SELECT fileError) fileError,
+  (SELECT LAST_INSERT_ID() AS fileId) fileId
 );
 END //
 DELIMITER ;

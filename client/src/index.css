@@ -23,4 +23,5 @@ ul {
   min-height: calc(100dvh - 10rem);
   padding: 0 calc(100vw/12);
   background-color: transparent;
+  border-radius: revert;
 }
