@@ -12,3 +12,19 @@
     border: revert;
     border-top: 1px solid #e5e7eb;
 }
+
+.visible-description {
+    display: flex;
+}
+
+@media screen and (max-width: 768px) {
+    .visible-description {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .visible-tag {
+        display: none;
+    }
+}

@@ -1,5 +1,5 @@
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FileUpload } from 'primereact/fileupload';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
@@ -21,6 +21,7 @@ const MultipleUpload = ({ formik }) => {
             _totalSize += files[key].size || 0;
         });
 
+        formik.setFieldTouched("files", true);
         formik.setFieldValue("files", files);
 
         setTotalSize(_totalSize);
@@ -38,6 +39,15 @@ const MultipleUpload = ({ formik }) => {
         setTotalSize(0);
         formik.setFieldValue("files", []);
     };
+
+    useEffect(() => {
+        if (formik.status?.success) {
+            fileUploadRef.current.clear();
+            formik.setStatus(undefined);
+            formik.resetForm();
+        };
+
+    },[formik]);
 
     const headerTemplate = (options) => {
         const { className, chooseButton, cancelButton } = options;
@@ -60,13 +70,16 @@ const MultipleUpload = ({ formik }) => {
         return (
             <div className="flex align-items-center flex-wrap">
                 <div className="flex align-items-center" style={{ width: '40%' }}>
-                    <img alt={file.name} role="presentation" src={file.objectURL} width={100} />
-                    <span className="flex flex-column text-left ml-3">
-                        {file.name}
+                    {file.type === "application/pdf"
+                    ? <embed src={file.objectURL} width={100} height={100}/>
+                    : <img alt={file.name} role="presentation" src={file.objectURL} width={100} height={100} style={{objectFit: 'cover'}}/>
+                    }
+                    <span className="flex-column text-left ml-3 visible-description">
+                        {file.name.length > 10 ? file.name.slice(0, 10) + ' ...' : file.name}
                         <small>{new Date().toLocaleDateString()}</small>
                     </span>
                 </div>
-                <Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
+                <Tag value={props.formatSize} severity="warning" className="px-3 py-2 visible-tag" />
                 <Button type="button" icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger ml-auto" onClick={() => onTemplateRemove(file, props.onRemove)} />
             </div>
         );
@@ -86,18 +99,17 @@ const MultipleUpload = ({ formik }) => {
     const chooseOptions = { icon: 'pi pi-fw pi-file-arrow-up', iconOnly: true, className: 'custom-choose-btn p-button-rounded p-button-outlined' };
     const cancelOptions = { icon: 'pi pi-fw pi-times', iconOnly: true, className: 'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined' };
 
-    console.log(formik.values);
-
     return (
         <div>
             <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
             <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
-            <FileUpload ref={fileUploadRef} name="files" multiple accept={supportedFileFormats} maxFileSize={1000 * 1024}
+            <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={1000 * 1024}
                 onSelect={onTemplateSelect} onError={onTemplateClear} onClear={onTemplateClear}
                 headerTemplate={headerTemplate} itemTemplate={itemTemplate} emptyTemplate={emptyTemplate}
                 chooseOptions={chooseOptions} cancelOptions={cancelOptions}
             />
+            {formik.touched.files && formik.errors.files && <div className="text-red-500 text-xs">{formik.errors.files}</div>}
         </div>
     )
 };

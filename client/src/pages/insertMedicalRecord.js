@@ -5,7 +5,6 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import './insertMedicalRecord.css';
 import { useCreateMedicalRecord, useCreateRecordType, useMultipleUpload, useRecordTypes } from "../hooks/hooks";
 import { useUserQuery } from '../hooks/hooks';
 import { useNavigate } from "react-router-dom";
@@ -20,6 +19,7 @@ import { TINYMCE_API_KEY, stripHtmlTags, supportedFileFormats } from "../utils/u
 import CountDown from "../components/countdown";
 import LoadingSkeleton from "../components/skeleton";
 import MultipleUpload from "../components/multipleUpload";
+import './insertMedicalRecord.css';
 
 
 const InsertMedicalRecord = () => {
@@ -39,7 +39,7 @@ const InsertMedicalRecord = () => {
             recordData: '',
             files: []
         },
-        onSubmit: async (values, { resetForm }) => {
+        onSubmit: async (values, { resetForm, setStatus }) => {
             const { files: _, ...recordValues } = values;
             const resMedicalRecord = await addMedicalRecord(recordValues);
             if (resMedicalRecord.medicalRecordError) {
@@ -51,10 +51,19 @@ const InsertMedicalRecord = () => {
                     resetForm();
                     navigate('/');
                 };
-            } else {
-                console.log(resMedicalRecord);
+            } else if (values.files.length > 0) {
                 const resAddFiles = await addFiles(resMedicalRecord.medicalRecord.recordId, values.files);
-                console.log('[resAddFiles]', resAddFiles);
+                if (resAddFiles.fileError) {
+                    showMessage('warn', 'Warning', 'Health data was created, but some files had errors', true);
+                    resAddFiles.fileError.forEach(error => showMessage('error', 'Error', error, true));
+                    resetForm();
+                } else {
+                    setStatus({ success: resAddFiles.fileConfirmation});
+                    showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
+                    showMessage('success', 'Success', resAddFiles.fileConfirmation);
+                    if (user.userType === 'Doctor') navigate('/medical-records-access');
+                };
+            } else {
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
                 if (user.userType === 'Doctor') navigate('/medical-records-access');
@@ -67,13 +76,23 @@ const InsertMedicalRecord = () => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
                 }),
-            files: Yup.array().nullable().notRequired().of(Yup.mixed()
-                .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
-                    return file ? supportedFileFormats.includes(file.type) : true;
+            files: Yup.array().nullable().notRequired().of(
+                Yup.mixed()
+                    .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
+                        return file ? supportedFileFormats.includes(file.type) : true;
+                    })
+                    .test('FILE_SIZE', "Uploaded file is too big (max 1000kb)", (file) => {
+                        return file ? file.size <= 1000 * 1024 : true;
+                    })
+                )
+                .test('MAX_FILES', 'You can only upload a maximum of 10 files', (files) => {
+                    return files ? files.length <= 10 : true;
                 })
-                .test('FILE_SIZE', "Uploaded file is too big (max 1000kb)", (file) => {
-                    return file ? file.size <= 1000 * 1024 : true;
-                }))
+                .test('TOTAL_SIZE', 'Total size of uploaded files must not exceed 10MB', (files) => {
+                    if (!files) return true;
+                    const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+                    return totalSize <= 10 * 1024 * 1024;
+                })
         })
     });
     const formikCategory = useFormik({
@@ -114,7 +133,7 @@ const InsertMedicalRecord = () => {
         return <LoadingSkeleton />;
     };
 
-    if (errorRecordTypes || errorRecordType || errorMedicalRecord || (user.userType === 'Doctor' && errorUser)) {
+    if (errorRecordTypes || errorRecordType || errorMedicalRecord || errorFiles || (user.userType === 'Doctor' && errorUser)) {
         navigate('/');
         showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
@@ -165,7 +184,7 @@ const InsertMedicalRecord = () => {
                     {formik.touched.recordData && formik.errors.recordData && <div className="text-red-500 text-xs">{formik.errors.recordData}</div>}
                 </div>
                 <MultipleUpload formik={formik} />
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord} loading={loadingRecordTypes || loadingMedicalRecord} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord || loadingFiles} loading={loadingRecordTypes || loadingMedicalRecord || loadingFiles} />
             </form>
             <Dialog
                 header="New Category"
@@ -183,7 +202,7 @@ const InsertMedicalRecord = () => {
                         <label htmlFor="category">Category</label>
                         {formikCategory.touched.category && formikCategory.errors.category && <div className="text-red-500 text-xs">{formikCategory.errors.category}</div>}
                     </FloatLabel>
-                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType || loadingFiles} loading={loadingRecordType || loadingFiles} />
+                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType} loading={loadingRecordType} />
                 </form>
             </Dialog>
         </Card>

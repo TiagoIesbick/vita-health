@@ -361,22 +361,24 @@ def resolve_deactivate_token(_, info, tokenId):
 
 @mutation.field("multipleUpload")
 async def resolve_multiple_upload(_, info, recordId, files):
+    if not info.context['authenticated']:
+        return {'fileError': ['Missing authentication']}
+    if info.context['user_detail']['userType'] == 'Doctor' and not info.context['medical_access']:
+        return {'fileError': ['Missing authorization']}
     file_infos = []
     file_errors = []
     for file in files:
         filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
         content_type = file.content_type
         file_path = os.path.join(UPLOAD_DIR, filename)
-        async with aiofiles.open(file_path, 'wb') as out_file:
-            content = await file.read()
-            await out_file.write(content)
         file_url = f"/uploads/{filename}"
         res = add_file_info(recordId, filename, content_type, file_url)
         if res['fileError']:
-            file_errors.append({
-                'fileError': rf"{file.filename}: {res['fileError']}"
-            })
+            file_errors.append(rf"{file.filename}: {res['fileError']}")
         else:
+            async with aiofiles.open(file_path, 'wb') as out_file:
+                content = await file.read()
+                await out_file.write(content)
             file_infos.append({
                 "fileId": res['fileId'],
                 "fileName": filename,
