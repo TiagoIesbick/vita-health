@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useApolloClient } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
@@ -74,6 +74,12 @@ export const useRealTimeCacheUpdate = (user) => {
 export const useMedicalRecords = () => {
     const { data, loading, error } = useQuery(medicalRecordsQuery);
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
+};
+
+
+export const useMedicalRecord = (recordId) => {
+    const { data, loading, error } = useQuery(medicalRecordQuery, { variables: { recordId } });
+    return {medicalRecord: data?.medicalRecord, loading, error: Boolean(error)};
 };
 
 
@@ -408,7 +414,12 @@ export const useMultipleUpload = () => {
         console.log('[hook files]:', files);
         console.log('[hook recordId]:', recordId);
         const { data: { multipleUpload } } = await mutate({
-            variables: { recordId, files }
+            variables: { recordId, files },
+            update: (cache, { data: { multipleUpload } }) => {
+                if (multipleUpload.files.length > 0) {
+                    console.log('[files]:', multipleUpload.files);
+                }
+            },
         });
         return multipleUpload;
     };

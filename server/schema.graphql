@@ -28,7 +28,6 @@ type Files {
     fileName: String!
     mimeType: String!
     url: String!
-    medicalRecord: MedicalRecords!
 }
 
 type Users {

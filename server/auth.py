@@ -92,6 +92,7 @@ async def serve_file(request: Request) -> JSONResponse | FileResponse:
         res = get_filename_by_user(filename, request.user.user_detail['userId'])
         if len(res) == 0:
             return JSONResponse({"error": "Unauthorized access"})
+
     if request.user.user_detail['userType'] == 'Doctor':
         if not request.user.medical_access:
             return JSONResponse({"error": "Unauthorized access"})

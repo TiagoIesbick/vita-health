@@ -40,6 +40,16 @@ export const medicalRecordsQuery = gql`
 `;
 
 
+export const medicalRecordQuery = gql`
+    query MedicalRecord ($recordId: ID!) {
+        medicalRecord (recordId: $recordId) {
+            ...MedicalRecordsDetail
+        }
+    }
+    ${medicalRecordsFragment}
+`;
+
+
 export const activePatientTokensQuery = gql`
     query ActivePatientTokens {
         activePatientTokens {

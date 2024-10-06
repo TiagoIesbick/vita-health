@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -192,11 +192,9 @@ export const mutationMultipleUpload = gql`
             fileConfirmation
             fileError
             files {
-                fileId
-                fileName
-                mimeType
-                url
+                ...FileDetail
             }
         }
     }
+    ${fileFragment}
 `;

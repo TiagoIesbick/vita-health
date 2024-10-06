@@ -78,7 +78,7 @@ export const customizedContent = (item) => {
             <div dangerouslySetInnerHTML={{__html: item.recordData}} />
             <span>Files</span>
             {item.files.length > 0 && <Link to={`${BASE_URL_SERVER}${item.files[0].url}`} target='_blank'>{item.files[0].fileName}</Link>}
-            <Button label="Read more" text></Button>
+            <Link to={`/medical-record/${item.recordId}`}><Button label="Read more" text></Button></Link>
         </Card>
     );
 };
