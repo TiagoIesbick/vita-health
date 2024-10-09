@@ -71,8 +71,10 @@ export const useRealTimeCacheUpdate = (user) => {
 };
 
 
-export const useMedicalRecords = () => {
-    const { data, loading, error } = useQuery(medicalRecordsQuery);
+export const useMedicalRecords = (limit, offset) => {
+    const { data, loading, error } = useQuery(medicalRecordsQuery, {
+        variables: {limit, offset}
+    });
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
 };
 
@@ -344,16 +346,26 @@ export const useCreateMedicalRecord = () => {
             variables: values,
             update: (cache, { data: { createMedicalRecord }}) => {
                 if (createMedicalRecord.medicalRecordError) return;
-                const existingCacheData = cache.readQuery({ query: medicalRecordsQuery });
-                if (!existingCacheData) return;
                 const newMedicalRecord = createMedicalRecord.medicalRecord;
                 cache.writeQuery({
+                    query: medicalRecordQuery,
+                    variables: {recordId: newMedicalRecord.recordId},
+                    data: { medicalRecord: newMedicalRecord }
+                });
+                const existingCacheData = cache.readQuery({
                     query: medicalRecordsQuery,
-                    data: {
-                        medicalRecords: !existingCacheData.medicalRecords
-                        ? [newMedicalRecord]
-                        : [newMedicalRecord, ...existingCacheData.medicalRecords]
-                    }
+                    variables: { limit: 10, offset: 0}
+                });
+                if (!existingCacheData) return;
+                const updatedMedicalRecords = {
+                    ...existingCacheData.medicalRecords,
+                    items: [newMedicalRecord, ...existingCacheData.medicalRecords.items],
+                    totalCount: existingCacheData.medicalRecords.totalCount + 1,
+                };
+                cache.writeQuery({
+                    query: medicalRecordsQuery,
+                    variables: { limit: 10, offset: 0 },
+                    data: { medicalRecords: updatedMedicalRecords}
                 });
             },
         });

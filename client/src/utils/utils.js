@@ -1,12 +1,9 @@
 import { Divider } from 'primereact/divider';
-import { Card } from "primereact/card";
-import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
-import { Link } from "react-router-dom";
-import { BASE_URL_SERVER } from '../graphql/apolloConfig';
+import HealthDataContent from '../components/healthDataContent';
 
 
 export const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
@@ -56,7 +53,8 @@ export const customizedMarker = (item) => {
         'X-Ray': {icon: <FontAwesomeIcon icon={faXRay} />, color: '--primary-900'},
         'Ultrasound': {icon: <FontAwesomeIcon icon={faTowerBroadcast} />, color: '--indigo-500'},
         'ECG': {icon: <FontAwesomeIcon icon={faHeartPulse} />, color: '--pink-500'}
-    }
+    };
+
     return (
         <span
             className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
@@ -70,18 +68,7 @@ export const customizedMarker = (item) => {
 };
 
 
-export const customizedContent = (item) => {
-    let date = localDateTime(item.dateCreated, 'minus');
-    console.log(item);
-    return (
-        <Card title={item.recordType.recordName} subTitle={`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}>
-            <div dangerouslySetInnerHTML={{__html: item.recordData}} />
-            <span>Files</span>
-            {item.files.length > 0 && <Link to={`${BASE_URL_SERVER}${item.files[0].url}`} target='_blank'>{item.files[0].fileName}</Link>}
-            <Link to={`/medical-record/${item.recordId}`}><Button label="Read more" text></Button></Link>
-        </Card>
-    );
-};
+export const customizedContent = (item) => <HealthDataContent item={item} />;
 
 
 export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm) => {
@@ -103,7 +90,7 @@ export const handleTokenAccess = async (token, client, addTokenAccess, setPatien
         setPatient(credentials);
         const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
         if (cachedData) {
-            client.refetchQueries({ include: ["medicalRecords"] });
+            client.refetchQueries({ include: ["MedicalRecords"] });
         }
         showMessage('success', 'Success', 'Permission Granted');
         navigate("/medical-records-access");

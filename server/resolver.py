@@ -161,7 +161,7 @@ def resolve_login(*_, email, password):
 
 
 @query.field("medicalRecords")
-def resolve_medical_records(_, info):
+def resolve_medical_records(_, info, limit, offset):
     if not info.context['authenticated']:
         return None
     if info.context['user_detail']['userType'] == 'Patient':
@@ -173,7 +173,12 @@ def resolve_medical_records(_, info):
         if not info.context['medical_access']:
             return None
         patient_id = info.context['medical_access']['patientId']
-    return get_medical_records_by_pacient(patient_id)
+    items = get_medical_records_by_pacient(patient_id, limit, offset)
+    total_medical_records = count_medical_records(patient_id)
+    if not total_medical_records:
+        return None
+    total_medical_records['items'] = items
+    return total_medical_records
 
 
 @query.field("medicalRecord")

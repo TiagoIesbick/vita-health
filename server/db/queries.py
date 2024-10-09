@@ -71,7 +71,7 @@ def get_doctors_tokens_access(id: int) -> (None | list[dict]):
     return tokens_access
 
 
-def get_user_by_email_password(email:str, password:str) -> (None | dict):
+def get_user_by_email_password(email:str, password:str) -> None | dict:
     query = rf"SELECT * FROM Users WHERE email = '{email}';"
     user = mysql_results(query)
     if len(user) == 0:
@@ -81,15 +81,23 @@ def get_user_by_email_password(email:str, password:str) -> (None | dict):
     return user[0]
 
 
-def get_medical_records_by_pacient(id: int) -> (None | list[dict]):
-    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id} ORDER BY dateCreated DESC;'
+def get_medical_records_by_pacient(id: int, limit: int, offset: int) -> None | list[dict]:
+    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {id} ORDER BY dateCreated DESC LIMIT {limit} OFFSET {offset};'
     records = mysql_results(query)
     if len(records) == 0:
         return None
     return records
 
 
-def get_medical_records_type(id: int) -> (None | dict):
+def count_medical_records(id: int) -> None | dict:
+    query = rf"SELECT COUNT(recordId) AS totalCount FROM MedicalRecords WHERE patientId = {id};"
+    total_count= mysql_results(query)
+    if len(total_count) == 0:
+        return None
+    return total_count[0]
+
+
+def get_medical_records_type(id: int) -> None | dict:
     query = rf'SELECT * FROM RecordTypes WHERE recordTypeId = {id};'
     record_type = mysql_results(query)
     if len(record_type) == 0:
