@@ -23,8 +23,8 @@ def get_record_types() -> list[dict]:
     return mysql_results('SELECT * FROM RecordTypes;')
 
 
-def get_medical_record(id: int) -> (None | dict):
-    query = rf'SELECT * FROM MedicalRecords WHERE recordId = {id};'
+def get_medical_record(recordId: int, patientId: int) -> None | dict:
+    query = rf'SELECT * FROM MedicalRecords WHERE recordId = {recordId} AND patientId = {patientId};'
     medical_record = mysql_results(query)
     if len(medical_record) == 0:
         None
@@ -39,7 +39,7 @@ def get_users_patient(id: int) -> (None | dict):
     return patient[0]
 
 
-def get_patients_tokens(id: int) -> (None | list[dict]):
+def get_patients_tokens(id: int) -> None | list[dict]:
     query = rf'SELECT * FROM Tokens WHERE patientId = {id};'
     tokens = mysql_results(query)
     if len(tokens) == 0:
@@ -47,7 +47,7 @@ def get_patients_tokens(id: int) -> (None | list[dict]):
     return tokens
 
 
-def get_doctor(id: int) -> (None | dict):
+def get_doctor(id: int) -> None | dict:
     query = rf'SELECT * FROM Doctors WHERE doctorId = {id};'
     doctor = mysql_results(query)
     if len(doctor) == 0:
@@ -55,7 +55,7 @@ def get_doctor(id: int) -> (None | dict):
     return doctor[0]
 
 
-def get_users_doctor(id: int) -> (None | dict):
+def get_users_doctor(id: int) -> None | dict:
     query = rf'SELECT * FROM Doctors WHERE userId = {id};'
     doctor = mysql_results(query)
     if len(doctor) == 0:
@@ -63,7 +63,7 @@ def get_users_doctor(id: int) -> (None | dict):
     return doctor[0]
 
 
-def get_doctors_tokens_access(id: int) -> (None | list[dict]):
+def get_doctors_tokens_access(id: int) -> None | list[dict]:
     query = rf'SELECT * FROM TokenAccess WHERE doctorId = {id};'
     tokens_access = mysql_results(query)
     if len(tokens_access) == 0:
@@ -105,7 +105,7 @@ def get_medical_records_type(id: int) -> None | dict:
     return record_type[0]
 
 
-def get_token(id: int) -> (None | dict):
+def get_token(id: int) -> None | dict:
     query = rf'SELECT * FROM Tokens WHERE tokenId = {id};'
     token = mysql_results(query)
     if len(token) == 0:
@@ -113,7 +113,7 @@ def get_token(id: int) -> (None | dict):
     return token[0]
 
 
-def get_active_tokens_by_patient(id: int) -> (None | list[dict]):
+def get_active_tokens_by_patient(id: int) -> None | list[dict]:
     query = rf"SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate > '{datetime.now()}' ORDER BY expirationDate;"
     tokens = mysql_results(query)
     if len(tokens) == 0:
@@ -121,7 +121,7 @@ def get_active_tokens_by_patient(id: int) -> (None | list[dict]):
     return tokens
 
 
-def get_tokens_token_access(id: int) -> (None | list[dict]):
+def get_tokens_token_access(id: int) -> None | list[dict]:
     query = rf'SELECT * FROM TokenAccess WHERE tokenId = {id};'
     token_accesses = mysql_results(query)
     if len(token_accesses) == 0:
@@ -129,7 +129,7 @@ def get_tokens_token_access(id: int) -> (None | list[dict]):
     return token_accesses
 
 
-def get_token_access(id: int) -> (None | dict):
+def get_token_access(id: int) -> None | dict:
     query = rf'SELECT * FROM TokenAccess WHERE tokenAccessId = {id};'
     token_access = mysql_results(query)
     if len(token_access) == 0:
@@ -137,7 +137,7 @@ def get_token_access(id: int) -> (None | dict):
     return token_access[0]
 
 
-def get_active_tokens_by_doctor(id: int) -> (None | list[dict]):
+def get_active_tokens_by_doctor(id: int) -> None | list[dict]:
     query = rf'''SELECT a.tokenId, a.token, a.patientId, a.expirationDate from Tokens a INNER JOIN
         (SELECT DISTINCT tokenId FROM TokenAccess WHERE doctorId = {id}) v ON a.tokenId = v.tokenId
         WHERE expirationDate > '{datetime.now()}' ORDER BY expirationDate;'''
@@ -147,7 +147,7 @@ def get_active_tokens_by_doctor(id: int) -> (None | list[dict]):
     return tokens
 
 
-def get_inactive_tokens(id: int, limit: int, offset: int) -> (None | list[dict]):
+def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
     query = rf'''SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}'
         ORDER BY expirationDate DESC LIMIT {limit} OFFSET {offset};'''
     tokens = mysql_results(query)
@@ -169,7 +169,7 @@ def get_medical_records_files(id: int) -> list[dict]:
     return mysql_results(query)
 
 
-def get_filename_by_user(fileName: str, userId: int) -> dict:
+def get_filename_by_user(fileName: str, userId: int) -> list[dict]:
     query = rf'''
     SELECT f.fileName, u.userId FROM Files f
     INNER JOIN MedicalRecords mr ON f.recordId = mr.recordId

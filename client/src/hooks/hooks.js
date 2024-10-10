@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useApolloClient } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
-import { localDateTime } from "../utils/utils";
+import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
 
 
@@ -12,8 +12,8 @@ export const useBackgroundImageResize = () => {
     const location = useLocation();
 
     useEffect(() => {
+        const body = document.body;
         const backgroundImageResize = () => {
-            const body = document.body
             const bodyHeight = body.scrollHeight;
             const windowHeight = window.innerHeight;
             if (bodyHeight > 2*windowHeight) {
@@ -23,9 +23,12 @@ export const useBackgroundImageResize = () => {
             };
         };
         backgroundImageResize();
+        const resizeObserver = new ResizeObserver(() => backgroundImageResize());
+        resizeObserver.observe(body);
         window.addEventListener('resize', backgroundImageResize);
         backgroundImageResize();
         return () => {
+            resizeObserver.unobserve(body);
             window.removeEventListener('resize', backgroundImageResize);
         };
     },[location])
@@ -429,8 +432,15 @@ export const useMultipleUpload = () => {
             variables: { recordId, files },
             update: (cache, { data: { multipleUpload } }) => {
                 if (multipleUpload.files.length > 0) {
-                    console.log('[files]:', multipleUpload.files);
-                }
+                    cache.modify({
+                        id: cache.identify({ __typename: "MedicalRecords", recordId }),
+                        fields: {
+                            files(existingFiles = []) {
+                                return [...existingFiles, ...multipleUpload.files];
+                            },
+                        },
+                    });
+                };
             },
         });
         return multipleUpload;
@@ -439,5 +449,51 @@ export const useMultipleUpload = () => {
         addFiles,
         loadingFiles: loading,
         errorFiles: error
+    };
+};
+
+
+export const useInfiniteMedicalRecords = () => {
+    const [offset, setOffset] = useState(0);
+    const { medicalRecords, loading, error } = useMedicalRecords(limit, offset);
+    const [allRecords, setAllRecords] = useState(medicalRecords?.items || []);
+    const loader = useRef(null);
+
+    useEffect(() => {
+        if (medicalRecords?.items) {
+            setAllRecords((prevRecords) => {
+                const newRecords = medicalRecords.items.filter(
+                    (record) => !prevRecords.some((existing) => existing.recordId === record.recordId)
+                );
+                return [...prevRecords, ...newRecords];
+            });
+        }
+    }, [medicalRecords]);
+
+    const observerCallback = useCallback(
+        (entries) => {
+            const [entry] = entries;
+            if (
+                entry.isIntersecting &&
+                !loading &&
+                medicalRecords?.items?.length > 0 &&
+                allRecords.length < medicalRecords?.totalCount
+            ) setOffset((prevOffset) => prevOffset + limit);
+        },
+        [loading, medicalRecords, allRecords.length]
+    );
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(observerCallback, { threshold: 1.0 });
+        if (loader.current) observer.observe(loader.current);
+        return () => observer.disconnect();
+    }, [observerCallback]);
+
+    return {
+        allRecords,
+        medicalRecords,
+        loading,
+        error,
+        loader
     };
 };
