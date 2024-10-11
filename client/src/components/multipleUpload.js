@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { Tag } from 'primereact/tag';
 import { supportedFileFormats } from '../utils/utils';
+import FileRenderer from './fileRenderer';
 import './multipleUpload.css';
 
 
@@ -51,7 +52,7 @@ const MultipleUpload = ({ formik }) => {
 
     const headerTemplate = (options) => {
         const { className, chooseButton, cancelButton } = options;
-        const value = totalSize / 100000;
+        const value = totalSize / (10 * 1024 * 1024) * 100;
         const formatedValue = fileUploadRef && fileUploadRef.current ? fileUploadRef.current.formatSize(totalSize) : '0 B';
 
         return (
@@ -70,10 +71,18 @@ const MultipleUpload = ({ formik }) => {
         return (
             <div className="flex align-items-center flex-wrap">
                 <div className="flex align-items-center" style={{ width: '40%' }}>
-                    {file.type === "application/pdf"
-                    ? <embed src={file.objectURL} width={100} height={100}/>
-                    : <img alt={file.name} role="presentation" src={file.objectURL} width={100} height={100} style={{objectFit: 'cover'}}/>
-                    }
+                    <FileRenderer
+                        file={{ url: file.objectURL, mimeType: file.type, fileName: file.name }}
+                        style={{
+                            width: '5rem',
+                            height: '5rem',
+                            objectFit: file.type !== "application/pdf" ? 'cover' : undefined
+                        }}
+                        fallback={
+                            <i className="pi pi-file-pdf text-red-500" style={{ fontSize: '5rem' }}></i>
+                        }
+                        preview={true}
+                    />
                     <span className="flex-column text-left ml-3 visible-description">
                         {file.name.length > 10 ? file.name.slice(0, 10) + ' ...' : file.name}
                         <small>{new Date().toLocaleDateString()}</small>
@@ -104,13 +113,13 @@ const MultipleUpload = ({ formik }) => {
             <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
             <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
-            <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={1000 * 1024}
+            <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={2 * 1024 * 1024}
                 onSelect={onTemplateSelect} onError={onTemplateClear} onClear={onTemplateClear}
                 headerTemplate={headerTemplate} itemTemplate={itemTemplate} emptyTemplate={emptyTemplate}
                 chooseOptions={chooseOptions} cancelOptions={cancelOptions}
             />
             {formik.touched.files && formik.errors.files && <div className="text-red-500 text-xs">{formik.errors.files}</div>}
         </div>
-    )
+    );
 };
 export default MultipleUpload;

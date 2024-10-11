@@ -3,7 +3,7 @@ import { Card } from "primereact/card";
 import { Link } from "react-router-dom";
 import { BASE_URL_SERVER } from "../graphql/apolloConfig";
 import { useEffect, useRef, useState } from "react";
-import ObjectFile from './objectFile';
+import FileRenderer from './fileRenderer';
 
 
 const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
@@ -14,61 +14,47 @@ const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
         if (show) galleria.current.show();
     },[show]);
 
-    const itemTemplate = (file) => {
-        const fileHeight = layout === 'grid' ? 'calc(100vh - (100vh/6))' : 'calc(100vh - (100vh/6) - 116px)';
+    const fileHeight = layout === 'grid'
+        ? 'calc(100vh - (100vh/6))'
+        : 'calc(100vh - (100vh/6) - 116px)';
 
-        return file.mimeType === "application/pdf"
-            ?   <ObjectFile
-                    file={file}
-                    style={{
-                        height: fileHeight,
-                        width: 'calc(100vw - (100vw/6))'
-                    }}
-                    fallback={
-                        <div className='flex align-items-center h-full justify-content-center mx-4'>
-                            <Card className='text-center text-white' style={{background: 'linear-gradient(45deg, darkblue, darkorchid)'}}>
-                                <p className='mt-0'>Your browser does not support viewing this file.</p>
-                                <Link to={BASE_URL_SERVER + file.url} target="_blank" className='text-white underline'>Download the file here</Link>
-                            </Card>
-                        </div>
-                    }
-                />
-            : <img
-                src={BASE_URL_SERVER + file.url}
-                alt={file.fileName}
-                style={{
-                    objectFit: 'cover',
-                    maxHeight: fileHeight,
-                    maxWidth: 'calc(100vw - (100vw/6))'
-                }}
-             />;
-    };
+    const fileWidth = 'calc(100vw - (100vw/6))';
 
-    const thumbnailTemplate = (file) => {
-        return file.mimeType === "application/pdf"
-            ?   <div className="relative w-full h-full">
-                    <ObjectFile
-                        file={file}
-                        style={{
-                            height: 'calc(5rem - 4px)',
-                            width: '5rem'
-                        }}
-                        fallback={
-                            <i className="pi pi-file-pdf text-red-500" style={{ fontSize: 'calc(5rem - 4px)' }}></i>
-                        }
-                    />
-                    <div className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
+    const itemTemplate = (file) => (
+        <FileRenderer
+            file={file}
+            style={{
+                height: file.mimeType !== "application/pdf" ? undefined: fileHeight,
+                width: file.mimeType !== "application/pdf" ? undefined: fileWidth,
+                objectFit: file.mimeType !== "application/pdf" ? 'cover' : undefined,
+                maxHeight: file.mimeType !== "application/pdf" ? fileHeight: undefined,
+                maxWidth: file.mimeType !== "application/pdf" ? fileWidth : undefined,
+            }}
+            fallback={
+                <div className='flex align-items-center h-full justify-content-center mx-4'>
+                    <Card className='text-center text-white' style={{background: 'linear-gradient(45deg, darkblue, darkorchid)'}}>
+                        <p className='mt-0'>Your browser does not support viewing this file.</p>
+                        <Link to={BASE_URL_SERVER + file.url} target="_blank" className='text-white underline'>Download the file here</Link>
+                    </Card>
                 </div>
-            :   <img
-                    src={BASE_URL_SERVER + file.url}
-                    alt={file.fileName}
-                    style={{
-                        objectFit: 'cover',
-                        height: '5rem',
-                        width: '5rem'
-                    }}
-                />;
-    };
+            }
+        />
+    );
+
+    const thumbnailTemplate = (file) => (
+        <div className="relative w-full h-full">
+            <FileRenderer
+                file={file}
+                style={{
+                    height: '5rem',
+                    width: '5rem',
+                    objectFit: file.mimeType !== "application/pdf" ? 'cover' : undefined
+                }}
+                fallback={<i className="pi pi-file-pdf text-red-500" style={{ fontSize: '5rem' }}></i>}
+            />
+            <div className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
+        </div>
+    );
 
     const responsiveOptions = [
         {
@@ -112,39 +98,24 @@ const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
                 onHide={() => setShow(false)}
             />
             {layout === 'grid' &&
-            <div className="grid m-auto align-items-center mt-3" style={{ maxWidth: '400px' }} hidden={files.length < 1}>
-                {
-                    files && files.map((file, index) => {
-                        let fileEl = file.mimeType === "application/pdf"
-                            ? <div className="relative w-full h-5rem" onClick={() => handleClick(index)}>
-                                <ObjectFile
+                <div className="grid m-auto align-items-center mt-3" style={{ maxWidth: '400px' }} hidden={files.length < 1}>
+                    {files && files.map((file, index) => (
+                        <div className="col-3" key={index}>
+                            <div className="relative w-5rem h-5rem" onClick={() => handleClick(index)}>
+                                <FileRenderer
                                     file={file}
                                     style={{
-                                        height: 'calc(5rem - 4px)',
-                                        width: '5rem'
+                                        height: '5rem',
+                                        width: '5rem',
+                                        objectFit: file.mimeType !== "application/pdf" ? 'cover' : undefined
                                     }}
-                                    fallback={
-                                        <i className="pi pi-file-pdf text-red-500" style={{ fontSize: 'calc(5rem - 4px)' }}></i>
-                                    }
+                                    fallback={<i className="pi pi-file-pdf text-red-500" style={{ fontSize: '5rem' }}></i>}
                                 />
                                 <div className="absolute top-0 left-0 w-full h-full cursor-pointer"></div>
-                              </div>
-                            : <img
-                                src={BASE_URL_SERVER + file.url}
-                                className="w-full h-5rem"
-                                alt={file.fileName}
-                                style={{objectFit: 'cover', cursor: 'pointer'}}
-                                onClick={() => handleClick(index)}
-                              />;
-
-                        return (
-                            <div className="col-3" key={index}>
-                                {fileEl}
                             </div>
-                        );
-                    })
-                }
-            </div>
+                        </div>
+                    ))}
+                </div>
             }
         </>
     );

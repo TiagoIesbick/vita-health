@@ -9,7 +9,10 @@ import HealthDataContent from '../components/healthDataContent';
 export const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
 
 
-export const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
+export const stripHtmlTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+};
 
 
 export const supportedFileFormats = ["image/jpeg", "image/png", "image/svg+xml", "image/webp", "application/pdf"];
