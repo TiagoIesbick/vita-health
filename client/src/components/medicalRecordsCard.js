@@ -37,9 +37,9 @@ const MedicalRecordsCard = ({
             <div
                 ref={loader}
                 className={
-                    classNames("flex justify-content-center align-items-center", {
-                        "max-h-0": allRecords.length === medicalRecords?.totalCount,
-                        "h-2rem": allRecords.length < medicalRecords?.totalCount
+                    classNames("h-2rem justify-content-center align-items-center", {
+                        "hidden": allRecords.length === medicalRecords?.totalCount,
+                        "flex": allRecords.length < medicalRecords?.totalCount
                     })
                 }
             />
