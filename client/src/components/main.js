@@ -1,10 +1,11 @@
 import Home from "../pages/home";
-import MedicalRecords from "../pages/medicalRecords";
 import Login from "../pages/login";
 import CreateUser from "../pages/createUser";
 import EditProfile from "../pages/editProfile";
 import GenerateAccessToken from "../pages/generateAccessToken";
 import InsertToken from "../pages/insertToken";
+import MedicalRecords from "../pages/medicalRecords";
+import MedicalRecord from "../pages/medicalRecord";
 import MedicalRecordsAccess from "../pages/medicalRecordsAccess";
 import ActiveTokens from "../pages/activeTokens";
 import InactiveTokens from "../pages/inactiveTokens";
@@ -34,6 +35,7 @@ const Main = () => {
                 <Route path="/active-tokens" element={user ? <ActiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/inactive-tokens" element={user && user.userType === 'Patient' ? <InactiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/insert-medical-record" element={user ? <InsertMedicalRecord /> : <Navigate to="/" replace />} />
+                <Route path="/medical-record/:recordId" element={<MedicalRecord />} />
             </Routes>
         </main>
     );

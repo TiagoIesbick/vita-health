@@ -6,6 +6,7 @@ import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
 import { Button } from "primereact/button";
+import { Tooltip } from 'primereact/tooltip';
 import './countdown.css';
 
 
@@ -45,11 +46,22 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
 
     return (
         <div className='flex flex-wrap gap-2 mb-4 text-xl font-semibold text-primary-900 align-items-center'>
-            <span className='flex sm:flex-1 gap-1 min-w-max'>
+            <Tooltip target=".patient-tooltip" />
+            <span className='flex sm:flex-1 gap-1 min-w-max patient-tooltip'
+                data-pr-tooltip='Patient name'
+                data-pr-position='top'
+                data-pr-at="left+60 top"
+            >
                 <FontAwesomeIcon icon={faHospitalUser} />
                 {patientDetail.firstName + ' ' + patientDetail.lastName}
             </span>
-            <span className='flex sm:flex-1 gap-1 countdown-width' ref={clock}>
+            <Tooltip target=".expiration-tooltip" />
+            <span className='flex sm:flex-1 gap-1 countdown-width expiration-tooltip'
+                ref={clock}
+                data-pr-tooltip='Expiration timer'
+                data-pr-position='top'
+                data-pr-at="left+60 top"
+            >
                 <i className="pi pi-clock text-xl font-semibold"></i>
                 {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
             </span>

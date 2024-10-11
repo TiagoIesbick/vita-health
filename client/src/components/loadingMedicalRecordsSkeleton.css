@@ -1,0 +1,21 @@
+.skeleton-width {
+    width: 100%;
+    padding-left: 2rem;
+}
+
+.skeleton-reverse-row {
+    flex-direction: row-reverse;
+}
+
+@media screen and (min-width: 991px) {
+    .skeleton-width {
+        width: calc(50% + 1rem);
+        padding-left: 0;
+    }
+    .skeleton-justify-content {
+        justify-content: end;
+    }
+    .skeleton-reverse-row {
+        flex-direction: row;
+    }
+}

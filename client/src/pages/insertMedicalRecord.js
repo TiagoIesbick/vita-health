@@ -5,46 +5,69 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Button } from 'primereact/button';
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import './insertMedicalRecord.css';
-import { useCreateMedicalRecord, useCreateRecordType, useRecordTypes } from "../hooks/hooks";
+import { useCreateMedicalRecord, useCreateRecordType, useMultipleUpload, useRecordTypes } from "../hooks/hooks";
 import { useUserQuery } from '../hooks/hooks';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
 import { useUser } from "../providers/userContext";
+import { useApolloClient } from "@apollo/client";
+import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
+import { delTokenFromActiveDoctorTokensCache } from "../graphql/cache";
+import { TINYMCE_API_KEY, stripHtmlTags, supportedFileFormats } from "../utils/utils";
 import CountDown from "../components/countdown";
 import LoadingSkeleton from "../components/skeleton";
-
-
-const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
-
-
-const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
+import MultipleUpload from "../components/multipleUpload";
+import './insertMedicalRecord.css';
 
 
 const InsertMedicalRecord = () => {
     const navigate = useNavigate();
+    const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
-    const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId);
+    const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId || 0);
     const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
     const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
     const { addMedicalRecord, loadingMedicalRecord, errorMedicalRecord } = useCreateMedicalRecord();
+    const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
     const clickableWarning = useRef(null);
     const [visible, setVisible] = useState(false);
     const formik = useFormik({
         initialValues: {
             recordTypeId: '',
-            recordData: ''
+            recordData: '',
+            files: []
         },
-        onSubmit: async (values, { resetForm }) => {
-            const resMedicalRecord = await addMedicalRecord(values);
+        onSubmit: async (values, { resetForm, setStatus }) => {
+            const { files: _, ...recordValues } = values;
+            const resMedicalRecord = await addMedicalRecord(recordValues);
             if (resMedicalRecord.medicalRecordError) {
                 showMessage('error', 'Error', resMedicalRecord.medicalRecordError);
+                if (resMedicalRecord.medicalRecordError === 'Missing authorization') {
+                    delTokenFromActiveDoctorTokensCache(client.cache, patient.tokenId);
+                    setPatient(null);
+                    deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
+                    resetForm();
+                    navigate('/');
+                };
+            } else if (values.files.length > 0) {
+                const resAddFiles = await addFiles(resMedicalRecord.medicalRecord.recordId, values.files);
+                if (resAddFiles.fileError) {
+                    showMessage('warn', 'Warning', 'Health data was created, but some files had errors', true);
+                    resAddFiles.fileError.forEach(error => showMessage('error', 'Error', error, true));
+                    resetForm();
+                } else {
+                    setStatus({ success: resAddFiles.fileConfirmation});
+                    showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
+                    showMessage('success', 'Success', resAddFiles.fileConfirmation);
+                    if (user.userType === 'Doctor') navigate('/medical-records-access');
+                };
             } else {
                 resetForm();
                 showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
-                if (user.userType === 'Doctor') navigate('/medical-records-access');
+                // if (user.userType === 'Doctor') navigate('/medical-records-access');
+                user.userType === 'Doctor' ? navigate('/medical-records-access') : navigate(`/medical-record/${resMedicalRecord.medicalRecord.recordId}`);
             };
         },
         validationSchema: Yup.object({
@@ -53,6 +76,23 @@ const InsertMedicalRecord = () => {
                 .test('min-length-no-html', 'Minimum 3 characters', (value) => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
+                }),
+            files: Yup.array().nullable().notRequired().of(
+                Yup.mixed()
+                    .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
+                        return file ? supportedFileFormats.includes(file.type) : true;
+                    })
+                    .test('FILE_SIZE', "Uploaded file is too big (max 1000kb)", (file) => {
+                        return file ? file.size <= 1000 * 1024 : true;
+                    })
+                )
+                .test('MAX_FILES', 'You can only upload a maximum of 10 files', (files) => {
+                    return files ? files.length <= 10 : true;
+                })
+                .test('TOTAL_SIZE', 'Total size of uploaded files must not exceed 10MB', (files) => {
+                    if (!files) return true;
+                    const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+                    return totalSize <= 10 * 1024 * 1024;
                 })
         })
     });
@@ -94,7 +134,7 @@ const InsertMedicalRecord = () => {
         return <LoadingSkeleton />;
     };
 
-    if (errorRecordTypes || errorRecordType || errorMedicalRecord || (user.userType === 'Doctor' && errorUser)) {
+    if (errorRecordTypes || errorRecordType || errorMedicalRecord || errorFiles || (user.userType === 'Doctor' && errorUser)) {
         navigate('/');
         showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
@@ -144,7 +184,8 @@ const InsertMedicalRecord = () => {
                     />
                     {formik.touched.recordData && formik.errors.recordData && <div className="text-red-500 text-xs">{formik.errors.recordData}</div>}
                 </div>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord} loading={loadingRecordTypes || loadingMedicalRecord} />
+                <MultipleUpload formik={formik} />
+                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord || loadingFiles} loading={loadingRecordTypes || loadingMedicalRecord || loadingFiles} />
             </form>
             <Dialog
                 header="New Category"

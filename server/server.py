@@ -1,35 +1,29 @@
 from ariadne.asgi import GraphQL
-from ariadne import load_schema_from_path, make_executable_schema
+from ariadne import load_schema_from_path, make_executable_schema, upload_scalar
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
-from starlette.requests import Request
-from auth import BasicAuthBackend
+from auth import BasicAuthBackend, get_context_value, serve_file
 from resolver import query, users, patients, doctors, mutation, medical_records, \
     tokens, token_access
 
 
 type_defs = load_schema_from_path("schema.graphql")
 
+
 schema = make_executable_schema(
     type_defs, query, users, patients, doctors, mutation, medical_records,
-    tokens, token_access
+    tokens, token_access, upload_scalar
 )
+
 
 middleware = [
     Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=("GET", "POST", "OPTIONS"), allow_headers=['*']),
     Middleware(AuthenticationMiddleware, backend=BasicAuthBackend())
 ]
 
-async def get_context_value(request: Request):
-    return {
-        "request": request,
-        "authenticated": request.user.is_authenticated,
-        "user_detail": None if not request.user.is_authenticated else request.user.user_detail,
-        "medical_access": None if not request.user.is_authenticated else request.user.medical_access
-    }
 
 graphql_app = GraphQL(
     schema,
@@ -37,8 +31,11 @@ graphql_app = GraphQL(
     context_value=get_context_value
 )
 
+
 routes = [
-    Route("/graphql/", graphql_app.handle_request, methods=["GET", "POST", "OPTIONS"])
+    Route("/graphql/", graphql_app.handle_request, methods=["GET", "POST", "OPTIONS"]),
+    Route("/uploads/{filename}", serve_file, methods=["GET"])
 ]
+
 
 app = Starlette(debug=True, middleware=middleware, routes=routes)

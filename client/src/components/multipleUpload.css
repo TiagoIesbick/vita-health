@@ -1,0 +1,30 @@
+.p-fileupload.p-fileupload-advanced.p-component {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    transition:
+        border 0.2s ease-in;
+    &:hover {
+        border: 1px solid var(--primary-500) !important;
+    }
+}
+
+.p-fileupload .p-fileupload-content {
+    border: revert;
+    border-top: 1px solid #e5e7eb;
+}
+
+.visible-description {
+    display: flex;
+}
+
+@media screen and (max-width: 768px) {
+    .visible-description {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .visible-tag {
+        display: none;
+    }
+}

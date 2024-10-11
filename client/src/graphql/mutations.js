@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -183,4 +183,18 @@ export const mutationDeactivateToken = gql`
             }
         }
     }
+`;
+
+
+export const mutationMultipleUpload = gql`
+    mutation MultipleUpload ($recordId: ID!, $files: [Upload!]) {
+        multipleUpload(recordId: $recordId, files: $files) {
+            fileConfirmation
+            fileError
+            files {
+                ...FileDetail
+            }
+        }
+    }
+    ${fileFragment}
 `;

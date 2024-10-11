@@ -48,6 +48,16 @@ export const recordTypeFragment = gql`
 `;
 
 
+export const fileFragment = gql`
+    fragment FileDetail on Files {
+        fileId
+        fileName
+        mimeType
+        url
+    }
+`;
+
+
 export const medicalRecordsFragment = gql`
     fragment MedicalRecordsDetail on MedicalRecords {
         recordId
@@ -56,8 +66,12 @@ export const medicalRecordsFragment = gql`
         recordType {
             ...RecordTypeDetail
         }
+        files {
+            ...FileDetail
+        }
     }
     ${recordTypeFragment}
+    ${fileFragment}
 `;
 
 

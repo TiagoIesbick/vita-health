@@ -17,3 +17,15 @@
         margin-top: 1rem;
     }
 }
+
+@media screen and (min-width: 431px) and (max-width: 991px) {
+    .p-timeline-event .health-data-buttons {
+        flex-direction: row-reverse;
+    }
+}
+
+@media screen and (min-width: 991px) {
+    .p-timeline-event:nth-child(odd) .health-data-buttons {
+        flex-direction: row-reverse;
+    }
+}

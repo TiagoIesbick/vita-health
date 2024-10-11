@@ -1,5 +1,7 @@
+scalar Upload
+
 type Query {
-    medicalRecords: [MedicalRecords]
+    medicalRecords(limit: Int, offset: Int): MedicalRecordsSubList
     medicalRecord(recordId: ID!): MedicalRecords
     user(userId: ID!): Users
     activePatientTokens: [Tokens]
@@ -13,11 +15,24 @@ type MedicalRecords {
     recordData: String!
     dateCreated: String!
     recordType: RecordTypes!
+    files: [Files]
+}
+
+type MedicalRecordsSubList {
+    items: [MedicalRecords]
+    totalCount: Int
 }
 
 type RecordTypes {
     recordTypeId: ID!
     recordName: String!
+}
+
+type Files {
+    fileId: ID!
+    fileName: String!
+    mimeType: String!
+    url: String!
 }
 
 type Users {
@@ -59,6 +74,7 @@ type Mutation {
     saveTokenAccess(token: String!): TokenAccessResult
     createRecordType(recordName: String!): RecordTypeResult
     createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
+    multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
     deactivateToken(tokenId: ID!): DeactivateTokenResult
 }
 
@@ -149,4 +165,10 @@ type DeactivateTokenResult {
     deactivateTokenConfirmation: String
     deactivateTokenError: String
     token: Tokens
+}
+
+type MultipleUploadResult {
+    fileConfirmation: String
+    fileError: [String]
+    files: [Files]
 }

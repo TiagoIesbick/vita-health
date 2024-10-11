@@ -1,8 +1,18 @@
 import { Divider } from 'primereact/divider';
-import { Card } from "primereact/card";
-import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
+import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
+import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
+import HealthDataContent from '../components/healthDataContent';
+
+
+export const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
+
+
+export const stripHtmlTags = (html) => html.replace(/<\/?[^>]+>/gi, '');
+
+
+export const supportedFileFormats = ["image/jpeg", "image/png", "image/svg+xml", "image/webp", "application/pdf"];
 
 
 export const passwordHeader = <div className="font-bold mb-3">Pick a password</div>;
@@ -28,6 +38,9 @@ export const toDay = new Date();
 export const toDayPlus90 = new Date( Date.now() + 90 * 24 * 60 * 60 * 1000);
 
 
+export const limit = 10;
+
+
 export const localDateTime = (date, operation) => {
     const timeZoneOffset = new Date().getTimezoneOffset() / 60;
     let localDate = new Date(date);
@@ -43,7 +56,8 @@ export const customizedMarker = (item) => {
         'X-Ray': {icon: <FontAwesomeIcon icon={faXRay} />, color: '--primary-900'},
         'Ultrasound': {icon: <FontAwesomeIcon icon={faTowerBroadcast} />, color: '--indigo-500'},
         'ECG': {icon: <FontAwesomeIcon icon={faHeartPulse} />, color: '--pink-500'}
-    }
+    };
+
     return (
         <span
             className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
@@ -57,12 +71,32 @@ export const customizedMarker = (item) => {
 };
 
 
-export const customizedContent = (item) => {
-    let date = localDateTime(item.dateCreated, 'minus');
-    return (
-        <Card title={item.recordType.recordName} subTitle={`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}>
-            <div dangerouslySetInnerHTML={{__html: item.recordData}} />
-            <Button label="Read more" text></Button>
-        </Card>
-    );
+export const customizedContent = (item) => <HealthDataContent item={item} />;
+
+
+export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm) => {
+    storeToken(ACCESS_MEDICAL_TOKEN_KEY, token);
+    const resTokenAccess = await addTokenAccess(token);
+
+    if (resTokenAccess.accessError) {
+        showMessage('error', 'Error', resTokenAccess.accessError);
+        if (resTokenAccess.accessError === 'Missing authorization') {
+            const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
+            if (cachedData) {
+                client.refetchQueries({ include: ["ActiveDoctorTokens"] });
+            }
+        }
+        setPatient(null);
+        deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
+    } else {
+        const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
+        setPatient(credentials);
+        const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
+        if (cachedData) {
+            client.refetchQueries({ include: ["MedicalRecords"] });
+        }
+        showMessage('success', 'Success', 'Permission Granted');
+        navigate("/medical-records-access");
+        if (resetForm) resetForm();
+    }
 };

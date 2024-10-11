@@ -17,6 +17,8 @@ services:
     build: ./server
     ports:
       - '8000:8000'
+    volumes:
+      - uploads:/server/uploads
     depends_on:
       - database
     env_file:
@@ -52,3 +54,4 @@ services:
 volumes:
   mysql_data:
   client-build:
+  uploads:

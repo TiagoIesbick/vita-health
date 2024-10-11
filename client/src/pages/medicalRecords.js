@@ -1,20 +1,18 @@
-import { useMedicalRecords } from "../hooks/hooks";
-import { Card } from "primereact/card";
-import { Timeline } from 'primereact/timeline';
 import { useUser } from "../providers/userContext";
-import { useNavigate } from 'react-router';
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router';
+import { useInfiniteMedicalRecords } from "../hooks/hooks";
 import LoadingSkeleton from "../components/skeleton";
-import { customizedContent, customizedMarker } from "../utils/utils";
-import './medicalRecords.css';
+import MedicalRecordsCard from "../components/medicalRecordsCard";
 
 
 const MedicalRecords = () => {
     const navigate = useNavigate();
     const { showMessage } = useUser();
-    const { medicalRecords, loading, error } = useMedicalRecords();
+    const { allRecords, medicalRecords, loading, error, loader } = useInfiniteMedicalRecords();
 
-    if (loading) {
+
+    if (loading && allRecords.length === 0) {
         return <LoadingSkeleton />
     };
 
@@ -24,19 +22,20 @@ const MedicalRecords = () => {
     };
 
     return (
-        <Card
+        <MedicalRecordsCard
             title="Health History"
-            className="flex justify-content-center align-items-center card-min-height medical-record"
-        >
-            {!medicalRecords || medicalRecords.length === 0 ?
+            allRecords={allRecords}
+            medicalRecords={medicalRecords}
+            loading={loading}
+            loader={loader}
+            emptyMessage={
                 <>
                     <p>You have no health history yet.</p>
-                    <p>Start by adding your health data <Link to="/insert-medical-record" >here</Link> to begin building your records.</p>
-                    <p>Alternatively, generate a token <Link to="/generate-access-token" >here</Link> to share with your health professional so they can add new information.</p>
-                </> :
-                <Timeline value={medicalRecords} align="alternate" className="customized-timeline" marker={customizedMarker} content={customizedContent} />
+                    <p>Start by adding your health data <Link to="/insert-medical-record">here</Link> to begin building your records.</p>
+                    <p>Alternatively, generate a token <Link to="/generate-access-token">here</Link> to share with your health professional so they can add new information.</p>
+                </>
             }
-        </Card>
+        />
     );
 };
 export default MedicalRecords;

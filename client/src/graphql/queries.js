@@ -31,8 +31,21 @@ export const recordTypesQuery = gql`
 
 
 export const medicalRecordsQuery = gql`
-    query medicalRecords {
-        medicalRecords {
+    query MedicalRecords ($limit: Int, $offset: Int) {
+        medicalRecords (limit: $limit, offset: $offset) {
+            items {
+                ...MedicalRecordsDetail
+            }
+            totalCount
+        }
+    }
+    ${medicalRecordsFragment}
+`;
+
+
+export const medicalRecordQuery = gql`
+    query MedicalRecord ($recordId: ID!) {
+        medicalRecord (recordId: $recordId) {
             ...MedicalRecordsDetail
         }
     }
