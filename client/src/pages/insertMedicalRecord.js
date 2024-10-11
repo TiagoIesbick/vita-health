@@ -82,14 +82,14 @@ const InsertMedicalRecord = () => {
                     .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
                         return file ? supportedFileFormats.includes(file.type) : true;
                     })
-                    .test('FILE_SIZE', "Uploaded file is too big (max 1000kb)", (file) => {
-                        return file ? file.size <= 1000 * 1024 : true;
+                    .test('FILE_SIZE', "Uploaded file is too big (max 2 MB)", (file) => {
+                        return file ? file.size <= 2 * 1024 * 1024 : true;
                     })
                 )
                 .test('MAX_FILES', 'You can only upload a maximum of 10 files', (files) => {
                     return files ? files.length <= 10 : true;
                 })
-                .test('TOTAL_SIZE', 'Total size of uploaded files must not exceed 10MB', (files) => {
+                .test('TOTAL_SIZE', 'Total size of uploaded files must not exceed 10 MB', (files) => {
                     if (!files) return true;
                     const totalSize = files.reduce((acc, file) => acc + file.size, 0);
                     return totalSize <= 10 * 1024 * 1024;
@@ -157,7 +157,6 @@ const InsertMedicalRecord = () => {
                     {formik.touched.recordTypeId && formik.errors.recordTypeId &&<div ref={clickableWarning} onClick={handleClick} className="text-red-500 text-xs">{formik.errors.recordTypeId}</div>}
                 </FloatLabel>
                 <div>
-                    {/* <label style={{top: '-.3rem', fontSize: '12px', left: '0.75rem', position: 'relative'}} htmlFor="record-data">Health Data</label> */}
                     <Editor
                         textareaName="record-data"
                         apiKey={TINYMCE_API_KEY}

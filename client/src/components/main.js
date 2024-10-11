@@ -35,7 +35,7 @@ const Main = () => {
                 <Route path="/active-tokens" element={user ? <ActiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/inactive-tokens" element={user && user.userType === 'Patient' ? <InactiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/insert-medical-record" element={user ? <InsertMedicalRecord /> : <Navigate to="/" replace />} />
-                <Route path="/medical-record/:recordId" element={<MedicalRecord />} />
+                <Route path="/medical-record/:recordId" element={user ? <MedicalRecord /> : <Navigate to="/" replace />} />
             </Routes>
         </main>
     );
