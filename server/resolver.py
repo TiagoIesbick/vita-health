@@ -9,6 +9,7 @@ from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from utils.utils import UPLOAD_DIR
+from utils.decorators import *
 from pathlib import Path
 from utils.utils import encrypt, validate_email, validate_password, \
     validate_name, generate_token
@@ -105,9 +106,8 @@ def resolve_create_patient_or_doctor_user(*_, userId, userType):
 
 
 @mutation.field("updateUser")
+@requires_authentication('userError')
 def resolve_update_user(_, info, input):
-    if not info.context['authenticated']:
-        return {'userError': 'Missing authentication'}
     email, firstName, lastName, userId = \
         input['email'], input['firstName'].strip().capitalize(), \
         input['lastName'].strip().capitalize(), info.context['user_detail']['userId']
@@ -125,12 +125,9 @@ def resolve_update_user(_, info, input):
 
 
 @mutation.field("updatePatientUser")
-def resolve_update_patient_user(_, info, input):
-    if not info.context['authenticated']:
-        return {'userError': 'Missing authentication'}
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return {'userError': 'Missing patient credential'}
+@requires_authentication('userError')
+@requires_patient('userError')
+def resolve_update_patient_user(_, info, patient, input):
     dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).strftime("%Y-%m-%d")
     res = update_patient_user(dateOfBirth, input['gender'], patient['patientId'])
     if res['userConfirmation']:
@@ -139,12 +136,9 @@ def resolve_update_patient_user(_, info, input):
 
 
 @mutation.field("updateDoctorUser")
-def resolve_update_doctor_user(_, info, input):
-    if not info.context['authenticated']:
-        return {'userError': 'Missing authentication'}
-    doctor = get_users_doctor(info.context['user_detail']['userId'])
-    if not doctor:
-        return {'userError': 'Missing doctor credential'}
+@requires_authentication('userError')
+@requires_doctor('userError')
+def resolve_update_doctor_user(_, info, doctor, input):
     res = update_doctor_user(nh3.clean(input['specialty'].strip().capitalize()), nh3.clean(input['licenseNumber'].strip()), doctor['doctorId'])
     if res['userConfirmation']:
         res['user'] = get_user(info.context['user_detail']['userId'])
@@ -161,9 +155,8 @@ def resolve_login(*_, email, password):
 
 
 @query.field("medicalRecords")
+@requires_authentication(return_none=True)
 def resolve_medical_records(_, info, limit, offset):
-    if not info.context['authenticated']:
-        return None
     if info.context['user_detail']['userType'] == 'Patient':
         patient = get_users_patient(info.context['user_detail']['userId'])
         if not patient:
@@ -182,9 +175,8 @@ def resolve_medical_records(_, info, limit, offset):
 
 
 @query.field("medicalRecord")
+@requires_authentication(return_none=True)
 def resolve_get_medical_record(_, info, recordId):
-    if not info.context['authenticated']:
-        return None
     if info.context['user_detail']['userType'] == 'Patient':
         patient = get_users_patient(info.context['user_detail']['userId'])
         if not patient:
@@ -203,14 +195,13 @@ def resolve_medical_records_type(medicalRecords, *_):
 
 
 @medical_records.field("files")
-def resolve_medical_records_files(medicalRecords, info):
+def resolve_medical_records_files(medicalRecords, *_):
     return get_medical_records_files(medicalRecords['recordId'])
 
 
 @mutation.field("createMedicalRecord")
+@requires_authentication('medicalRecordError')
 def resolve_create_medical_record(_, info, recordTypeId, recordData):
-    if not info.context['authenticated']:
-        return {'medicalRecordError': 'Missing authentication'}
     if info.context['user_detail']['userType'] == 'Patient':
         patient = get_users_patient(info.context['user_detail']['userId'])
         if not patient:
@@ -233,46 +224,30 @@ def resolve_record_types(*_):
 
 
 @mutation.field("createRecordType")
-def resolve_create_record_type(_, info, recordName):
-    if not info.context['authenticated']:
-        return {'recordTypeError': 'Missing authentication'}
+@requires_authentication('recordTypeError')
+def resolve_create_record_type(*_, recordName):
     recordName = ' '.join(nh3.clean(recordName).split()).title()
     return create_record_type(recordName)
 
 
 @query.field("activePatientTokens")
-def resolve_patients_active_tokens(_, info):
-    if not info.context['authenticated']:
-        return None
-    if info.context['user_detail']['userType'] != 'Patient':
-        return None
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return None
+@requires_authentication(return_none=True)
+@requires_patient(return_none=True)
+def resolve_patients_active_tokens(*_, patient):
     return get_active_tokens_by_patient(patient['patientId'])
 
 
 @query.field("activeDoctorTokens")
-def resolve_doctors_active_tokens(_, info):
-    if not info.context['authenticated']:
-        return None
-    if info.context['user_detail']['userType'] != 'Doctor':
-        return None
-    doctor = get_users_doctor(info.context['user_detail']['userId'])
-    if not doctor:
-        return None
+@requires_authentication(return_none=True)
+@requires_doctor(return_none=True)
+def resolve_doctors_active_tokens(*_, doctor):
     return get_active_tokens_by_doctor(doctor['doctorId'])
 
 
 @query.field("inactiveTokens")
-def resolve_inactive_tokens(_, info, limit, offset):
-    if not info.context['authenticated']:
-        return None
-    if info.context['user_detail']['userType'] != 'Patient':
-        return None
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return None
+@requires_authentication(return_none=True)
+@requires_patient(return_none=True)
+def resolve_inactive_tokens(*_, patient, limit, offset):
     items = get_inactive_tokens(patient['patientId'], limit, offset)
     total_inactive_tokens = count_inactive_tokens(patient['patientId'])
     if not total_inactive_tokens:
@@ -282,12 +257,9 @@ def resolve_inactive_tokens(_, info, limit, offset):
 
 
 @mutation.field("generateToken")
-def resolve_generate_token(_, info, expirationDate):
-    if not info.context['authenticated']:
-        return {'tokenError': 'Missing authentication'}
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return {'tokenError': 'Missing patient credential'}
+@requires_authentication('tokenError')
+@requires_patient('tokenError')
+def resolve_generate_token(*_, patient, expirationDate):
     exp = datetime.fromisoformat(expirationDate).strftime("%Y-%m-%d %H:%M:%S")
     unix_timestamp = int(datetime.fromisoformat(expirationDate.replace("Z", "+00:00")).timestamp())
     reserve_tokenId = reserve_token_id(patient['patientId'], exp)
@@ -310,18 +282,15 @@ def resolve_generate_token(_, info, expirationDate):
 
 
 @mutation.field("saveTokenAccess")
-def resolve_save_token_access(_, info, token):
-    if not info.context['authenticated']:
-        return {'accessError': 'Missing authentication'}
-    if info.context['user_detail']['userType'] != 'Doctor':
-        return {'accessError': 'Missing healthcare professional credential'}
+@requires_authentication('accessError')
+@requires_doctor('accessError')
+def resolve_save_token_access(_, info, doctor, token):
     try:
         jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
     except jwt.exceptions.PyJWTError as exc:
         return {'accessError': str(exc)}
     if not info.context['medical_access']:
         return {'accessError': 'Missing authorization'}
-    doctor = get_users_doctor(info.context['user_detail']['userId'])
     res = create_token_access(info.context['medical_access']['tokenId'], doctor['doctorId'])
     if res['accessConfirmation']:
         res['tokenAccess'] = get_token_access(res['tokenAccessId'])
@@ -357,14 +326,9 @@ def resolve_token_access_doctor(tokenAccess, info):
 
 
 @mutation.field("deactivateToken")
-def resolve_deactivate_token(_, info, tokenId):
-    if not info.context['authenticated']:
-        return {'deactivateTokenError': 'Missing authentication'}
-    if info.context['user_detail']['userType'] != 'Patient':
-        return {'deactivateTokenError': 'Missing patient credential'}
-    patient = get_users_patient(info.context['user_detail']['userId'])
-    if not patient:
-        return {'deactivateTokenError': 'Missing patient credential'}
+@requires_authentication('deactivateTokenError')
+@requires_patient('deactivateTokenError')
+def resolve_deactivate_token(*_, patient, tokenId):
     tokens = get_active_tokens_by_patient(patient['patientId'])
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:

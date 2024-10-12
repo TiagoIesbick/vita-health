@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import FileRenderer from './fileRenderer';
 
 
-const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
+const FileGallery = ({ files, layout='grid', show, setShow=()=>{} }) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const galleria = useRef(null);
 
