@@ -52,8 +52,9 @@ def resolve_patients_user(patients, *_):
 
 
 @patients.field("tokens")
-def resolve_patients_tokens(patients, info):
-    if not info.context['authenticated'] or not patients['patientId']:
+@requires_authentication(return_none=True)
+def resolve_patients_tokens(patients, *_):
+    if not patients['patientId']:
         return None
     return get_patients_tokens(patients['patientId'])
 
@@ -66,8 +67,9 @@ def resolve_doctors_user(doctors, *_):
 
 
 @doctors.field("tokensAccess")
-def resolve_doctors_user(doctors, info):
-    if not info.context['authenticated'] or not doctors['doctorId']:
+@requires_authentication(return_none=True)
+def resolve_doctors_user(doctors, *_):
+    if not doctors['doctorId']:
         return None
     return get_doctors_tokens_access(doctors['userId'])
 
@@ -156,16 +158,8 @@ def resolve_login(*_, email, password):
 
 @query.field("medicalRecords")
 @requires_authentication(return_none=True)
-def resolve_medical_records(_, info, limit, offset):
-    if info.context['user_detail']['userType'] == 'Patient':
-        patient = get_users_patient(info.context['user_detail']['userId'])
-        if not patient:
-            return None
-        patient_id = patient['patientId']
-    elif info.context['user_detail']['userType'] == 'Doctor':
-        if not info.context['medical_access']:
-            return None
-        patient_id = info.context['medical_access']['patientId']
+@requires_patient_or_doctor_access(return_none=True)
+def resolve_medical_records(*_, limit, offset, patient_id):
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
     if not total_medical_records:
@@ -176,16 +170,8 @@ def resolve_medical_records(_, info, limit, offset):
 
 @query.field("medicalRecord")
 @requires_authentication(return_none=True)
-def resolve_get_medical_record(_, info, recordId):
-    if info.context['user_detail']['userType'] == 'Patient':
-        patient = get_users_patient(info.context['user_detail']['userId'])
-        if not patient:
-            return None
-        patient_id = patient['patientId']
-    elif info.context['user_detail']['userType'] == 'Doctor':
-        if not info.context['medical_access']:
-            return None
-        patient_id = info.context['medical_access']['patientId']
+@requires_patient_or_doctor_access(return_none=True)
+def resolve_get_medical_record(*_, recordId, patient_id):
     return get_medical_record(recordId, patient_id)
 
 
@@ -201,18 +187,9 @@ def resolve_medical_records_files(medicalRecords, *_):
 
 @mutation.field("createMedicalRecord")
 @requires_authentication('medicalRecordError')
-def resolve_create_medical_record(_, info, recordTypeId, recordData):
-    if info.context['user_detail']['userType'] == 'Patient':
-        patient = get_users_patient(info.context['user_detail']['userId'])
-        if not patient:
-            return {'medicalRecordError': 'Missing patient credential'}
-        patient_id = patient['patientId']
-        res = create_medical_record(patient_id, recordTypeId, recordData)
-    else:
-        if not info.context['medical_access']:
-            return {'medicalRecordError': 'Missing authorization'}
-        patient_id = info.context['medical_access']['patientId']
-        res = create_medical_record(patient_id, recordTypeId, recordData)
+@requires_patient_or_doctor_access('medicalRecordError')
+def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id):
+    res = create_medical_record(patient_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         res['medicalRecord'] = get_medical_record(res['medicalRecordId'], patient_id)
     return res
@@ -298,29 +275,33 @@ def resolve_save_token_access(_, info, doctor, token):
 
 
 @tokens.field("patient")
-def resolve_tokens_patient(tokens, info):
-    if not info.context['authenticated'] or not tokens['patientId']:
+@requires_authentication(return_none=True)
+def resolve_tokens_patient(tokens, *_):
+    if not tokens['patientId']:
         return None
     return get_patient(tokens['patientId'])
 
 
 @tokens.field("tokenAccess")
-def resolve_tokens_token_access(tokens, info):
-    if not info.context['authenticated'] or not tokens['tokenId']:
+@requires_authentication(return_none=True)
+def resolve_tokens_token_access(tokens, *_):
+    if not tokens['tokenId']:
         return None
     return get_tokens_token_access(tokens['tokenId'])
 
 
 @token_access.field("token")
-def resolve_token_access_token(tokenAccess, info):
-    if not info.context['authenticated'] or not tokenAccess['tokenId']:
+@requires_authentication(return_none=True)
+def resolve_token_access_token(tokenAccess, *_):
+    if not tokenAccess['tokenId']:
         return None
     return get_token(tokenAccess['tokenId'])
 
 
 @token_access.field("doctor")
-def resolve_token_access_doctor(tokenAccess, info):
-    if not info.context['authenticated'] or not tokenAccess['tokenId']:
+@requires_authentication(return_none=True)
+def resolve_token_access_doctor(tokenAccess, *_):
+    if not tokenAccess['tokenId']:
         return None
     return get_doctor(tokenAccess['doctorId'])
 

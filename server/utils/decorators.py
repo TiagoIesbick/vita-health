@@ -45,3 +45,27 @@ def requires_doctor(error_field: Optional[str] = None, return_none: bool = False
             return resolver_function(*args, doctor=doctor, **kwargs)
         return wrapper
     return decorator
+
+
+def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_none: bool = False) -> Callable:
+    def decorator(resolver_function: Callable) -> Callable:
+        @wraps(resolver_function)
+        def wrapper(*args: Any, **kwargs: Any) -> Union[Dict[str, str], None, Any]:
+            info = args[1]
+            user_detail = info.context['user_detail']
+            user_type = user_detail.get('userType')
+            if user_type == 'Patient':
+                patient = get_users_patient(user_detail['userId'])
+                if not patient:
+                    return None if return_none else {error_field: 'Missing patient credential'}
+                patient_id = patient['patientId']
+            elif user_type == 'Doctor':
+                medical_access = info.context.get('medical_access')
+                if not medical_access:
+                    return None if return_none else {error_field: 'Missing authorization'}
+                patient_id = medical_access['patientId']
+            else:
+                return None if return_none else {error_field: 'User is neither a Patient nor a Doctor'}
+            return resolver_function(*args, patient_id=patient_id, **kwargs)
+        return wrapper
+    return decorator
