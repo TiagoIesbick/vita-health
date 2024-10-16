@@ -5,7 +5,8 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
-from auth import BasicAuthBackend, get_context_value, serve_file
+from auth import BasicAuthBackend, get_context_value
+from routes import serve_file, get_chatgpt_insights
 from resolver import query, users, patients, doctors, mutation, medical_records, \
     tokens, token_access
 
@@ -34,7 +35,8 @@ graphql_app = GraphQL(
 
 routes = [
     Route("/graphql/", graphql_app.handle_request, methods=["GET", "POST", "OPTIONS"]),
-    Route("/uploads/{filename}", serve_file, methods=["GET"])
+    Route("/uploads/{filename}", serve_file, methods=["GET"]),
+    Route("/ai/", get_chatgpt_insights, methods=["POST"])
 ]
 
 

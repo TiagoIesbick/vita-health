@@ -156,6 +156,7 @@ CREATE TABLE IF NOT EXISTS `vita_health`.`Files` (
   `fileName` VARCHAR(255) NOT NULL,
   `mimeType` VARCHAR(255) NOT NULL,
   `url` VARCHAR(255) NOT NULL,
+  `textContent` LONGTEXT NULL,
   PRIMARY KEY (`fileId`),
   UNIQUE INDEX `fileName_UNIQUE` (`fileName` ASC) VISIBLE,
   INDEX `filesRecordId_idx` (`recordId` ASC) VISIBLE,
@@ -737,6 +738,44 @@ SELECT * FROM(
   (SELECT fileConfirmation) fileConfirmation,
   (SELECT fileError) fileError,
   (SELECT LAST_INSERT_ID() AS fileId) fileId
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Create Procedure to update file text content
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE UpdateFileTextContent(IN FLID INT, IN TXCT LONGTEXT)
+BEGIN
+DECLARE fileConfirmation VARCHAR(45);
+DECLARE fileError VARCHAR(45);
+PREPARE CountFileId FROM 'SELECT COUNT(`fileId`) INTO @countFileId FROM `Files`
+	WHERE `fileId` = ?' ;
+PREPARE UpdateTextContent FROM 'UPDATE `vita_health`.`Files` SET `textContent` = ?
+	WHERE `fileId` = ?' ;
+START TRANSACTION;
+SET @fileId = FLID ;
+SET @textContent = TXCT ;
+EXECUTE CountFileId USING @fileId ;
+IF @countFileId != 1 THEN
+	ROLLBACK ;
+    SET fileError = 'The file does not exist' ;
+ELSE
+	EXECUTE UpdateTextContent USING @textContent, @fileId ;
+    SELECT `textContent` INTO @newTextContent FROM `vita_health`.`Files` WHERE `fileId` = FLID ;
+    IF @newTextContent = @textContent THEN
+		COMMIT ;
+		SET fileConfirmation = 'Saved file text content!' ;
+	ELSE
+		ROLLBACK ;
+        SET fileError = 'File text content not saved' ;
+	END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT fileConfirmation) fileConfirmation,
+  (SELECT fileError) fileError
 );
 END //
 DELIMITER ;

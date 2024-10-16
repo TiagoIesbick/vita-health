@@ -84,3 +84,13 @@ export const inactiveTokensQuery = gql`
     }
     ${tokenFragment}
 `;
+
+
+export const aiConversationQuery = gql`
+    query AIConversation {
+        aiConversation {
+            role
+            content
+        }
+    }
+`;

@@ -2,6 +2,10 @@ FROM python:3.12
 
 WORKDIR /server
 
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    libtesseract-dev
+
 COPY Pipfile Pipfile.lock ./
 
 RUN pip install pipenv

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useApolloClient } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
 import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
@@ -496,4 +496,10 @@ export const useInfiniteMedicalRecords = () => {
         error,
         loader
     };
+};
+
+
+export const useAIConversation = () => {
+    const { data, loading, error } = useQuery(aiConversationQuery);
+    return {aiConversation: data?.aiConversation, loading, error: Boolean(error)};
 };

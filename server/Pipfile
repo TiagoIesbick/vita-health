@@ -13,6 +13,10 @@ pytz = "*"
 aiofiles = "*"
 ariadne = {extras = ["asgi"], version = "*"}
 python-multipart = "*"
+openai = "*"
+redis = "*"
+pymupdf = "*"
+pytesseract = "*"
 
 [dev-packages]
 

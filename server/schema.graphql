@@ -8,6 +8,7 @@ type Query {
     activeDoctorTokens: [Tokens]
     inactiveTokens(limit: Int, offset: Int): TokensSubList
     recordTypes: [RecordTypes]
+    aiConversation: [Conversation]
 }
 
 type MedicalRecords {
@@ -33,6 +34,7 @@ type Files {
     fileName: String!
     mimeType: String!
     url: String!
+    textContent: String
 }
 
 type Users {
@@ -63,6 +65,11 @@ type Doctors {
     tokensAccess: [TokenAccess]
 }
 
+type Conversation {
+    role: String
+    content: String
+}
+
 type Mutation {
     createUser(input: CreateUserInput!): UserConfirmation
     createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
@@ -76,6 +83,7 @@ type Mutation {
     createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
     multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
     deactivateToken(tokenId: ID!): DeactivateTokenResult
+    createConversation(content: String!): ConversationResult
 }
 
 input CreateUserInput {
@@ -171,4 +179,10 @@ type MultipleUploadResult {
     fileConfirmation: String
     fileError: [String]
     files: [Files]
+}
+
+type ConversationResult {
+    conversationConfirmation: String
+    conversationError: String
+    conversation: [Conversation]
 }

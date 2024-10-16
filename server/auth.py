@@ -3,11 +3,10 @@ import jwt
 import starlette.authentication
 import starlette.requests
 from starlette.requests import Request
-from starlette.responses import FileResponse, JSONResponse
-from os import getenv, path
+from os import getenv
 from datetime import datetime
-from db.queries import get_user_by_email_password, get_token, get_filename_by_user
-from utils.utils import decrypt, UPLOAD_DIR
+from db.queries import get_user_by_email_password, get_token
+from utils.utils import decrypt
 
 
 class UserDetail(SimpleUser):
@@ -76,28 +75,3 @@ async def get_context_value(request: Request) -> dict:
         "user_detail": None if not request.user.is_authenticated else request.user.user_detail,
         "medical_access": None if not request.user.is_authenticated else request.user.medical_access
     }
-
-
-async def serve_file(request: Request) -> JSONResponse | FileResponse:
-    filename = request.path_params["filename"]
-    file_path = path.join(UPLOAD_DIR, filename)
-
-    if not path.exists(file_path):
-        return JSONResponse({"error": "File not found"})
-
-    if not request.user.is_authenticated:
-        return JSONResponse({"error": "Unauthorized access"})
-
-    if request.user.user_detail['userType'] == 'Patient':
-        res = get_filename_by_user(filename, request.user.user_detail['userId'])
-        if len(res) == 0:
-            return JSONResponse({"error": "Unauthorized access"})
-
-    if request.user.user_detail['userType'] == 'Doctor':
-        if not request.user.medical_access:
-            return JSONResponse({"error": "Unauthorized access"})
-        res = get_filename_by_user(filename, request.user.medical_access['userId'])
-        if len(res) == 0:
-            return JSONResponse({"error": "Unauthorized access"})
-
-    return FileResponse(file_path)

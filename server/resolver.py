@@ -3,16 +3,15 @@ import jwt
 import aiofiles
 import uuid
 import os
+import json
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
-from utils.utils import UPLOAD_DIR
 from utils.decorators import *
 from pathlib import Path
-from utils.utils import encrypt, validate_email, validate_password, \
-    validate_name, generate_token
+from utils.utils import *
 
 
 query = QueryType()
@@ -233,6 +232,38 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
     return total_inactive_tokens
 
 
+@query.field("aiConversation")
+@requires_authentication(return_none=True)
+@requires_patient_or_doctor_access(return_none=True)
+@fetch_conversation
+def resolve_ai_conversation(*_, conversation, patient_id):
+    return conversation
+
+
+@mutation.field("createConversation")
+@requires_authentication("conversationError")
+@requires_patient_or_doctor_access("conversationError")
+def resolve_create_conversation(_, info, content, patient_id):
+    user_id = info.context['user_detail']['userId']
+    key = rf"conversation:{user_id}:{patient_id}"
+    conversation_history = redis_req.get(key)
+    if conversation_history:
+        conversation = json.loads(conversation_history)
+    else:
+        conversation = [{"role": "system", "content": "You are an assistant providing insights on medical records."}]
+    conversation.append({"role": "user", "content": content})
+    assistant_message = openai_chat(conversation)
+    print('[assistant_message]:', assistant_message)
+    if assistant_message.get('conversationError', False):
+        return assistant_message
+    conversation.append(assistant_message)
+    redis_req.set(key, json.dumps(conversation))
+    return {
+        'conversationConfirmation': 'Conversation Added!',
+        'conversation': conversation
+    }
+
+
 @mutation.field("generateToken")
 @requires_authentication('tokenError')
 @requires_patient('tokenError')
@@ -326,26 +357,50 @@ async def resolve_multiple_upload(_, info, recordId, files):
         return {'fileError': ['Missing authentication']}
     if info.context['user_detail']['userType'] == 'Doctor' and not info.context['medical_access']:
         return {'fileError': ['Missing authorization']}
+    if not validate_files_length(files):
+        return {'fileError': ['You can only upload a maximum of 10 files']}
+    if not validate_files_size(files):
+        return {'fileError': ['Total size of uploaded files must not exceed 10 MB']}
     file_infos = []
     file_errors = []
     for file in files:
-        filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
         content_type = file.content_type
+        if not validate_file_format(content_type):
+            file_errors.append(rf"{file.filename}: Uploaded file has unsupported format")
+            continue
+        if not validate_file_size(file.size):
+            file_errors.append(rf"{file.filename}: Uploaded file is too big (max 2 MB)")
+            continue
+        filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
         file_path = os.path.join(UPLOAD_DIR, filename)
         file_url = f"/uploads/{filename}"
         res = add_file_info(recordId, filename, content_type, file_url)
         if res['fileError']:
             file_errors.append(rf"{file.filename}: {res['fileError']}")
-        else:
+            continue
+        try:
             async with aiofiles.open(file_path, 'wb') as out_file:
                 content = await file.read()
                 await out_file.write(content)
+            if content_type == "application/pdf":
+                text = extract_text_from_pdf(file_path)
+                if not text:
+                    text = extract_text_with_ocr(file_path)
+            else:
+                text = extract_text_with_ocr(file_path, content_type)
+            save_text = update_file_text_content(res['fileId'], text)
+            if save_text.get('fileError', True):
+                text = None
+            print('[text file]:', text)
             file_infos.append({
                 "fileId": res['fileId'],
                 "fileName": filename,
                 "mimeType": content_type,
-                "url": file_url
+                "url": file_url,
+                "textContent": text
             })
-    if len(file_errors) > 0:
+        except Exception as e:
+            file_errors.append(rf"{file.filename}: Failed to process file - {str(e)}")
+    if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
     return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
