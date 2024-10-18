@@ -94,3 +94,13 @@ export const aiConversationQuery = gql`
         }
     }
 `;
+
+
+export const messageSubscription = gql`
+    subscription MessageSubscription {
+        message {
+            role
+            content
+        }
+    }
+`;

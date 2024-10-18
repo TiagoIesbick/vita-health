@@ -2,7 +2,7 @@ import Navbar from "./navbar";
 import logo from "../assets/logos/logo-vita-no-bg.png";
 import './header.css';
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 const Header = () => {
     return (

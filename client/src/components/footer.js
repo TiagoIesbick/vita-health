@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import logo from "../assets/logos/logo-vita-no-bg.png";
 

@@ -1,13 +1,16 @@
+import io
 import re
 import jwt
 import openai
 import redis
 import fitz
 import pytesseract
+import json
+import asyncio
 from PIL import Image
-import io
 from openai import OpenAIError
 from cryptography.fernet import Fernet
+from broadcaster import Broadcast
 from os import getenv
 
 
@@ -22,7 +25,8 @@ openai.api_key = getenv('OPENAI_API_KEY')
 
 redis_host = getenv('REDIS_HOST')
 redis_port = getenv('REDIS_PORT')
-redis_req = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+pubsub = Broadcast(rf"redis://{redis_host}:{redis_port}")
 
 
 def encrypt(msg: str) -> bytes:
@@ -100,17 +104,36 @@ def extract_text_with_ocr(file_path: str, content_type: str ="application/pdf") 
         return text
 
 
-def openai_chat(conversation: list[dict]) -> dict:
+async def openai_chat_stream(conversation: list[dict], key: str):
     try:
-        response = openai.chat.completions.create(
+        response = await asyncio.to_thread(
+            openai.chat.completions.create,
+            model="gpt-4o-mini",
             messages=conversation,
-            model="gpt-4",
             max_tokens=2000,
-            temperature=0.7
+            temperature=0.7,
+            stream=True
         )
-    except OpenAIError as e:
-        return {'conversationError': str(e)}
-    print('[openai response]:', response)
 
-    content = response.choices[0].message.content.strip()
-    return {"role": "assistant", "content": content}
+        full_response = ""
+        for chunk in response:
+            if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
+                delta = chunk.choices[0].delta
+                if hasattr(delta, 'content') and delta.content:
+                    full_response += delta.content
+
+                    await pubsub.publish(channel=key, message=json.dumps({
+                        "role": "assistant",
+                        "content": delta.content
+                    }))
+
+        conversation_history = json.loads(redis_client.get(key))
+        conversation_history.append({"role": "assistant", "content": full_response})
+        await asyncio.to_thread(redis_client.set, key, json.dumps(conversation_history))
+
+    except OpenAIError as e:
+        await pubsub.publish(channel=key, message=json.dumps({
+            "role": "error",
+            "content": str(e)
+        }))
+

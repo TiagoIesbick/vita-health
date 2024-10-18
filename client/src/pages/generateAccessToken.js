@@ -10,7 +10,7 @@ import { useGenerateToken } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 import CopyButton from "../components/copyButton";
 
 

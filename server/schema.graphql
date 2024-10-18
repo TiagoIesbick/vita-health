@@ -70,6 +70,10 @@ type Conversation {
     content: String
 }
 
+type Subscription {
+  message: Conversation
+}
+
 type Mutation {
     createUser(input: CreateUserInput!): UserConfirmation
     createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
@@ -83,7 +87,7 @@ type Mutation {
     createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
     multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
     deactivateToken(tokenId: ID!): DeactivateTokenResult
-    createConversation(content: String!): ConversationResult
+    createConversation(content: String!, allRecords: String!): ConversationResult
 }
 
 input CreateUserInput {

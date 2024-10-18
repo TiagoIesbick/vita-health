@@ -5,7 +5,7 @@ import uuid
 import os
 import json
 from os import getenv
-from ariadne import QueryType, ObjectType, MutationType
+from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
@@ -15,10 +15,11 @@ from utils.utils import *
 
 
 query = QueryType()
+mutation = MutationType()
+subscription = SubscriptionType()
 users = ObjectType("Users")
 patients = ObjectType("Patients")
 doctors = ObjectType("Doctors")
-mutation = MutationType()
 medical_records = ObjectType("MedicalRecords")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
@@ -31,46 +32,34 @@ def resolve_user(*_, userId):
 
 @users.field("patient")
 def resolve_users_patient(users, *_):
-    if not users['userId']:
-        return None
-    return get_users_patient(users['userId'])
+    return None if not users['userId'] else get_users_patient(users['userId'])
 
 
 @users.field("doctor")
 def resolve_users_patient(users, *_):
-    if not users['userId']:
-        return None
-    return get_users_doctor(users['userId'])
+    return None if not users['userId'] else get_users_doctor(users['userId'])
 
 
 @patients.field("user")
 def resolve_patients_user(patients, *_):
-    if not patients['userId']:
-        return None
-    return get_user(patients['userId'])
+    return None if not patients['userId'] else get_user(patients['userId'])
 
 
 @patients.field("tokens")
 @requires_authentication(return_none=True)
 def resolve_patients_tokens(patients, *_):
-    if not patients['patientId']:
-        return None
-    return get_patients_tokens(patients['patientId'])
+    return None if not patients['patientId'] else get_patients_tokens(patients['patientId'])
 
 
 @doctors.field("user")
 def resolve_doctors_user(doctors, *_):
-    if not doctors['userId']:
-        return None
-    return get_user(doctors['userId'])
+    return None if not doctors['userId'] else get_user(doctors['userId'])
 
 
 @doctors.field("tokensAccess")
 @requires_authentication(return_none=True)
 def resolve_doctors_user(doctors, *_):
-    if not doctors['doctorId']:
-        return None
-    return get_doctors_tokens_access(doctors['userId'])
+    return None if not doctors['doctorId'] else get_doctors_tokens_access(doctors['userId'])
 
 
 @mutation.field("createUser")
@@ -236,32 +225,57 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 @fetch_conversation
-def resolve_ai_conversation(*_, conversation, patient_id):
+def resolve_ai_conversation(*_, conversation, key, patient_id):
     return conversation
 
 
 @mutation.field("createConversation")
 @requires_authentication("conversationError")
 @requires_patient_or_doctor_access("conversationError")
-def resolve_create_conversation(_, info, content, patient_id):
-    user_id = info.context['user_detail']['userId']
-    key = rf"conversation:{user_id}:{patient_id}"
-    conversation_history = redis_req.get(key)
-    if conversation_history:
-        conversation = json.loads(conversation_history)
-    else:
-        conversation = [{"role": "system", "content": "You are an assistant providing insights on medical records."}]
-    conversation.append({"role": "user", "content": content})
-    assistant_message = openai_chat(conversation)
-    print('[assistant_message]:', assistant_message)
-    if assistant_message.get('conversationError', False):
-        return assistant_message
-    conversation.append(assistant_message)
-    redis_req.set(key, json.dumps(conversation))
+@fetch_conversation
+async def resolve_create_conversation(*_, content, allRecords, conversation, key, patient_id):
+    if not allRecords:
+        return {'conversationError': 'There is no health data to analyze'}
+
+    conversation_copy = conversation.copy()
+    new_msg = {"role": "user", "content": content}
+    conversation.append(new_msg)
+    redis_client.set(key, json.dumps(conversation))
+
+    await pubsub.publish(channel=key, message=json.dumps(new_msg))
+
+    prompt = rf'''{content}
+    You are provided with the following medical records: {allRecords}.
+    Only use these records to provide your insights and answer the user's questions. Do not use any external sources or assumptions.
+    '''
+
+    msg_to_ai = {"role": "user", "content": prompt}
+    conversation_copy.append(msg_to_ai)
+
+    # await openai_chat_stream(conversation_copy, key)
+
     return {
         'conversationConfirmation': 'Conversation Added!',
         'conversation': conversation
     }
+
+
+@subscription.source("message")
+@requires_authentication(return_none=True)
+@requires_patient_or_doctor_access(return_none=True)
+async def source_message(_, info, patient_id):
+    user_id = info.context['user_detail']['userId']
+    key = rf"conversation:{user_id}:{patient_id}"
+    print('[key]:', key)
+    async with pubsub.subscribe(channel=key) as subscriber:
+        async for event in subscriber:
+            print('[event]', event)
+            yield json.loads(event.message)
+
+
+@subscription.field("message")
+def resolve_message_added(event, *_):
+    return event
 
 
 @mutation.field("generateToken")
@@ -308,33 +322,25 @@ def resolve_save_token_access(_, info, doctor, token):
 @tokens.field("patient")
 @requires_authentication(return_none=True)
 def resolve_tokens_patient(tokens, *_):
-    if not tokens['patientId']:
-        return None
-    return get_patient(tokens['patientId'])
+    return None if not tokens['patientId'] else get_patient(tokens['patientId'])
 
 
 @tokens.field("tokenAccess")
 @requires_authentication(return_none=True)
 def resolve_tokens_token_access(tokens, *_):
-    if not tokens['tokenId']:
-        return None
-    return get_tokens_token_access(tokens['tokenId'])
+    return None if not tokens['tokenId'] else get_tokens_token_access(tokens['tokenId'])
 
 
 @token_access.field("token")
 @requires_authentication(return_none=True)
 def resolve_token_access_token(tokenAccess, *_):
-    if not tokenAccess['tokenId']:
-        return None
-    return get_token(tokenAccess['tokenId'])
+    return None if not tokenAccess['tokenId'] else get_token(tokenAccess['tokenId'])
 
 
 @token_access.field("doctor")
 @requires_authentication(return_none=True)
 def resolve_token_access_doctor(tokenAccess, *_):
-    if not tokenAccess['tokenId']:
-        return None
-    return get_doctor(tokenAccess['doctorId'])
+    return None if not tokenAccess['tokenId'] else get_doctor(tokenAccess['doctorId'])
 
 
 @mutation.field("deactivateToken")
