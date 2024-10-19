@@ -18,26 +18,30 @@ const MessageInput = ({ formik, loading, loadingConversation }) => {
 
 
     return (
-        <di className="flex overflow-hidden align-items-center">
-            <textarea
-                type="text"
-                placeholder="Ask a question..."
-                {...formik.getFieldProps("content")}
-                className='custom-textarea flex-grow-1'
-                onKeyDown={handleKeyDown}
-                rows={3}
-            />
-            <Button
-                className="w-3rem mr-0"
-                icon="pi pi-send"
-                disabled={loading || !formik.isValid || loadingConversation}
-                loading={loadingConversation}
-                rounded
-                outlined
-                aria-label="Send content"
-                type="submit"
-            />
-        </di>
+        <>
+            <div className="flex overflow-hidden align-items-center message-input">
+                <textarea
+                    type="text"
+                    placeholder="Ask a question..."
+                    {...formik.getFieldProps("content")}
+                    className='custom-textarea flex-grow-1 text-left'
+                    onKeyDown={handleKeyDown}
+                    rows={1}
+                />
+                <Button
+                    className="w-3rem mr-0"
+                    icon="pi pi-send"
+                    disabled={loading || !formik.isValid || loadingConversation}
+                    loading={loadingConversation}
+                    rounded
+                    outlined
+                    aria-label="Send content"
+                    type="submit"
+                />
+            </div>
+            {formik.touched.content && formik.errors.content &&<div className="text-red-500 text-xs">{formik.errors.content}</div>}
+        </>
+       
     );
 };
 export default MessageInput;

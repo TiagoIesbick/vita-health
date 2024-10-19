@@ -2,7 +2,6 @@ import io
 import re
 import jwt
 import openai
-import redis
 import fitz
 import pytesseract
 import json
@@ -10,8 +9,8 @@ import asyncio
 from PIL import Image
 from openai import OpenAIError
 from cryptography.fernet import Fernet
-from broadcaster import Broadcast
 from os import getenv
+from db.redis import redis_client, pubsub
 
 
 UPLOAD_DIR = "uploads"
@@ -21,12 +20,6 @@ fernet = Fernet(getenv('FERNET_KEY'))
 
 
 openai.api_key = getenv('OPENAI_API_KEY')
-
-
-redis_host = getenv('REDIS_HOST')
-redis_port = getenv('REDIS_PORT')
-redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
-pubsub = Broadcast(rf"redis://{redis_host}:{redis_port}")
 
 
 def encrypt(msg: str) -> bytes:

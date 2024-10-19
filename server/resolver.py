@@ -9,6 +9,7 @@ from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
 from datetime import datetime
 from db.queries import *
 from db.mutations import *
+from db.redis import pubsub
 from utils.decorators import *
 from pathlib import Path
 from utils.utils import *
@@ -252,7 +253,7 @@ async def resolve_create_conversation(*_, content, allRecords, conversation, key
     msg_to_ai = {"role": "user", "content": prompt}
     conversation_copy.append(msg_to_ai)
 
-    # await openai_chat_stream(conversation_copy, key)
+    await openai_chat_stream(conversation_copy, key)
 
     return {
         'conversationConfirmation': 'Conversation Added!',

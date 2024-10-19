@@ -8,7 +8,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route, WebSocketRoute
 from auth import BasicAuthBackend, get_context_value
 from routes import serve_file
-from utils.utils import pubsub
+from db.redis import pubsub
 from resolver import query, users, patients, doctors, mutation, medical_records, \
     tokens, token_access, subscription
 

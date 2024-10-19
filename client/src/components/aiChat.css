@@ -16,3 +16,24 @@
 .p-dialog-content::-webkit-scrollbar-thumb:hover {
     background-color: var(--primary-200);
 }
+
+.suggested-questions-list {
+    list-style: revert;
+}
+
+
+.suggested-questions-list li::marker {
+    color: var(--primary-500);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.dialog-content-width {
+    width: 50%;
+}
+
+@media screen and (max-width: 500px) {
+    .dialog-content-width {
+        width: 80%;
+    }
+}

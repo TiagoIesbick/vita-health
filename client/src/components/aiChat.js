@@ -40,11 +40,12 @@ const AIChat = ({ allRecords }) => {
         if (scrollRef.current) {
             setTimeout(() => {
                 const el = scrollRef.current.getContent()?.firstElementChild?.lastElementChild;
-                console.log(el); // Check if the element is available
-                el?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
+                loadingConversation && aiConversation[aiConversation.length -1].role === 'assistant'
+                    ? el?.scrollIntoView()
+                    : el?.scrollIntoView({ behavior: 'smooth' });
+            }, 10);
         }
-    }, [aiConversation, visible]);
+    }, [aiConversation, visible, loadingConversation]);
 
     const show = (position) => {
         setPosition(position);
@@ -60,23 +61,31 @@ const AIChat = ({ allRecords }) => {
 
     const chatBox = (conversation, index) => {
         if (index === 0) return null;
-        // console.log('[chat]:', conversation);
 
         return (
             <div key={index}>
                 {conversation.role === 'user'
-                    ?   <div className="flex justify-content-end mb-3">
-                            <Card
+                    ?   <motion.div
+                            initial={{ x: 10 }}
+                            whileInView={{ x: 0 }}
+                            transition={{ type: "spring" }}
+                            className="flex justify-content-end mb-3"
+                        >
+                            <div
                                 style={{
                                     maxWidth: '80%',
                                     width: 'max-content',
-                                    wordBreak: 'break-word'
+                                    wordBreak: 'break-word',
+                                    borderRadius: '25px',
+                                    background: 'linear-gradient(45deg, darkblue, darkorchid)',
+                                    color: 'white',
+                                    padding: '1rem',
+                                    fontWeight: '500'
                                 }}
-                                className="surface-ground text-right"
                             >
                                 {conversation.content}
-                            </Card>
-                        </div>
+                            </div>
+                        </motion.div>
                     :   <p style={{wordBreak: 'break-word'}}>{conversation.content}</p>
                 }
             </div>
@@ -119,23 +128,34 @@ const AIChat = ({ allRecords }) => {
             }}>
             <motion.img
                 whileHover={{ scale: 1.2 }}
-                whileTap={{
-                  scale: 0.8,
-                }}
+                whileTap={{ scale: 0.8 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 src={aiIcon}
                 alt="AI-assistant"
                 className="w-3rem cursor-pointer"
                 onClick={() => show('right')}
             />
-            <Dialog header={header} ref={scrollRef} footer={footer} visible={visible} position={position} style={{ width: '50vw', maxHeight: '80%' }} onHide={() => {if (!visible) return; setVisible(false); }} draggable resizable modal={false} >
-                <div>
-                    <p>Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.</p>
+            <Dialog
+                header={header}
+                ref={scrollRef}
+                footer={footer}
+                visible={visible}
+                position={position}
+                style={{ maxHeight: '80%' }}
+                onHide={() => {if (!visible) return; setVisible(false); }}
+                draggable
+                resizable
+                modal={false}
+                className="dialog-content-width"
+            >
+                <div className="text-justify">
+                    <p className="mt-0">Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.</p>
                     <p>For example, you can ask me things like:</p>
-                    <ul>
+                    <ul className="suggested-questions-list">
                         <li>What does this test result mean?</li>
                         <li>Can you explain the details of my recent medical record?</li>
                     </ul>
-                    <p>Your health information is handled with the highest level of privacy and security. How can I assist you today?</p>
+                    <p>How can I assist you today?</p>
                     {!loading && aiConversation.length > 0 && aiConversation.map((conversation, index) => chatBox(conversation, index))}
                 </div>
             </Dialog>

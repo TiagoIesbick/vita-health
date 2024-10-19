@@ -1,5 +1,4 @@
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError, SimpleUser
-from starlette.background import BackgroundTasks
 import jwt
 import starlette.authentication
 import starlette.requests
@@ -74,6 +73,5 @@ async def get_context_value(request: Request) -> dict:
         "request": request,
         "authenticated": request.user.is_authenticated,
         "user_detail": None if not request.user.is_authenticated else request.user.user_detail,
-        "medical_access": None if not request.user.is_authenticated else request.user.medical_access,
-        "background_tasks": BackgroundTasks()
+        "medical_access": None if not request.user.is_authenticated else request.user.medical_access
     }
