@@ -1,33 +1,35 @@
 .custom-textarea {
     all: unset;
-    width: 100%; /* Full width */
+    width: 100%;
     height: auto;
-    padding: 10px; /* Space inside the textarea */
-    border: 2px solid #ccc; /* Border color */
-    border-radius: 6px; /* Rounded corners */
-    font-size: 16px; /* Font size */
-    line-height: 1.5; /* Line height for readability */
-    background-color: #f9f9f9; /* Light background */
-    color: #333; /* Text color */
-    resize: vertical; /* Disable resizing (optional) */
-    max-height: calc(1.5em * 10);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
-    outline: none; /* Remove the outline when focused */
+    outline: none;
+    line-height: 1.5;
+    padding: 10px;
+    border-radius: 25px 0 0 25px;
+    resize: none;
+    text-align: left;
+    word-break: break-word;
 }
 
-/* Add focus effect */
-.custom-textarea:focus {
-    border-color: #007bff; /* Change border color on focus */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus glow effect */
-    background-color: #fff; /* Background change on focus */
-}
-
-/* Placeholder styling */
 .custom-textarea::placeholder {
-    color: #888; /* Lighter text for placeholder */
+    color: #888;
 }
 
-.message-input {
-    border: 1px solid var(--primary-500);
+.message-container {
     border-radius: 25px;
+    border: 1px solid #d1d5db !important;
+    transition:
+        border 0.2s ease-in,
+        box-shadow 0.2s ease-in;
+    &:hover {
+        border: 1px solid var(--primary-500) !important;
+    }
+    &:focus-within {
+        border: 1px solid var(--primary-500) !important;
+        box-shadow: 0 0 0 0.2rem #ddd6fe !important;
+    }
+}
+
+.icon-rotate {
+    transform: rotate(45deg);
 }

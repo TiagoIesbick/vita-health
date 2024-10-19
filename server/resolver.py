@@ -275,7 +275,7 @@ async def source_message(_, info, patient_id):
 
 
 @subscription.field("message")
-def resolve_message_added(event, *_):
+def resolve_message(event, *_):
     return event
 
 

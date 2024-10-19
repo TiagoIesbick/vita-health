@@ -1,8 +1,5 @@
 import aiIcon from "../assets/icons/ai.png";
-import { Button } from 'primereact/button';
-import { Card } from "primereact/card";
 import { Dialog } from 'primereact/dialog';
-import { InputTextarea } from "primereact/inputtextarea";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from 'react';
 import { useAIConversation, useCreateConversation } from "../hooks/hooks";
@@ -93,27 +90,7 @@ const AIChat = ({ allRecords }) => {
     };
 
     const footer = () => (
-        <form /*className="flex mt-2 align-items-center"*/ onSubmit={formik.handleSubmit}>
-            {/* <InputTextarea
-                id="content-to-ai"
-                rows={1}
-                placeholder="Send me a message ..."
-                autoResize
-                aria-label="content-to-ai"
-                className="flex-grow-1"
-                {...formik.getFieldProps("content")}
-            />
-            <Button
-                className="w-3rem mr-0"
-                icon="pi pi-send"
-                disabled={loading || !formik.isValid || loadingConversation}
-                loading={loadingConversation}
-                rounded
-                outlined
-                aria-label="Send content"
-                type="submit"
-            />
-            {formik.touched.content && formik.errors.content &&<div className="text-red-500 text-xs">{formik.errors.content}</div>} */}
+        <form onSubmit={formik.handleSubmit}>
             <MessageInput formik={formik} loading={loading} loadingConversation={loadingConversation}/>
         </form>
     );
