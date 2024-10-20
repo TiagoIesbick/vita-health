@@ -23,7 +23,6 @@ const AIChat = ({ allRecords }) => {
         onSubmit: async (values, { resetForm }) => {
             resetForm();
             values['allRecords'] = JSON.stringify(allRecords);
-            resetForm();
             await addConversation(values);
         },
         validationSchema: Yup.object({
