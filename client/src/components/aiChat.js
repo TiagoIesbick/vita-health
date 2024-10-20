@@ -12,8 +12,8 @@ import './aiChat.css';
 const AIChat = ({ allRecords }) => {
     const [visible, setVisible] = useState(false);
     const [position, setPosition] = useState('center');
-    const { aiConversation, loading, error } = useAIConversation();
-    const { addConversation, loadingConversation, errorConversation } = useCreateConversation();
+    const { aiConversation, loading } = useAIConversation();
+    const { addConversation, loadingConversation } = useCreateConversation();
     const scrollRef = useRef(null);
 
     const formik =  useFormik({
@@ -21,11 +21,10 @@ const AIChat = ({ allRecords }) => {
             content: ''
         },
         onSubmit: async (values, { resetForm }) => {
-            values['allRecords'] = JSON.stringify(allRecords);
-            console.log(values);
-            const resAI = await addConversation(values);
-            console.log('[resAI]:', resAI);
             resetForm();
+            values['allRecords'] = JSON.stringify(allRecords);
+            resetForm();
+            await addConversation(values);
         },
         validationSchema: Yup.object({
             content: Yup.string().required('Required')
@@ -36,10 +35,24 @@ const AIChat = ({ allRecords }) => {
     useEffect(() => {
         if (scrollRef.current) {
             setTimeout(() => {
+                const scrollContainer = scrollRef.current.getContent();
                 const el = scrollRef.current.getContent()?.firstElementChild?.lastElementChild;
-                loadingConversation && aiConversation[aiConversation.length -1].role === 'assistant'
-                    ? el?.scrollIntoView()
-                    : el?.scrollIntoView({ behavior: 'smooth' });
+                if (el) {
+                    const margin = 20;
+                    const elementPosition = el.offsetTop;
+                    const targetPosition = elementPosition - scrollContainer.clientHeight + el.offsetHeight + margin;
+                    if (loadingConversation && aiConversation[aiConversation.length - 1].role === 'assistant') {
+                        scrollContainer.scrollTo({
+                            top: targetPosition,
+                            behavior: 'auto'
+                        });
+                    } else {
+                        scrollContainer.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    };
+                };
             }, 10);
         }
     }, [aiConversation, visible, loadingConversation]);
