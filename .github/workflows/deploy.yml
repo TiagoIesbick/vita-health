@@ -36,6 +36,9 @@ jobs:
         echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
         echo "SECRET=${{ secrets.SECRET }}" >> .env
         echo "TINYMCE_API_KEY=${{ secrets.TINYMCE_API_KEY }}" >> .env
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+        echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+        echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
         mkdir -p server/uploads
         sudo docker compose -f docker-compose.prod.yml down
         sudo lsof -ti :80 | xargs sudo kill -9

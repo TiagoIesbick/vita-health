@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import FileRenderer from './fileRenderer';
 
 
-const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
+const FileGallery = ({ files, layout='grid', show, setShow=()=>{} }) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const galleria = useRef(null);
 
@@ -98,9 +98,9 @@ const FileGallery = ({ files, layout='grid', show, setShow=()=>{}}) => {
                 onHide={() => setShow(false)}
             />
             {layout === 'grid' &&
-                <div className="grid m-auto align-items-center mt-3" style={{ maxWidth: '400px' }} hidden={files.length < 1}>
+                <div className="grid gap-3 m-auto justify-content-center align-items-center mt-3" style={{ maxWidth: '400px' }} hidden={files.length < 1}>
                     {files && files.map((file, index) => (
-                        <div className="col-3" key={index}>
+                        <div key={index}>
                             <div className="relative w-5rem h-5rem" onClick={() => handleClick(index)}>
                                 <FileRenderer
                                     file={file}

@@ -40,7 +40,15 @@ const MedicalRecord = () => {
                     >
                         <div dangerouslySetInnerHTML={{__html: medicalRecord.recordData}} />
 
-                        {medicalRecord.files && medicalRecord.files.length > 0 && <FileGallery files={medicalRecord.files} />}
+                        {medicalRecord.files && medicalRecord.files.length > 0 &&
+                            <>
+                                <div className="flex flex-row align-items-center gap-2 justify-content-center">
+                                    <i className="pi pi-folder-open text-xl font-semi-bold text-primary"></i>
+                                    <h3 className="flex justify-content-center">Files Gallery</h3>
+                                </div>
+                                <FileGallery files={medicalRecord.files} />
+                            </>
+                        }
                     </Card>
             }
         </>

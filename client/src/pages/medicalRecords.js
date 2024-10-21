@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { useInfiniteMedicalRecords } from "../hooks/hooks";
 import LoadingSkeleton from "../components/skeleton";
 import MedicalRecordsCard from "../components/medicalRecordsCard";
+import AIChat from "../components/aiChat";
 
 
 const MedicalRecords = () => {
@@ -22,20 +23,23 @@ const MedicalRecords = () => {
     };
 
     return (
-        <MedicalRecordsCard
-            title="Health History"
-            allRecords={allRecords}
-            medicalRecords={medicalRecords}
-            loading={loading}
-            loader={loader}
-            emptyMessage={
-                <>
-                    <p>You have no health history yet.</p>
-                    <p>Start by adding your health data <Link to="/insert-medical-record">here</Link> to begin building your records.</p>
-                    <p>Alternatively, generate a token <Link to="/generate-access-token">here</Link> to share with your health professional so they can add new information.</p>
-                </>
-            }
-        />
+        <>
+            { allRecords.length > 0 && <AIChat allRecords={allRecords} /> }
+            <MedicalRecordsCard
+                title="Health History"
+                allRecords={allRecords}
+                medicalRecords={medicalRecords}
+                loading={loading}
+                loader={loader}
+                emptyMessage={
+                    <>
+                        <p>You have no health history yet.</p>
+                        <p>Start by adding your health data <Link to="/insert-medical-record">here</Link> to begin building your records.</p>
+                        <p>Alternatively, generate a token <Link to="/generate-access-token">here</Link> to share with your health professional so they can add new information.</p>
+                    </>
+                }
+            />
+        </>
     );
 };
 export default MedicalRecords;

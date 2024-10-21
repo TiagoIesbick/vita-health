@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useSubscription } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, recordTypesQuery, userQuery } from "../graphql/queries";
-import { mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, recordTypesQuery, userQuery } from "../graphql/queries";
+import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
 
@@ -426,8 +426,6 @@ export const useMultipleUpload = () => {
     const [mutate, { loading, error }] = useMutation(mutationMultipleUpload);
 
     const addFiles = async (recordId, files) => {
-        console.log('[hook files]:', files);
-        console.log('[hook recordId]:', recordId);
         const { data: { multipleUpload } } = await mutate({
             variables: { recordId, files },
             update: (cache, { data: { multipleUpload } }) => {
@@ -495,5 +493,58 @@ export const useInfiniteMedicalRecords = () => {
         loading,
         error,
         loader
+    };
+};
+
+
+export const useAIConversation = () => {
+    const { data, loading: queryLoading, error: queryError } = useQuery(aiConversationQuery);
+
+    useSubscription(messageSubscription, {
+        onData: ({ client: { cache }, data: { data: { message } } }) => {
+            cache.updateQuery({ query: aiConversationQuery }, ({ aiConversation }) => {
+                const lastMessage = aiConversation[aiConversation.length - 1];
+                if (lastMessage?.role === 'assistant' && message.role === 'assistant') {
+                    const updatedLastMessage = {
+                        ...lastMessage,
+                        content: lastMessage.content + message.content
+                    };
+                    return {
+                        aiConversation: [
+                            ...aiConversation.slice(0, -1),
+                            updatedLastMessage
+                        ]
+                    };
+                } else {
+                    return { aiConversation: [...aiConversation, message] };
+                };
+            });
+        },
+        onError: (error) => {
+            console.error('[Subscription Error]:', error);
+        }
+    });
+
+    return {
+        aiConversation: data?.aiConversation || [],
+        loading: queryLoading,
+        error: Boolean(queryError),
+    };
+};
+
+
+export const useCreateConversation = () => {
+    const [mutate, { loading, error }] = useMutation(mutationCreateConversation);
+
+    const addConversation = async (values) => {
+        const { data: { createConversation } } = await mutate({
+            variables: values
+        });
+        return createConversation;
+    };
+    return {
+        addConversation,
+        loadingConversation: loading,
+        errorConversation: error
     };
 };

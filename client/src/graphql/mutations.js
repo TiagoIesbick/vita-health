@@ -198,3 +198,17 @@ export const mutationMultipleUpload = gql`
     }
     ${fileFragment}
 `;
+
+
+export const mutationCreateConversation = gql`
+    mutation CreateConversation ($content: String!, $allRecords: String!) {
+        createConversation(content: $content, allRecords: $allRecords) {
+            conversationConfirmation
+            conversationError
+            conversation {
+                role
+                content
+            }
+        }
+    }
+`;

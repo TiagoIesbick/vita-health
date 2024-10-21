@@ -51,11 +51,13 @@ const UserBar = () => {
     return (
         <>
             <Menu model={items} popup ref={userMenu} />
-            <motion.button
-                className="p-link"
-                whileHover={{scale: 1.2}}
+            <motion.div
+                className="align-self-center cursor-pointer"
+                whileHover={{scale: 1.1}}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 onClick={(e) => userMenu?.current?.toggle(e)}
-                style={{gridColumn: '9', justifySelf: 'end'}}
+                style={{ gridColumn: '9', justifySelf: 'end' }}
             >
                 <Avatar
                     label={user.firstName[0]}
@@ -67,7 +69,7 @@ const UserBar = () => {
                         fontWeight: 'bold'
                     }}
                 />
-            </motion.button>
+            </motion.div>
         </>
     );
 };

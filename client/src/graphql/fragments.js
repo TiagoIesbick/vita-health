@@ -54,6 +54,7 @@ export const fileFragment = gql`
         fileName
         mimeType
         url
+        textContent
     }
 `;
 

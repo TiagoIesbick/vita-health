@@ -17,6 +17,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^11.2.11",
     "graphql": "^16.8.2",
+    "graphql-ws": "^5.16.0",
     "jwt-decode": "^4.0.0",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",

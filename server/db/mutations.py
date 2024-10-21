@@ -91,7 +91,7 @@ def create_medical_record(patientId: int, recordTypeId: int, recordData: str) ->
     return confirmation[0]
 
 
-def deactivate_token(tokenId: int) -> (None | dict):
+def deactivate_token(tokenId: int) -> None | dict:
     args = [tokenId]
     query = 'DeactivateToken'
     confirmation = mysql_results(query, 'procedure', args)
@@ -100,9 +100,18 @@ def deactivate_token(tokenId: int) -> (None | dict):
     return confirmation[0]
 
 
-def add_file_info(recordId: int, fileName: str, mimeType: str, url: str) -> (None | dict):
+def add_file_info(recordId: int, fileName: str, mimeType: str, url: str) -> None | dict:
     args = [recordId, fileName, mimeType, url]
     query = 'AddFiles'
+    confirmation = mysql_results(query, 'procedure', args)
+    if len(confirmation) == 0:
+        return None
+    return confirmation[0]
+
+
+def update_file_text_content(fileId: int, textContent: str) -> None | dict:
+    args = [fileId, textContent]
+    query = 'UpdateFileTextContent'
     confirmation = mysql_results(query, 'procedure', args)
     if len(confirmation) == 0:
         return None

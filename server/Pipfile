@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 mysql-connector-python = "*"
-uvicorn = "*"
 cryptography = "*"
 pyjwt = "*"
 nh3 = "*"
@@ -13,6 +12,13 @@ pytz = "*"
 aiofiles = "*"
 ariadne = {extras = ["asgi"], version = "*"}
 python-multipart = "*"
+openai = "*"
+redis = "*"
+pymupdf = "*"
+pytesseract = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+broadcaster = "*"
+websockets = "*"
 
 [dev-packages]
 
