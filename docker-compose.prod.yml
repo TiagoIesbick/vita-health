@@ -12,6 +12,12 @@ services:
       - ./database:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
 
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+
   server:
     restart: always
     build: ./server
@@ -21,6 +27,7 @@ services:
       - uploads:/server/uploads
     depends_on:
       - database
+      - redis
     env_file:
       - .env
 
@@ -53,5 +60,6 @@ services:
 
 volumes:
   mysql_data:
+  redis_data:
   client-build:
   uploads:
