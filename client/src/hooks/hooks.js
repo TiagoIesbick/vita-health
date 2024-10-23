@@ -362,7 +362,7 @@ export const useCreateMedicalRecord = () => {
                 if (!existingCacheData) return;
                 const updatedMedicalRecords = {
                     ...existingCacheData.medicalRecords,
-                    items: [newMedicalRecord, ...existingCacheData.medicalRecords.items],
+                    items: [newMedicalRecord, ...existingCacheData.medicalRecords.items || []],
                     totalCount: existingCacheData.medicalRecords.totalCount + 1,
                 };
                 cache.writeQuery({

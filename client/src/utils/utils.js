@@ -2,7 +2,7 @@ import { Divider } from 'primereact/divider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
-import { activeDoctorTokensQuery, medicalRecordsQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery } from "../graphql/queries";
 import HealthDataContent from '../components/healthDataContent';
 
 
@@ -94,10 +94,9 @@ export const handleTokenAccess = async (token, client, addTokenAccess, setPatien
     } else {
         const credentials = getCredentials(ACCESS_MEDICAL_TOKEN_KEY);
         setPatient(credentials);
-        const cachedData = client.cache.readQuery({ query: medicalRecordsQuery });
-        if (cachedData) {
-            client.refetchQueries({ include: ["MedicalRecords"] });
-        }
+        client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'medicalRecords' });
+        client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'aiConversation' });
+        client.cache.gc();
         showMessage('success', 'Success', 'Permission Granted');
         navigate("/medical-records-access");
         if (resetForm) resetForm();

@@ -9,7 +9,7 @@ import MessageInput from "./messageInput";
 import './aiChat.css';
 
 
-const AIChat = ({ allRecords }) => {
+const AIChat = ({ user, allRecords }) => {
     const [visible, setVisible] = useState(false);
     const [position, setPosition] = useState('center');
     const { aiConversation, loading } = useAIConversation();
@@ -138,13 +138,26 @@ const AIChat = ({ allRecords }) => {
                 className="dialog-content-width"
             >
                 <div className="text-justify">
-                    <p className="mt-0">Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.</p>
-                    <p>For example, you can ask me things like:</p>
-                    <ul className="suggested-questions-list">
-                        <li>What does this test result mean?</li>
-                        <li>Can you explain the details of my recent medical record?</li>
-                    </ul>
-                    <p>How can I assist you today?</p>
+                    {user.userType === 'Patient'
+                        ?   <>
+                                <p className="mt-0">Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.</p>
+                                <p>For example, you can ask me things like:</p>
+                                <ul className="suggested-questions-list">
+                                    <li>Are there any patterns in my health history that suggest a serious condition?</li>
+                                    <li>Can you highlight any critical changes in my recent medical records?</li>
+                                </ul>
+                                <p>How can I assist you today?</p>
+                            </>
+                        :   <>
+                                <p className="mt-0">Hello! I'm your health assistant, here to help you understand your patient's medical history. You can ask me questions about their health records, lab results, and any other medical information.</p>
+                                <p>For example, you can ask me things like:</p>
+                                <ul className="suggested-questions-list">
+                                    <li>Are there any patterns in my patient’s health history that suggest a serious condition?</li>
+                                    <li>Can you highlight any critical changes in the patient’s recent medical records?</li>
+                                </ul>
+                                <p>How can I assist you in better understanding your patient's health today?</p>
+                            </>
+                    }
                     {!loading && aiConversation.length > 0 && aiConversation.map((conversation, index) => chatBox(conversation, index))}
                 </div>
             </Dialog>
