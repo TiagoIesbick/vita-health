@@ -9,7 +9,7 @@ import AIChat from "../components/aiChat";
 
 const MedicalRecords = () => {
     const navigate = useNavigate();
-    const { showMessage } = useUser();
+    const { user, showMessage } = useUser();
     const { allRecords, medicalRecords, loading, error, loader } = useInfiniteMedicalRecords();
 
 
@@ -24,7 +24,7 @@ const MedicalRecords = () => {
 
     return (
         <>
-            { allRecords.length > 0 && <AIChat allRecords={allRecords} /> }
+            { allRecords.length > 0 && <AIChat allRecords={allRecords} user={user} /> }
             <MedicalRecordsCard
                 title="Health History"
                 allRecords={allRecords}

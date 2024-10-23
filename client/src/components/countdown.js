@@ -53,7 +53,7 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
                 data-pr-at="left+60 top"
             >
                 <FontAwesomeIcon icon={faHospitalUser} />
-                {patientDetail.firstName + ' ' + patientDetail.lastName}
+                {patientDetail?.firstName + ' ' + patientDetail?.lastName}
             </span>
             <Tooltip target=".expiration-tooltip" />
             <span className='flex sm:flex-1 gap-1 countdown-width expiration-tooltip'
