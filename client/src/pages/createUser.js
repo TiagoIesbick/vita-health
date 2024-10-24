@@ -50,7 +50,7 @@ const CreateUser = () => {
                         setUser(login.user);
                         resetForm();
                         client.resetStore();
-                        navigate('/');
+                        login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
                         showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`)
                     };
                 };

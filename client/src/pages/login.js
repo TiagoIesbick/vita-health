@@ -35,8 +35,7 @@ const Login = () => {
                 storeToken(ACCESS_TOKEN_KEY, login.token);
                 setUser(login.user);
                 client.resetStore();
-                if (login.user.userType === 'Patient') navigate('/generate-access-token');
-                if (login.user.userType === 'Doctor') navigate('/insert-token');
+                login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
                 showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
             };
         },

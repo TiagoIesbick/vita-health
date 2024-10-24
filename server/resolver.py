@@ -234,14 +234,19 @@ def resolve_ai_conversation(*_, conversation, key, patient_id):
 @requires_authentication("conversationError")
 @requires_patient_or_doctor_access("conversationError")
 @fetch_conversation
-async def resolve_create_conversation(*_, content, allRecords, conversation, key, patient_id):
+async def resolve_create_conversation(_, info, content, allRecords, conversation, key, patient_id):
     if not allRecords:
         return {'conversationError': 'There is no health data to analyze'}
 
     conversation_copy = conversation.copy()
     new_msg = {"role": "user", "content": content}
     conversation.append(new_msg)
+
     redis_client.set(key, json.dumps(conversation))
+    if info.context['user_detail']['userType'] == 'Patient':
+        redis_client.expire(key, 60 * 60)
+    else:
+        redis_client.expireat(key, info.context['medical_access']['exp'])
 
     await pubsub.publish(channel=key, message=json.dumps(new_msg))
 

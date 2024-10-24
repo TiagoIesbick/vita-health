@@ -122,7 +122,11 @@ async def openai_chat_stream(conversation: list[dict], key: str):
 
         conversation_history = json.loads(redis_client.get(key))
         conversation_history.append({"role": "assistant", "content": full_response})
-        await asyncio.to_thread(redis_client.set, key, json.dumps(conversation_history))
+
+        ttl = redis_client.ttl(key)
+        if ttl > 0:
+            await asyncio.to_thread(redis_client.set, key, json.dumps(conversation_history))
+            await asyncio.to_thread(redis_client.expire, key, ttl)
 
     except OpenAIError as e:
         await pubsub.publish(channel=key, message=json.dumps({
