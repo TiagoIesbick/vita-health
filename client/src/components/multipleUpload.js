@@ -113,10 +113,10 @@ const MultipleUpload = ({ formik }) => {
             <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
             <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
-            <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={2 * 1024 * 1024}
+            <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={5 * 1024 * 1024}
                 onSelect={onTemplateSelect} onError={onTemplateClear} onClear={onTemplateClear}
                 headerTemplate={headerTemplate} itemTemplate={itemTemplate} emptyTemplate={emptyTemplate}
-                chooseOptions={chooseOptions} cancelOptions={cancelOptions}
+                chooseOptions={chooseOptions} cancelOptions={cancelOptions} className="file-upload"
             />
             {formik.touched.files && formik.errors.files && <div className="text-red-500 text-xs">{formik.errors.files}</div>}
         </div>

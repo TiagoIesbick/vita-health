@@ -17,6 +17,15 @@
     display: flex;
 }
 
+.file-upload {
+    max-width: calc(100vw - (100vw/6));
+    overflow: hidden;
+}
+
+.file-upload .p-message-wrapper {
+    max-width: 100%;
+}
+
 @media screen and (max-width: 768px) {
     .visible-description {
         display: none;
@@ -26,5 +35,13 @@
 @media screen and (max-width: 450px) {
     .visible-tag {
         display: none;
+    }
+    .file-upload .p-message-wrapper {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    .file-upload .p-message-wrapper .p-message-close.p-link {
+        margin-left: revert;
     }
 }

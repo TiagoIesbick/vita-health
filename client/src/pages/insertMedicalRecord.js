@@ -82,8 +82,8 @@ const InsertMedicalRecord = () => {
                     .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
                         return file ? supportedFileFormats.includes(file.type) : true;
                     })
-                    .test('FILE_SIZE', "Uploaded file is too big (max 2 MB)", (file) => {
-                        return file ? file.size <= 2 * 1024 * 1024 : true;
+                    .test('FILE_SIZE', "Uploaded file is too big (max 5 MB)", (file) => {
+                        return file ? file.size <= 5 * 1024 * 1024 : true;
                     })
                 )
                 .test('MAX_FILES', 'You can only upload a maximum of 10 files', (files) => {
@@ -169,6 +169,7 @@ const InsertMedicalRecord = () => {
                         init={{
                         height: 500,
                         menubar: false,
+                        placeholder: "Enter your notes here...",
                         plugins: [
                             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -178,7 +179,7 @@ const InsertMedicalRecord = () => {
                             'bold italic forecolor | alignleft aligncenter ' +
                             'alignright alignjustify | bullist numlist outdent indent | ' +
                             'removeformat | help',
-                        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:1rem }'
                         }}
                     />
                     {formik.touched.recordData && formik.errors.recordData && <div className="text-red-500 text-xs">{formik.errors.recordData}</div>}
