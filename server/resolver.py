@@ -381,7 +381,7 @@ async def resolve_multiple_upload(_, info, recordId, files):
             file_errors.append(rf"{file.filename}: Uploaded file has unsupported format")
             continue
         if not validate_file_size(file.size):
-            file_errors.append(rf"{file.filename}: Uploaded file is too big (max 2 MB)")
+            file_errors.append(rf"{file.filename}: Uploaded file is too big (max 5 MB)")
             continue
         filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
         file_path = os.path.join(UPLOAD_DIR, filename)
