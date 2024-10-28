@@ -44,4 +44,7 @@
     .file-upload .p-message-wrapper .p-message-close.p-link {
         margin-left: revert;
     }
+    .file-upload .p-message-wrapper .p-icon.p-message-icon {
+        display: none;
+    }
 }

@@ -61,7 +61,7 @@ def validate_file_format(file_type: str) -> bool:
 
 
 def validate_file_size(file_size: int) -> bool:
-    return file_size <= 2 * 1024 * 1024
+    return file_size <= 5 * 1024 * 1024
 
 
 def validate_files_length(files: list) -> bool:
