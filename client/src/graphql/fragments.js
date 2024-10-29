@@ -70,9 +70,18 @@ export const medicalRecordsFragment = gql`
         files {
             ...FileDetail
         }
+        doctor {
+            ...DoctorDetail
+            user {
+                userId
+                firstName
+                lastName
+            }
+        }
     }
     ${recordTypeFragment}
     ${fileFragment}
+    ${doctorDetailFragment}
 `;
 
 

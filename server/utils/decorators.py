@@ -58,6 +58,7 @@ def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_
             info = args[1]
             user_detail = info.context['user_detail']
             user_type = user_detail.get('userType')
+            doctor_id = None
             if user_type == 'Patient':
                 patient = get_users_patient(user_detail['userId'])
                 if not patient:
@@ -68,9 +69,13 @@ def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_
                 if not medical_access:
                     return None if return_none else {error_field: 'Missing authorization'}
                 patient_id = medical_access['patientId']
+                doctor = get_users_doctor(user_detail['userId'])
+                if not doctor:
+                    return None if return_none else {error_field: 'Missing doctor credential'}
+                doctor_id = doctor['doctorId']
             else:
                 return None if return_none else {error_field: 'User is neither a Patient nor a Doctor'}
-            return resolver_function(*args, patient_id=patient_id, **kwargs)
+            return resolver_function(*args, patient_id=patient_id, doctor_id=doctor_id, **kwargs)
         return wrapper
     return decorator
 

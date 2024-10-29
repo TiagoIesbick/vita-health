@@ -85,12 +85,14 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
   `recordId` INT NOT NULL AUTO_INCREMENT,
   `patientId` INT NOT NULL,
+  `doctorId` INT NULL,
   `recordTypeId` INT NOT NULL,
-  `recordData` LONGTEXT NULL,
+  `recordData` LONGTEXT NOT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT NOW(),
   PRIMARY KEY (`recordId`),
   INDEX `medicalRecordsPatientId_idx` (`patientId` ASC) VISIBLE,
   INDEX `medicalRecordsTypeId_idx` (`recordTypeId` ASC) VISIBLE,
+  INDEX `medicalRecordsDoctorId_idx` (`doctorId` ASC) VISIBLE,
   CONSTRAINT `medicalRecordsPatientId`
     FOREIGN KEY (`patientId`)
     REFERENCES `vita_health`.`Patients` (`patientId`)
@@ -100,7 +102,12 @@ CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
     FOREIGN KEY (`recordTypeId`)
     REFERENCES `vita_health`.`RecordTypes` (`recordTypeId`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `medicalRecordsDoctorId`
+    FOREIGN KEY (`doctorId`)
+    REFERENCES `vita_health`.`Doctors` (`doctorId`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -633,35 +640,53 @@ DELIMITER ;
 -- Create Procedure to create medical records
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddMedicalRecord(IN PTID INT, IN RCTY INT, IN RCDT LONGTEXT)
+CREATE PROCEDURE AddMedicalRecord(IN PTID INT, IN DCID INT, IN RCTY INT, IN RCDT LONGTEXT)
 BEGIN
-DECLARE medicalRecordConfirmation VARCHAR(45);
-DECLARE medicalRecordError VARCHAR(45);
-PREPARE CountPreviousMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countPreviousMedicalRecord FROM `MedicalRecords`
-	WHERE `patientID` = ?' ;
-PREPARE InsertMedicalRecord FROM 'INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`)
-	VALUES (?, ?, ?)' ;
-PREPARE CountMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countMedicalRecord FROM `MedicalRecords`
-	WHERE `patientID` = ?' ;
-START TRANSACTION;
-SET @patientId = PTID ;
-SET @recordTypeId = RCTY ;
-SET @recordData = RCDT ;
-EXECUTE CountPreviousMedicalRecord USING @patientId ;
-EXECUTE InsertMedicalRecord USING @patientId, @recordTypeId, @recordData ;
-EXECUTE CountMedicalRecord USING @patientId ;
-IF @countMedicalRecord - @countPreviousMedicalRecord = 1 THEN
-	COMMIT ;
-    SET medicalRecordConfirmation = 'Health Data Created!' ;
-ELSE
-	ROLLBACK ;
-	SET medicalRecordError = 'Health Data NOT created!' ;
-END IF ;
-SELECT * FROM(
-  (SELECT medicalRecordConfirmation) medicalRecordConfirmation,
-  (SELECT medicalRecordError) medicalRecordError,
-  (SELECT LAST_INSERT_ID() AS medicalRecordId) medicalRecordId
-);
+    DECLARE medicalRecordConfirmation VARCHAR(45);
+    DECLARE medicalRecordError VARCHAR(45);
+    DECLARE insertQuery TEXT;
+
+    PREPARE CountPreviousMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countPreviousMedicalRecord FROM `MedicalRecords`
+        WHERE `patientID` = ?' ;
+    PREPARE CountMedicalRecord FROM 'SELECT COUNT(`recordId`) INTO @countMedicalRecord FROM `MedicalRecords`
+        WHERE `patientID` = ?' ;
+
+
+    SET @patientId = PTID;
+    SET @doctorId = IF(DCID IS NULL, NULL, DCID);
+    SET @recordTypeId = RCTY;
+    SET @recordData = RCDT;
+
+    SET @insertQuery = IF(@doctorId IS NULL,
+        'INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`) VALUES (?, ?, ?)',
+        'INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `doctorId`, `recordTypeId`, `recordData`) VALUES (?, ?, ?, ?)'
+    );
+
+    PREPARE InsertMedicalRecord FROM @insertQuery;
+
+    START TRANSACTION;
+    EXECUTE CountPreviousMedicalRecord USING @patientId;
+
+    IF @doctorId IS NULL THEN
+        EXECUTE InsertMedicalRecord USING @patientId, @recordTypeId, @recordData;
+    ELSE
+        EXECUTE InsertMedicalRecord USING @patientId, @doctorId, @recordTypeId, @recordData;
+    END IF;
+
+    EXECUTE CountMedicalRecord USING @patientId;
+    IF @countMedicalRecord - @countPreviousMedicalRecord = 1 THEN
+        COMMIT;
+        SET medicalRecordConfirmation = 'Health Data Created!';
+    ELSE
+        ROLLBACK;
+        SET medicalRecordError = 'Health Data NOT created!';
+    END IF;
+
+    SELECT * FROM (
+        (SELECT medicalRecordConfirmation) medicalRecordConfirmation,
+        (SELECT medicalRecordError) medicalRecordError,
+        (SELECT LAST_INSERT_ID() AS medicalRecordId) medicalRecordId
+    );
 END //
 DELIMITER ;
 

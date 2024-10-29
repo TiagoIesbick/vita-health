@@ -148,7 +148,7 @@ def resolve_login(*_, email, password):
 @query.field("medicalRecords")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-def resolve_medical_records(*_, limit, offset, patient_id):
+def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
     if not total_medical_records:
@@ -160,7 +160,7 @@ def resolve_medical_records(*_, limit, offset, patient_id):
 @query.field("medicalRecord")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-def resolve_get_medical_record(*_, recordId, patient_id):
+def resolve_get_medical_record(*_, recordId, patient_id, doctor_id):
     return get_medical_record(recordId, patient_id)
 
 
@@ -170,15 +170,22 @@ def resolve_medical_records_type(medicalRecords, *_):
 
 
 @medical_records.field("files")
+@requires_authentication(return_none=True)
 def resolve_medical_records_files(medicalRecords, *_):
     return get_medical_records_files(medicalRecords['recordId'])
+
+
+@medical_records.field("doctor")
+@requires_authentication(return_none=True)
+def resolve_medical_records_doctor(medicalRecords, *_):
+    return None if not medicalRecords['doctorId'] else get_doctor(medicalRecords['doctorId'])
 
 
 @mutation.field("createMedicalRecord")
 @requires_authentication('medicalRecordError')
 @requires_patient_or_doctor_access('medicalRecordError')
-def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id):
-    res = create_medical_record(patient_id, recordTypeId, recordData)
+def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doctor_id):
+    res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         res['medicalRecord'] = get_medical_record(res['medicalRecordId'], patient_id)
     return res
@@ -226,7 +233,7 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 @fetch_conversation
-def resolve_ai_conversation(*_, conversation, key, patient_id):
+def resolve_ai_conversation(*_, conversation, key, patient_id, doctor_id):
     return conversation
 
 
@@ -234,7 +241,7 @@ def resolve_ai_conversation(*_, conversation, key, patient_id):
 @requires_authentication("conversationError")
 @requires_patient_or_doctor_access("conversationError")
 @fetch_conversation
-async def resolve_create_conversation(_, info, content, allRecords, conversation, key, patient_id):
+async def resolve_create_conversation(_, info, content, allRecords, conversation, key, patient_id, doctor_id):
     if not allRecords:
         return {'conversationError': 'There is no health data to analyze'}
 
@@ -269,7 +276,7 @@ async def resolve_create_conversation(_, info, content, allRecords, conversation
 @subscription.source("message")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-async def source_message(_, info, patient_id):
+async def source_message(_, info, patient_id, doctor_id):
     user_id = info.context['user_detail']['userId']
     key = rf"conversation:{user_id}:{patient_id}"
     print('[key]:', key)
@@ -373,8 +380,10 @@ async def resolve_multiple_upload(_, info, recordId, files):
         return {'fileError': ['You can only upload a maximum of 10 files']}
     if not validate_files_size(files):
         return {'fileError': ['Total size of uploaded files must not exceed 10 MB']}
+
     file_infos = []
     file_errors = []
+
     for file in files:
         content_type = file.content_type
         if not validate_file_format(content_type):
@@ -383,27 +392,32 @@ async def resolve_multiple_upload(_, info, recordId, files):
         if not validate_file_size(file.size):
             file_errors.append(rf"{file.filename}: Uploaded file is too big (max 5 MB)")
             continue
+
         filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
         file_path = os.path.join(UPLOAD_DIR, filename)
         file_url = f"/uploads/{filename}"
+
         res = add_file_info(recordId, filename, content_type, file_url)
         if res['fileError']:
             file_errors.append(rf"{file.filename}: {res['fileError']}")
             continue
+
         try:
             async with aiofiles.open(file_path, 'wb') as out_file:
                 content = await file.read()
                 await out_file.write(content)
+
             if content_type == "application/pdf":
                 text = extract_text_from_pdf(file_path)
                 if not text:
                     text = extract_text_with_ocr(file_path)
             else:
                 text = extract_text_with_ocr(file_path, content_type)
+
             save_text = update_file_text_content(res['fileId'], text)
             if save_text.get('fileError', True):
                 text = None
-            print('[text file]:', text)
+
             file_infos.append({
                 "fileId": res['fileId'],
                 "fileName": filename,
@@ -411,8 +425,10 @@ async def resolve_multiple_upload(_, info, recordId, files):
                 "url": file_url,
                 "textContent": text
             })
+
         except Exception as e:
             file_errors.append(rf"{file.filename}: Failed to process file - {str(e)}")
+
     if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
     return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
