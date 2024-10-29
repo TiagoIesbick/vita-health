@@ -17,6 +17,7 @@ type MedicalRecords {
     dateCreated: String!
     recordType: RecordTypes!
     files: [Files]
+    doctor: Doctors
 }
 
 type MedicalRecordsSubList {

@@ -82,8 +82,8 @@ def create_record_type(recordName: str) -> (None | dict):
     return confirmation[0]
 
 
-def create_medical_record(patientId: int, recordTypeId: int, recordData: str) -> (None | dict):
-    args = [patientId, recordTypeId, recordData]
+def create_medical_record(patientId: int, doctor_id: int | None, recordTypeId: int, recordData: str) -> (None | dict):
+    args = [patientId, doctor_id, recordTypeId, recordData]
     query = 'AddMedicalRecord'
     confirmation = mysql_results(query, 'procedure', args)
     if len(confirmation) == 0:
