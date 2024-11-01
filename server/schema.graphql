@@ -9,6 +9,7 @@ type Query {
     inactiveTokens(limit: Int, offset: Int): TokensSubList
     recordTypes: [RecordTypes]
     aiConversation: [Conversation]
+    searchMedicalRecords(term: String!): [MedicalRecords]
 }
 
 type MedicalRecords {

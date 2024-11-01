@@ -104,3 +104,13 @@ export const messageSubscription = gql`
         }
     }
 `;
+
+
+export const searchMedicalRecordsQuery = gql`
+    query SearchMedicalRecords ($term: String!) {
+        searchMedicalRecords (term: $term) {
+            ...MedicalRecordsDetail
+        }
+    }
+    ${medicalRecordsFragment}
+`;

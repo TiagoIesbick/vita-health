@@ -10,6 +10,7 @@ from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
+from db.elastic import es
 from utils.decorators import *
 from pathlib import Path
 from utils.utils import *
@@ -187,7 +188,15 @@ def resolve_medical_records_doctor(medicalRecords, *_):
 def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doctor_id):
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
-        res['medicalRecord'] = get_medical_record(res['medicalRecordId'], patient_id)
+        medical_record = get_medical_record(res['medicalRecordId'], patient_id)
+        print(medical_record)
+        es.index(
+            index="medical_records",
+            id=medical_record['recordId'],
+            document=medical_record
+        )
+
+        res['medicalRecord'] = medical_record
     return res
 
 
@@ -418,6 +427,19 @@ async def resolve_multiple_upload(_, info, recordId, files):
             if save_text.get('fileError', True):
                 text = None
 
+            es.index(
+                index="files",
+                id=res['fileId'],
+                document={
+                    "fileId": res['fileId'],
+                    "recordId": recordId,
+                    "fileName": filename,
+                    "mimeType": content_type,
+                    "url": file_url,
+                    "textContent": text
+                }
+            )
+
             file_infos.append({
                 "fileId": res['fileId'],
                 "fileName": filename,
@@ -432,3 +454,37 @@ async def resolve_multiple_upload(_, info, recordId, files):
     if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
     return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
+
+
+@query.field("searchMedicalRecords")
+@requires_authentication(return_none=True)
+async def resolve_search_medical_records(*_, term):
+    if term:
+        res = es.search(index="medical_records", body={
+            "query": {
+                "multi_match": {
+                    "query": term,
+                    "fields": ["recordData.prefix^2", "recordData.full"],  # Adjust fields as necessary
+                    "type": "best_fields"
+                }
+            },
+            "highlight": {
+                "fields": {
+                    "recordData.prefix": {
+                        "pre_tags": ["<mark>"],
+                        "post_tags": ["</mark>"]
+                    }
+                }
+            }
+        })
+
+        return [
+            {
+                **hit["_source"],
+                "recordData": hit["highlight"]["recordData.prefix"][0]
+                if "highlight" in hit and "recordData.prefix" in hit["highlight"]
+                else hit["_source"]["recordData"]["full"]
+            }
+            for hit in res["hits"]["hits"]
+        ]
+    return []

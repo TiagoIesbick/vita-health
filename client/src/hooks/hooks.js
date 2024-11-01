@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useApolloClient, useSubscription } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, recordTypesQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, recordTypesQuery, searchMedicalRecordsQuery, userQuery } from "../graphql/queries";
 import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
@@ -547,4 +547,10 @@ export const useCreateConversation = () => {
         loadingConversation: loading,
         errorConversation: error
     };
+};
+
+
+export const useSearchMedicalRecords = (term) => {
+    const { data, loading, error } = useQuery(searchMedicalRecordsQuery, { variables: { term } });
+    return {searchMedicalRecords: data?.searchMedicalRecords, loading, error: Boolean(error)};
 };

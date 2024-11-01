@@ -19,6 +19,7 @@ pytesseract = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 broadcaster = "*"
 websockets = "*"
+elasticsearch = "*"
 
 [dev-packages]
 

@@ -12,6 +12,20 @@ services:
       - ./database:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    restart: always
+    depends_on:
+      - database
+
   redis:
     image: redis:alpine
     restart: always
@@ -48,3 +62,4 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  es_data:

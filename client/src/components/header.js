@@ -3,6 +3,7 @@ import logo from "../assets/logos/logo-vita-no-bg.png";
 import './header.css';
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import Search from "./search";
 
 const Header = () => {
     return (
@@ -17,6 +18,7 @@ const Header = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 />
             </Link>
+            <Search />
             <Navbar />
         </header>
     );
