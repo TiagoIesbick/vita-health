@@ -10,6 +10,7 @@ type Query {
     recordTypes: [RecordTypes]
     aiConversation: [Conversation]
     searchMedicalRecords(term: String!): [MedicalRecords]
+    searchFiles(term: String!): [Files]
 }
 
 type MedicalRecords {

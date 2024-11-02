@@ -8,20 +8,25 @@ es = Elasticsearch([{"host": elasticsearch_host, "port": int(elasticsearch_port)
 
 
 settings = {
+    "index": {
+        "max_ngram_diff": 19
+    },
     "analysis": {
         "analyzer": {
-            "edge_ngram_analyzer": {
+            "n_gram_analyzer": {
                 "type": "custom",
-                "tokenizer": "edge_ngram_tokenizer",
+                "tokenizer": "n_gram_tokenizer",
                 "filter": ["lowercase"]
+            },
+            "standard_analyzer": {
+                "type": "standard"
             }
         },
         "tokenizer": {
-            "edge_ngram_tokenizer": {
-                "type": "edge_ngram",
-                "min_gram": 2,
-                "max_gram": 10,
-                "token_chars": ["letter", "digit"]
+            "n_gram_tokenizer": {
+                "type": "ngram",
+                "min_gram": 1,
+                "max_gram": 20
             }
         }
     }
@@ -29,16 +34,8 @@ settings = {
 
 field_settings = {
     "type": "text",
-    "fields": {
-        "prefix": {
-            "type": "text",
-            "analyzer": "edge_ngram_analyzer"
-        },
-        "full": {
-            "type": "text",
-            "analyzer": "standard"
-        }
-    }
+    "analyzer": "n_gram_analyzer",
+    "search_analyzer": "standard_analyzer"
 }
 
 medical_records_mapping = {

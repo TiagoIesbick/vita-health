@@ -9,6 +9,7 @@ import asyncio
 from PIL import Image
 from openai import OpenAIError
 from cryptography.fernet import Fernet
+from bs4 import BeautifulSoup
 from os import getenv
 from db.redis import redis_client, pubsub
 
@@ -70,6 +71,11 @@ def validate_files_length(files: list) -> bool:
 
 def validate_files_size(files: list) -> bool:
     return sum(file.size for file in files) <= 10 * 1024 * 1024
+
+
+def strip_html_tags(html):
+    soup = BeautifulSoup(html, "html.parser")
+    return soup.get_text()
 
 
 def extract_text_from_pdf(file_path: str) -> str:

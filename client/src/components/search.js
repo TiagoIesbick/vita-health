@@ -3,7 +3,7 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { useRef, useState, useEffect } from 'react';
-import { useSearchMedicalRecords } from '../hooks/hooks';
+import { useSearchFiles, useSearchMedicalRecords } from '../hooks/hooks';
 
 
 const Search = () => {
@@ -11,6 +11,7 @@ const Search = () => {
     const [term, setTerm] =  useState('');
     const [debouncedTerm, setDebouncedTerm] = useState('');
     const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(debouncedTerm);
+    const { searchFiles, loadingFiles, errorFiles } = useSearchFiles(debouncedTerm);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -38,6 +39,11 @@ const Search = () => {
                 <ul>
                 {searchMedicalRecords && searchMedicalRecords.map(result => (
                     <li key={result.recordId} dangerouslySetInnerHTML={{ __html: result.recordData }}></li>
+                ))}
+                </ul>
+                <ul>
+                {searchFiles && searchFiles.map(result => (
+                    <li key={result.fileId} dangerouslySetInnerHTML={{ __html: result.textContent }}></li>
                 ))}
                 </ul>
             </OverlayPanel>

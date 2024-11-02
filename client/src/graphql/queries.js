@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { medicalRecordsFragment, doctorDetailFragment, patientDetailFragment, userDetailFragment, recordTypeFragment, tokenFragment } from './fragments';
+import { medicalRecordsFragment, doctorDetailFragment, patientDetailFragment, userDetailFragment, recordTypeFragment, tokenFragment, fileFragment } from './fragments';
 
 
 export const userQuery = gql`
@@ -113,4 +113,14 @@ export const searchMedicalRecordsQuery = gql`
         }
     }
     ${medicalRecordsFragment}
+`;
+
+
+export const searchFilesQuery = gql`
+    query SearchFiles ($term: String!) {
+        searchFiles (term: $term) {
+            ...FileDetail
+        }
+    }
+    ${fileFragment}
 `;

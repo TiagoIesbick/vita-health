@@ -189,11 +189,12 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         medical_record = get_medical_record(res['medicalRecordId'], patient_id)
-        print(medical_record)
+        medical_record_es = medical_record.copy()
+        medical_record_es['recordData'] = strip_html_tags(medical_record_es['recordData'] or '')
         es.index(
             index="medical_records",
             id=medical_record['recordId'],
-            document=medical_record
+            document=medical_record_es
         )
 
         res['medicalRecord'] = medical_record
@@ -462,17 +463,18 @@ async def resolve_search_medical_records(*_, term):
     if term:
         res = es.search(index="medical_records", body={
             "query": {
-                "multi_match": {
-                    "query": term,
-                    "fields": ["recordData.prefix^2", "recordData.full"],  # Adjust fields as necessary
-                    "type": "best_fields"
+                "match": {
+                    "recordData": term
                 }
             },
             "highlight": {
                 "fields": {
-                    "recordData.prefix": {
-                        "pre_tags": ["<mark>"],
-                        "post_tags": ["</mark>"]
+                    "recordData": {
+                        "type": "unified",
+                        "fragment_size": 100,
+                        "number_of_fragments": 1,
+                        "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
+                        "post_tags": ["</span>"]
                     }
                 }
             }
@@ -481,9 +483,44 @@ async def resolve_search_medical_records(*_, term):
         return [
             {
                 **hit["_source"],
-                "recordData": hit["highlight"]["recordData.prefix"][0]
-                if "highlight" in hit and "recordData.prefix" in hit["highlight"]
-                else hit["_source"]["recordData"]["full"]
+                "recordData": hit["highlight"]["recordData"][0]
+                if "highlight" in hit and "recordData" in hit["highlight"]
+                else hit["_source"]["recordData"]
+            }
+            for hit in res["hits"]["hits"]
+        ]
+    return []
+
+
+@query.field("searchFiles")
+@requires_authentication(return_none=True)
+async def resolve_search_files(*_, term):
+    if term:
+        res = es.search(index="files", body={
+            "query": {
+                "match": {
+                    "textContent": term
+                }
+            },
+            "highlight": {
+                "fields": {
+                    "textContent": {
+                        "type": "unified",
+                        "fragment_size": 100,
+                        "number_of_fragments": 1,
+                        "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
+                        "post_tags": ["</span>"]
+                    }
+                }
+            }
+        })
+
+        return [
+            {
+                **hit["_source"],
+                "textContent": hit["highlight"]["textContent"][0]
+                if "highlight" in hit and "textContent" in hit["highlight"]
+                else hit["_source"]["textContent"]
             }
             for hit in res["hits"]["hits"]
         ]
