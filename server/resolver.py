@@ -10,7 +10,8 @@ from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
-from db.elastic import es
+from db.elastic import es, search_with_highlights
+from db.openai import openai_chat_stream, extract_text_from_pdf, extract_text_with_ocr
 from utils.decorators import *
 from pathlib import Path
 from utils.utils import *
@@ -167,6 +168,7 @@ def resolve_get_medical_record(*_, recordId, patient_id, doctor_id):
 
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
+    print('[resolve_medical_records_type]', medicalRecords)
     return get_medical_records_type(medicalRecords['recordTypeId'])
 
 
@@ -189,14 +191,17 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         medical_record = get_medical_record(res['medicalRecordId'], patient_id)
-        medical_record_es = medical_record.copy()
-        medical_record_es['recordData'] = strip_html_tags(medical_record_es['recordData'] or '')
         es.index(
             index="medical_records",
             id=medical_record['recordId'],
-            document=medical_record_es
+            document={
+                "recordId": medical_record['recordId'],
+                "recordData": strip_html_tags(medical_record['recordData'] or ''),
+                "dateCreated": medical_record['dateCreated'],
+                "doctorFullName": get_doctor_full_name(doctor_id),
+                "recordTypeName": get_record_type_name(medical_record['recordTypeId'])
+            }
         )
-
         res['medicalRecord'] = medical_record
     return res
 
@@ -461,34 +466,11 @@ async def resolve_multiple_upload(_, info, recordId, files):
 @requires_authentication(return_none=True)
 async def resolve_search_medical_records(*_, term):
     if term:
-        res = es.search(index="medical_records", body={
-            "query": {
-                "match": {
-                    "recordData": term
-                }
-            },
-            "highlight": {
-                "fields": {
-                    "recordData": {
-                        "type": "unified",
-                        "fragment_size": 100,
-                        "number_of_fragments": 1,
-                        "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
-                        "post_tags": ["</span>"]
-                    }
-                }
-            }
-        })
-
-        return [
-            {
-                **hit["_source"],
-                "recordData": hit["highlight"]["recordData"][0]
-                if "highlight" in hit and "recordData" in hit["highlight"]
-                else hit["_source"]["recordData"]
-            }
-            for hit in res["hits"]["hits"]
-        ]
+        return await search_with_highlights(
+            index="medical_records",
+            term=term,
+            search_fields=["recordData", "doctorFullName", "recordTypeName"]
+        )
     return []
 
 
@@ -496,32 +478,10 @@ async def resolve_search_medical_records(*_, term):
 @requires_authentication(return_none=True)
 async def resolve_search_files(*_, term):
     if term:
-        res = es.search(index="files", body={
-            "query": {
-                "match": {
-                    "textContent": term
-                }
-            },
-            "highlight": {
-                "fields": {
-                    "textContent": {
-                        "type": "unified",
-                        "fragment_size": 100,
-                        "number_of_fragments": 1,
-                        "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
-                        "post_tags": ["</span>"]
-                    }
-                }
-            }
-        })
-
-        return [
-            {
-                **hit["_source"],
-                "textContent": hit["highlight"]["textContent"][0]
-                if "highlight" in hit and "textContent" in hit["highlight"]
-                else hit["_source"]["textContent"]
-            }
-            for hit in res["hits"]["hits"]
-        ]
+        return await search_with_highlights(
+            index="files",
+            term=term,
+            search_fields=["textContent"],
+            query_type="match"
+        )
     return []

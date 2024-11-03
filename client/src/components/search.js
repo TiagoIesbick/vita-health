@@ -4,6 +4,7 @@ import { InputIcon } from 'primereact/inputicon';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { useRef, useState, useEffect } from 'react';
 import { useSearchFiles, useSearchMedicalRecords } from '../hooks/hooks';
+import SearchList from './searchList';
 
 
 const Search = () => {
@@ -29,6 +30,8 @@ const Search = () => {
         };
     };
 
+    console.log(searchMedicalRecords);
+
     return (
         <>
             <IconField iconPosition="left">
@@ -36,11 +39,7 @@ const Search = () => {
                 <InputText placeholder="Search" onChange={handleTerm}/>
             </IconField>
             <OverlayPanel ref={op} closeOnEscape className='max-w-full'>
-                <ul>
-                {searchMedicalRecords && searchMedicalRecords.map(result => (
-                    <li key={result.recordId} dangerouslySetInnerHTML={{ __html: result.recordData }}></li>
-                ))}
-                </ul>
+                {searchMedicalRecords && <SearchList searchResults={searchMedicalRecords}/>}
                 <ul>
                 {searchFiles && searchFiles.map(result => (
                     <li key={result.fileId} dangerouslySetInnerHTML={{ __html: result.textContent }}></li>

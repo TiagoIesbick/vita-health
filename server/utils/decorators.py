@@ -3,7 +3,7 @@ from db.queries import get_users_patient, get_users_doctor
 from typing import Callable, Any, Dict, Union, Optional, List
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from utils.utils import redis_client
+from db.redis import redis_client
 import json
 
 

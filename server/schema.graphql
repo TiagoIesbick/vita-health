@@ -9,7 +9,7 @@ type Query {
     inactiveTokens(limit: Int, offset: Int): TokensSubList
     recordTypes: [RecordTypes]
     aiConversation: [Conversation]
-    searchMedicalRecords(term: String!): [MedicalRecords]
+    searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [Files]
 }
 
@@ -25,6 +25,14 @@ type MedicalRecords {
 type MedicalRecordsSubList {
     items: [MedicalRecords]
     totalCount: Int
+}
+
+type SearchMedicalRecordsResult {
+    recordId: ID!
+    recordData: String!
+    dateCreated: String!
+    doctorFullName: String
+    recordTypeName: String
 }
 
 type RecordTypes {
