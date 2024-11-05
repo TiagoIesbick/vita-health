@@ -199,7 +199,8 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
                 "recordData": strip_html_tags(medical_record['recordData'] or ''),
                 "dateCreated": medical_record['dateCreated'],
                 "doctorFullName": get_doctor_full_name(doctor_id),
-                "recordTypeName": get_record_type_name(medical_record['recordTypeId'])
+                "recordTypeName": get_record_type_name(medical_record['recordTypeId']),
+                "patientId": patient_id
             }
         )
         res['medicalRecord'] = medical_record
@@ -386,11 +387,9 @@ def resolve_deactivate_token(*_, patient, tokenId):
 
 
 @mutation.field("multipleUpload")
-async def resolve_multiple_upload(_, info, recordId, files):
-    if not info.context['authenticated']:
-        return {'fileError': ['Missing authentication']}
-    if info.context['user_detail']['userType'] == 'Doctor' and not info.context['medical_access']:
-        return {'fileError': ['Missing authorization']}
+@requires_authentication(error_field="fileError", return_list=True)
+@requires_patient_or_doctor_access(error_field="fileError", return_list=True)
+async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
     if not validate_files_length(files):
         return {'fileError': ['You can only upload a maximum of 10 files']}
     if not validate_files_size(files):
@@ -442,7 +441,8 @@ async def resolve_multiple_upload(_, info, recordId, files):
                     "fileName": filename,
                     "mimeType": content_type,
                     "url": file_url,
-                    "textContent": text
+                    "textContent": text,
+                    "patientId": patient_id
                 }
             )
 
@@ -464,24 +464,27 @@ async def resolve_multiple_upload(_, info, recordId, files):
 
 @query.field("searchMedicalRecords")
 @requires_authentication(return_none=True)
-async def resolve_search_medical_records(*_, term):
+@requires_patient_or_doctor_access(return_none=True)
+async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
     if term:
         return await search_with_highlights(
             index="medical_records",
             term=term,
-            search_fields=["recordData", "doctorFullName", "recordTypeName"]
+            search_fields=["recordData", "doctorFullName", "recordTypeName"],
+            patient_id=patient_id
         )
     return []
 
 
 @query.field("searchFiles")
 @requires_authentication(return_none=True)
-async def resolve_search_files(*_, term):
+@requires_patient_or_doctor_access(return_none=True)
+async def resolve_search_files(*_, term, patient_id, doctor_id):
     if term:
         return await search_with_highlights(
             index="files",
             term=term,
             search_fields=["textContent"],
-            query_type="match"
+            patient_id=patient_id
         )
     return []

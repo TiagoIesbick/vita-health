@@ -10,7 +10,7 @@ type Query {
     recordTypes: [RecordTypes]
     aiConversation: [Conversation]
     searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
-    searchFiles(term: String!): [Files]
+    searchFiles(term: String!): [SearchFilesResult]
 }
 
 type MedicalRecords {
@@ -33,6 +33,7 @@ type SearchMedicalRecordsResult {
     dateCreated: String!
     doctorFullName: String
     recordTypeName: String
+    patientId: ID!
 }
 
 type RecordTypes {
@@ -46,6 +47,16 @@ type Files {
     mimeType: String!
     url: String!
     textContent: String
+}
+
+type SearchFilesResult {
+    fileId: ID!
+    recordId: ID!
+    fileName: String!
+    mimeType: String!
+    url: String!
+    textContent: String
+    patientId: ID!
 }
 
 type Users {

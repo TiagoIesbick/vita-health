@@ -122,8 +122,13 @@ export const searchMedicalRecordsQuery = gql`
 export const searchFilesQuery = gql`
     query SearchFiles ($term: String!) {
         searchFiles (term: $term) {
-            ...FileDetail
+            fileId
+            recordId
+            fileName
+            mimeType
+            url
+            textContent
+            patientId
         }
     }
-    ${fileFragment}
 `;

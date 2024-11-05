@@ -7,13 +7,15 @@ from db.redis import redis_client
 import json
 
 
-def requires_authentication(error_field: Optional[str] = None, return_none: bool = False) -> Callable:
+def requires_authentication(error_field: Optional[str] = None, return_none: bool = False, return_list: bool = False) -> Callable:
     def decorator(resolver_function: Callable) -> Callable:
         @wraps(resolver_function)
         def wrapper(*args: Any, **kwargs: Any) -> Union[Dict[str, str], None, Any]:
             info = args[1]  # info is the second argument passed to a resolver
             if not info.context.get('authenticated'):
-                return None if return_none else {error_field: 'Missing authentication'}
+                return None if return_none else (
+                    {error_field: 'Missing authentication'} if not return_list else {error_field: ['Missing authentication']}
+                )
             return resolver_function(*args, **kwargs)
         return wrapper
     return decorator
@@ -51,7 +53,7 @@ def requires_doctor(error_field: Optional[str] = None, return_none: bool = False
     return decorator
 
 
-def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_none: bool = False) -> Callable:
+def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_none: bool = False, return_list: bool = False) -> Callable:
     def decorator(resolver_function: Callable) -> Callable:
         @wraps(resolver_function)
         def wrapper(*args: Any, **kwargs: Any) -> Union[Dict[str, str], None, Any]:
@@ -62,19 +64,27 @@ def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_
             if user_type == 'Patient':
                 patient = get_users_patient(user_detail['userId'])
                 if not patient:
-                    return None if return_none else {error_field: 'Missing patient credential'}
+                    return None if return_none else (
+                        {error_field: 'Missing patient credential'} if not return_list else {error_field: ['Missing patient credential']}
+                    )
                 patient_id = patient['patientId']
             elif user_type == 'Doctor':
                 medical_access = info.context.get('medical_access')
                 if not medical_access:
-                    return None if return_none else {error_field: 'Missing authorization'}
+                    return None if return_none else (
+                        {error_field: 'Missing authorization'} if not return_list else {error_field: ['Missing authorization']}
+                    )
                 patient_id = medical_access['patientId']
                 doctor = get_users_doctor(user_detail['userId'])
                 if not doctor:
-                    return None if return_none else {error_field: 'Missing doctor credential'}
+                    return None if return_none else (
+                        {error_field: 'Missing doctor credential'} if not return_list else {error_field: ['Missing doctor credential']}
+                    )
                 doctor_id = doctor['doctorId']
             else:
-                return None if return_none else {error_field: 'User is neither a Patient nor a Doctor'}
+                return None if return_none else (
+                    {error_field: 'User is neither a Patient nor a Doctor'} if not return_list else {error_field: ['User is neither a Patient nor a Doctor']}
+                )
             return resolver_function(*args, patient_id=patient_id, doctor_id=doctor_id, **kwargs)
         return wrapper
     return decorator

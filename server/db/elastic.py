@@ -46,7 +46,8 @@ medical_records_mapping = {
             "recordData": field_settings,
             "dateCreated": {"type": "date", "format": "strict_date_optional_time||epoch_millis"},
             "doctorFullName": field_settings,
-            "recordTypeName": field_settings
+            "recordTypeName": field_settings,
+            "patientId": {"type": "integer"}
         }
     }
 }
@@ -60,7 +61,8 @@ files_mapping = {
             "fileName": {"type": "keyword"},
             "mimeType": {"type": "keyword"},
             "url": {"type": "keyword"},
-            "textContent": field_settings
+            "textContent": field_settings,
+            "patientId": {"type": "integer"}
         }
     }
 }
@@ -72,7 +74,7 @@ es.indices.create(index="files", body=files_mapping, ignore=400)
 
 field_highlight = {
     "type": "unified",
-    "fragment_size": 100,
+    "fragment_size": 20,
     "number_of_fragments": 1,
     "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
     "post_tags": ["</span>"]
@@ -83,23 +85,26 @@ def extract_highlighted_field(hit, field_name):
     return hit["highlight"].get(field_name, [hit["_source"].get(field_name)])[0]
 
 
-async def search_with_highlights(index, term, search_fields, query_type="multi_match"):
+async def search_with_highlights(index, term, search_fields, patient_id):
     query_body = {
         "query": {
-            query_type: {}
+            "bool": {
+                "must": [
+                    {
+                        "multi_match": {
+                            "query": term,
+                            "fields": search_fields,
+                            "type": "best_fields"
+                        }
+                    }
+                ],
+                "filter": [{"term": {"patientId": patient_id}}]
+            }
         },
         "highlight": {
             "fields": {field: field_highlight for field in search_fields}
         }
     }
-
-    if query_type == "multi_match":
-        query_body["query"][query_type]["query"] = term
-        query_body["query"][query_type]["fields"] = search_fields
-        query_body["query"][query_type]["type"] = "best_fields"
-
-    if query_type == "match":
-        query_body["query"][query_type][search_fields[0]] = term
 
     res = es.search(index=index, body=query_body)
 

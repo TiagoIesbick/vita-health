@@ -8,8 +8,12 @@ header a {
     grid-column: 2;
 }
 
+header .search-field {
+    grid-column: 3;
+}
+
 header nav {
-    grid-column: 3 / span 9;
+    grid-column: 4 / span 8;
     display: grid;
     grid-template-columns: repeat(9, 1fr);
 }
