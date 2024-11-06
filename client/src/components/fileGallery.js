@@ -1,9 +1,7 @@
 import { Galleria } from 'primereact/galleria';
-import { Card } from "primereact/card";
-import { Link } from "react-router-dom";
-import { BASE_URL_SERVER } from "../graphql/apolloConfig";
 import { useEffect, useRef, useState } from "react";
 import FileRenderer from './fileRenderer';
+import FileItem from './fileItem';
 
 
 const FileGallery = ({ files, layout='grid', show, setShow=()=>{} }) => {
@@ -19,27 +17,6 @@ const FileGallery = ({ files, layout='grid', show, setShow=()=>{} }) => {
         : 'calc(100vh - (100vh/6) - 116px)';
 
     const fileWidth = 'calc(100vw - (100vw/6))';
-
-    const itemTemplate = (file) => (
-        <FileRenderer
-            file={file}
-            style={{
-                height: file.mimeType !== "application/pdf" ? undefined: fileHeight,
-                width: file.mimeType !== "application/pdf" ? undefined: fileWidth,
-                objectFit: file.mimeType !== "application/pdf" ? 'cover' : undefined,
-                maxHeight: file.mimeType !== "application/pdf" ? fileHeight: undefined,
-                maxWidth: file.mimeType !== "application/pdf" ? fileWidth : undefined,
-            }}
-            fallback={
-                <div className='flex align-items-center h-full justify-content-center mx-4'>
-                    <Card className='text-center text-white' style={{background: 'linear-gradient(45deg, darkblue, darkorchid)'}}>
-                        <p className='mt-0'>Your browser does not support viewing this file.</p>
-                        <Link to={BASE_URL_SERVER + file.url} target="_blank" className='text-white underline'>Download the file here</Link>
-                    </Card>
-                </div>
-            }
-        />
-    );
 
     const thumbnailTemplate = (file) => (
         <div className="relative w-full h-full">
@@ -93,7 +70,13 @@ const FileGallery = ({ files, layout='grid', show, setShow=()=>{} }) => {
                 fullScreen
                 showItemNavigators
                 showThumbnails={layout === 'grid' ? false : true}
-                item={itemTemplate}
+                item={(file) => (
+                    <FileItem
+                        file={file}
+                        fileHeight={fileHeight}
+                        fileWidth={fileWidth}
+                    />
+                )}
                 thumbnail={thumbnailTemplate}
                 onHide={() => setShow(false)}
             />

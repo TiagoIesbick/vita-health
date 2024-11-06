@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { activeDoctorTokensQuery } from "../graphql/queries";
-import HealthDataContent from '../components/healthDataContent';
 
 
 export const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_API_KEY;
@@ -72,9 +71,6 @@ export const customizedMarker = (item) => {
         </span>
     );
 };
-
-
-export const customizedContent = (item) => <HealthDataContent item={item} />;
 
 
 export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm) => {

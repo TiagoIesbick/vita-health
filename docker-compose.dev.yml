@@ -13,13 +13,11 @@ services:
       - mysql_data:/var/lib/mysql
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=false
-    ports:
-      - "9200:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
     restart: always
@@ -42,6 +40,7 @@ services:
     depends_on:
       - database
       - redis
+      - elasticsearch
     env_file:
       - .env
 
@@ -55,6 +54,8 @@ services:
     volumes:
       - /client/node_modules
       - ./client:/client
+    depends_on:
+      - server
     environment:
       WATCHPACK_POLLING: true
       REACT_APP_TINYMCE_API_KEY: ${TINYMCE_API_KEY}

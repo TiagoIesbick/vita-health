@@ -2,8 +2,9 @@ import { Card } from "primereact/card";
 import { Timeline } from "primereact/timeline";
 import { classNames } from "primereact/utils";
 import { ScrollTop } from 'primereact/scrolltop';
-import { customizedContent, customizedMarker } from "../utils/utils";
+import { customizedMarker } from "../utils/utils";
 import LoadingMedicalRecordsSkeleton from "./loadingMedicalRecordsSkeleton";
+import HealthDataContent from "./healthDataContent";
 import './medicalRecordsCard.css';
 
 
@@ -25,7 +26,7 @@ const MedicalRecordsCard = ({
                             align="alternate"
                             className="customized-timeline"
                             marker={customizedMarker}
-                            content={customizedContent}
+                            content={(item) => <HealthDataContent item={item} />}
                         />
                         <ScrollTop
                             threshold={100}
