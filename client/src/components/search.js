@@ -85,6 +85,9 @@ const Search = () => {
                             <SearchList searchResults={searchFiles} resultsType={'files'} setTerm={setTerm} setFile={setFile} setVisible={setVisible}/>
                         </>
                     ) : null}
+                    {!searchMedicalRecords?.length && !searchFiles?.length &&
+                        <p>{term}</p>
+                    }
                 </OverlayPanel>
             </div>
             <Dialog

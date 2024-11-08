@@ -1,5 +1,4 @@
 .p-galleria.custom-galleria .p-galleria-close {
-    top: calc(-100vh/12);
-    right: calc(-100vw/12);
+    position: fixed;
     box-shadow: none !important;
 }

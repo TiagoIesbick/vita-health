@@ -1,11 +1,24 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useUser } from "../providers/userContext";
+import { useState, useEffect } from "react";
+import Search from "./search";
 import Navbar from "./navbar";
 import logo from "../assets/logos/logo-vita-no-bg.png";
 import './header.css';
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import Search from "./search";
+
 
 const Header = () => {
+    const { user, patient } = useUser();
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        if ((user && user.userType === 'Patient') ||
+            (user && user.userType === 'Doctor' && patient)) {
+            setVisible(true);
+        } else { setVisible(false); }
+    },[user, patient]);
+
     return (
         <header className="h-5rem">
             <Link to="/">
@@ -18,7 +31,7 @@ const Header = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 />
             </Link>
-            <Search />
+            {visible && <Search />}
             <Navbar />
         </header>
     );

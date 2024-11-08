@@ -12,10 +12,8 @@ const SearchList = ({ searchResults, resultsType='health-data', setTerm, setFile
 
     const searchItem = (result, index) => {
         const handleClick = () => {
-            if (resultsType === 'health-data') {
-                navigate(`/medical-record/${result.recordId}`);
-            } else {
-                navigate(`/medical-record/${result.recordId}`);
+            navigate(`/medical-record/${result.recordId}`);
+            if (resultsType !== 'health-data') {
                 setFile(result);
                 setVisible(true);
             };
