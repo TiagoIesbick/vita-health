@@ -8,6 +8,25 @@ import json
 
 
 def requires_authentication(error_field: Optional[str] = None, return_none: bool = False, return_list: bool = False) -> Callable:
+    """
+    A decorator that checks if the user is authenticated before executing the resolver function.
+
+    This decorator wraps a GraphQL resolver function and checks the 'authenticated' flag in the context.
+    If the user is not authenticated, it returns an error message or None based on the parameters.
+
+    Args:
+        error_field (Optional[str]): The field name to use for the error message in the returned dictionary.
+        return_none (bool): If True, returns None instead of an error dictionary when authentication fails.
+        return_list (bool): If True, returns the error message as a list instead of a string.
+
+    Returns:
+        Callable: A decorator function that wraps the original resolver function.
+
+    The wrapped function will return:
+        - The result of the original resolver function if the user is authenticated.
+        - None if return_none is True and the user is not authenticated.
+        - A dictionary with the error message if the user is not authenticated and return_none is False.
+    """
     def decorator(resolver_function: Callable) -> Callable:
         @wraps(resolver_function)
         def wrapper(*args: Any, **kwargs: Any) -> Union[Dict[str, str], None, Any]:

@@ -81,11 +81,38 @@ field_highlight = {
 }
 
 
-def extract_highlighted_field(hit, field_name):
+def extract_highlighted_field(hit: dict, field_name: str) -> str:
+    """
+    Extracts the highlighted field from a search hit result.
+
+    This function attempts to retrieve the highlighted version of a field from the search hit.
+    If the highlighted version is not available, it falls back to the original field value from the source.
+
+    Args:
+        hit (dict): A dictionary representing a single hit from an Elasticsearch search result.
+        field_name (str): The name of the field to extract.
+
+    Returns:
+        str: The highlighted field value if available, otherwise the original field value.
+              Returns the first element if the result is a list.
+    """
     return hit["highlight"].get(field_name, [hit["_source"].get(field_name)])[0]
 
 
-async def search_with_highlights(index, term, search_fields, patient_id):
+async def search_with_highlights(index: str, term: str, search_fields: list[str], patient_id: int) -> list[dict]:
+    """
+    This function performs a search operation on the specified Elasticsearch index with highlighting.
+
+    Parameters:
+    - index (str): The name of the Elasticsearch index to search.
+    - term (str): The search term to look for.
+    - search_fields (list[str]): A list of fields to search within.
+    - patient_id (int): The ID of the patient to filter the search results.
+
+    Returns:
+    - list[dict]: A list of dictionaries, where each dictionary represents a search result.
+    Each dictionary contains the original document source, plus the highlighted fields.
+    """
     query_body = {
         "query": {
             "bool": {

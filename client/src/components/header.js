@@ -11,6 +11,7 @@ import './header.css';
 const Header = () => {
     const { user, patient } = useUser();
     const [visible, setVisible] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     useEffect(() => {
         if ((user && user.userType === 'Patient') ||
@@ -21,7 +22,7 @@ const Header = () => {
 
     return (
         <header className="h-5rem">
-            <Link to="/">
+            <Link to="/" className="max-w-max">
                 <motion.img
                     src={logo}
                     alt="logo"
@@ -31,8 +32,8 @@ const Header = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 />
             </Link>
-            {visible && <Search />}
-            <Navbar />
+            {visible && <Search expanded={expanded} setExpanded={setExpanded} />}
+            <Navbar expanded={expanded} />
         </header>
     );
 };

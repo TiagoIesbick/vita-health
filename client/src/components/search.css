@@ -2,3 +2,20 @@
     position: fixed;
     box-shadow: none !important;
 }
+
+.mobile-search-button {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .mobile-search-button {
+        display: flex;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pi-spin {
+        animation-duration: 2s !important;
+        animation-iteration-count: infinite !important;
+    }
+}

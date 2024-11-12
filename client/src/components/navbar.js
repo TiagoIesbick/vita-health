@@ -1,16 +1,29 @@
+import { classNames } from 'primereact/utils';
 import { Link } from "react-router-dom";
 import { useUser } from "../providers/userContext";
 import UserBar from "./userBar";
 import './navbar.css';
 
 
-const Navbar = () => {
+const Navbar = ({ expanded }) => {
     const { user, patient } = useUser();
+
     return (
-        <nav>
+        <nav
+            className='w-full'
+            style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(9, 1fr)'
+            }}
+        >
             {user &&
                 <>
-                <ul className="flex flex-row justify-content-evenly align-items-center p-0" style={{gridColumn: "1 / span 8"}}>
+                <ul className={
+                        classNames("flex-row justify-content-evenly align-items-center p-0", {
+                            'flex': !expanded, 'hidden': expanded
+                    })}
+                    style={{gridColumn: "1 / span 8"}}
+                >
                     {user.userType === 'Patient' &&
                         <>
                             <li className="nav-button"><Link to="/medical-records">History</Link></li>

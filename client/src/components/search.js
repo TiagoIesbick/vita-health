@@ -12,23 +12,27 @@ import FileItem from './fileItem';
 import './search.css';
 
 
-const Search = () => {
+const Search = ({ expanded, setExpanded }) => {
     const overlayRef = useRef(null);
     const searchInput = useRef(null);
     const [term, setTerm] =  useState('');
     const [debouncedTerm, setDebouncedTerm] = useState('');
     const [file, setFile] = useState([]);
     const [visible, setVisible] = useState(false);
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(debouncedTerm);
     const { searchFiles, loadingFiles, errorFiles } = useSearchFiles(debouncedTerm);
+
+    const handleButtonClick = () => setExpanded(!expanded);
 
     const handleEvents = (_, options) => {
         if (options.valid) {
             overlayRef.current.hide();
             setTerm('');
-            searchInput.current.blur();
+            setExpanded(false);
+            searchInput?.current?.blur();
         };
-      };
+    };
 
     const [bindOverlayListener, unbindOverlayListener] = useOverlayListener({
         target: searchInput.current,
@@ -62,16 +66,77 @@ const Search = () => {
         };
     };
 
+    useEffect(() => {
+        const resizeListener = () => {
+            setScreenWidth(window.innerWidth);
+            if (expanded && window.innerWidth <= 600) setExpanded(false);
+        }
+        window.addEventListener('resize', resizeListener);
+        return () => window.removeEventListener('resize', resizeListener);
+    }, [expanded, setExpanded]);
+
+    useEffect(() => {
+        if (expanded) searchInput?.current?.focus();
+
+        const handleClickOutside = (e) => {
+            if (
+                searchInput.current &&
+                !searchInput.current.contains(e.target) &&
+                !overlayRef.current?.getElement()?.contains(e.target) &&
+                expanded
+            ) {
+                setExpanded(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [expanded, setExpanded]);
+
     const fileHeight = 'calc(100vh - (100vh/6))';
     const fileWidth = 'calc(100vw - (100vw/6))';
 
     return (
         <>
-            <div className='search-field'>
-                <IconField iconPosition="left" >
-                    <InputIcon className="pi pi-search" />
-                    <InputText placeholder="Search" value={term} onChange={handleTerm} ref={searchInput}/>
-                </IconField>
+            <div
+                style={{
+                    width: !expanded && screenWidth <= 600 ? undefined : '100%',
+                    maxWidth: !expanded && screenWidth <= 600 ? undefined : '300px',
+                    marginLeft: !expanded && screenWidth > 600 ? '1rem' : undefined
+                }}
+            >
+                {!expanded && screenWidth <= 600 && (
+                    <Button
+                        icon="pi pi-search"
+                        rounded text
+                        aria-label="Search"
+                        className="mobile-search-button"
+                        onClick={handleButtonClick}
+                    />
+                )}
+                {(expanded || screenWidth > 600) && (
+                    <IconField
+                        iconPosition="left"
+                        style={{
+                            minWidth: expanded ? '61vw' : undefined
+                        }}
+                    >
+                        <InputIcon className={loading || loadingFiles ? "pi pi-spin pi-spinner-dotted" : "pi pi-search"} />
+                        <InputText
+                            placeholder="Search"
+                            value={term}
+                            onChange={handleTerm}
+                            ref={searchInput}
+                            onBlur={() => setExpanded(false)}
+                            className='w-full'
+                        />
+                    </IconField>
+                )}
                 <OverlayPanel ref={overlayRef} closeOnEscape className='overflow-y-auto overflow-x-hidden'>
                     {searchMedicalRecords?.length ? (
                         <>
@@ -88,6 +153,7 @@ const Search = () => {
                     {!searchMedicalRecords?.length && !searchFiles?.length &&
                         <p>{term}</p>
                     }
+                    {error || errorFiles ? <p>Data unavailable</p> : null}
                 </OverlayPanel>
             </div>
             <Dialog
