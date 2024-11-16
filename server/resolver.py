@@ -369,6 +369,21 @@ def resolve_token_access_token(tokenAccess, *_):
 @token_access.field("doctor")
 @requires_authentication(return_none=True)
 def resolve_token_access_doctor(tokenAccess, *_):
+    """
+    Resolves the doctor field for a token access object.
+
+    This function retrieves the doctor associated with a token access. It requires
+    authentication and returns None if the token ID is not present.
+
+    Parameters:
+    tokenAccess (dict): A dictionary containing token access information,
+                        including 'tokenId' and 'doctorId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the doctor's information if the tokenId
+                  exists and the doctor is found, otherwise None.
+    """
     return None if not tokenAccess['tokenId'] else get_doctor(tokenAccess['doctorId'])
 
 
@@ -376,6 +391,29 @@ def resolve_token_access_doctor(tokenAccess, *_):
 @requires_authentication('deactivateTokenError')
 @requires_patient('deactivateTokenError')
 def resolve_deactivate_token(*_, patient, tokenId):
+    """
+    Deactivate a specific token for a patient.
+
+    This function checks if the given token exists for the patient and deactivates it if found.
+    It requires authentication and patient access to perform the operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    tokenId (str): The ID of the token to be deactivated.
+
+    Returns:
+    dict: A dictionary containing the result of the deactivation attempt.
+        If the token is not found:
+            {'deactivateTokenError': 'Token not found'}
+        If deactivation is successful:
+            {
+                'deactivateTokenConfirmation': True,
+                'token': [deactivated token information]
+            }
+        If deactivation fails:
+            The error message returned by the deactivate_token function.
+    """
     tokens = get_active_tokens_by_patient(patient['patientId'])
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:
@@ -519,7 +557,6 @@ async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
     return []
 
 
-
 @query.field("searchFiles")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
@@ -545,4 +582,3 @@ async def resolve_search_files(*_, term, patient_id, doctor_id):
             patient_id=patient_id
         )
     return []
-

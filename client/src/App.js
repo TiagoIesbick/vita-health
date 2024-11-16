@@ -1,10 +1,13 @@
 import { ApolloProvider } from '@apollo/client';
 import { UserProvider } from './providers/userContext';
+import { FileProvider } from './providers/fileContext';
 import { apolloClient } from './graphql/apolloConfig';
+import { useBackgroundImageResize } from './hooks/hooks';
 import Header from './components/header';
 import Main from './components/main';
 import Footer from './components/footer';
-import { useBackgroundImageResize } from './hooks/hooks';
+import FileDialog from './components/fileDialog';
+
 
 
 function App() {
@@ -13,9 +16,12 @@ function App() {
   return (
     <ApolloProvider client={apolloClient}>
       <UserProvider>
-        <Header />
-        <Main />
-        <Footer />
+        <FileProvider>
+          <Header />
+          <Main />
+          <Footer />
+          <FileDialog />
+        </FileProvider>
       </UserProvider>
     </ApolloProvider>
   );

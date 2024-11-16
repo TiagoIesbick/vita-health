@@ -5,7 +5,7 @@ import { customizedMarker, stripHtmlTags } from '../utils/utils';
 import { useNavigate } from 'react-router';
 
 
-const SearchList = ({ searchResults, resultsType='health-data', setTerm, setFile=()=>{}, setVisible=()=>{} }) => {
+const SearchList = ({ searchResults, resultsType='health-data', setTerm=()=>{}, setFile=()=>{}, setVisible=()=>{} }) => {
     const navigate = useNavigate();
 
     if (!searchResults) return;

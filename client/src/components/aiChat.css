@@ -1,19 +1,19 @@
-.p-dialog-content::-webkit-scrollbar, .custom-textarea::-webkit-scrollbar {
+.p-dialog-content::-webkit-scrollbar, .custom-textarea::-webkit-scrollbar, .p-overlaypanel::-webkit-scrollbar {
     width: 10px;
 }
 
-.p-dialog-content::-webkit-scrollbar-track, .custom-textarea::-webkit-scrollbar-track {
+.p-dialog-content::-webkit-scrollbar-track, .custom-textarea::-webkit-scrollbar-track, .p-overlaypanel::-webkit-scrollbar-track {
     background: var(--surface-100);
     border-radius: 6px;
 }
 
-.p-dialog-content::-webkit-scrollbar-thumb, .custom-textarea::-webkit-scrollbar-thumb {
+.p-dialog-content::-webkit-scrollbar-thumb, .custom-textarea::-webkit-scrollbar-thumb, .p-overlaypanel::-webkit-scrollbar-thumb  {
     background-color: var(--primary-100);
     border-radius: 6px;
     border: 3px solid transparent;
 }
 
-.p-dialog-content::-webkit-scrollbar-thumb:hover, .custom-textarea::-webkit-scrollbar-thumb:hover {
+.p-dialog-content::-webkit-scrollbar-thumb:hover, .custom-textarea::-webkit-scrollbar-thumb:hover, .p-overlaypanel::-webkit-scrollbar-thumb:hover {
     background-color: var(--primary-200);
 }
 
