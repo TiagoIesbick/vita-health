@@ -66,6 +66,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - client-build:/usr/share/nginx/html
+      - /usr/share/nginx/html/.well-known:/usr/share/nginx/html/.well-known
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - client
