@@ -104,3 +104,32 @@ export const messageSubscription = gql`
         }
     }
 `;
+
+
+export const searchMedicalRecordsQuery = gql`
+    query SearchMedicalRecords ($term: String!) {
+        searchMedicalRecords (term: $term) {
+            recordId
+            recordData
+            dateCreated
+            doctorFullName
+            recordTypeName
+            patientId
+        }
+    }
+`;
+
+
+export const searchFilesQuery = gql`
+    query SearchFiles ($term: String!) {
+        searchFiles (term: $term) {
+            fileId
+            recordId
+            fileName
+            mimeType
+            url
+            textContent
+            patientId
+        }
+    }
+`;

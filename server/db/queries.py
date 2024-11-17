@@ -43,6 +43,13 @@ def get_doctor(id: int) -> None | dict:
     return None if not doctor else doctor[0]
 
 
+def get_doctor_full_name(id: int) -> None | str:
+    query = rf'''SELECT CONCAT(u.firstName, ' ', u.lastName) AS fullName
+        FROM Doctors d JOIN Users u ON d.userId = u.userId;'''
+    doctor_full_name = mysql_results(query)
+    return None if not doctor_full_name else doctor_full_name[0]['fullName']
+
+
 def get_users_doctor(id: int) -> None | dict:
     query = rf'SELECT * FROM Doctors WHERE userId = {id};'
     doctor = mysql_results(query)
@@ -81,6 +88,12 @@ def get_medical_records_type(id: int) -> None | dict:
     query = rf'SELECT * FROM RecordTypes WHERE recordTypeId = {id};'
     record_type = mysql_results(query)
     return None if not record_type else record_type[0]
+
+
+def get_record_type_name(id: int) -> None | str:
+    query = rf'SELECT recordName FROM RecordTypes WHERE recordTypeId = {id};'
+    record_name = mysql_results(query)
+    return None if not record_name else record_name[0]['recordName']
 
 
 def get_token(id: int) -> None | dict:

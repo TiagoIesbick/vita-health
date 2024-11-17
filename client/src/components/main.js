@@ -10,6 +10,7 @@ import MedicalRecordsAccess from "../pages/medicalRecordsAccess";
 import ActiveTokens from "../pages/activeTokens";
 import InactiveTokens from "../pages/inactiveTokens";
 import InsertMedicalRecord from "../pages/insertMedicalRecord";
+import SearchResults from "../pages/searchResults";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
@@ -36,6 +37,7 @@ const Main = () => {
                 <Route path="/inactive-tokens" element={user && user.userType === 'Patient' ? <InactiveTokens /> : <Navigate to="/" replace />} />
                 <Route path="/insert-medical-record" element={user ? <InsertMedicalRecord /> : <Navigate to="/" replace />} />
                 <Route path="/medical-record/:recordId" element={user ? <MedicalRecord /> : <Navigate to="/" replace />} />
+                <Route path="/search-results" element={user ? <SearchResults /> : <Navigate to="/" replace />} />
             </Routes>
         </main>
     );

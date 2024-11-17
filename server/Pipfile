@@ -19,6 +19,8 @@ pytesseract = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 broadcaster = "*"
 websockets = "*"
+elasticsearch = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 

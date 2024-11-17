@@ -10,6 +10,8 @@ from datetime import datetime
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
+from db.elastic import es, search_with_highlights
+from db.openai import openai_chat_stream, extract_text_from_pdf, extract_text_with_ocr
 from utils.decorators import *
 from pathlib import Path
 from utils.utils import *
@@ -187,7 +189,20 @@ def resolve_medical_records_doctor(medicalRecords, *_):
 def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doctor_id):
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
-        res['medicalRecord'] = get_medical_record(res['medicalRecordId'], patient_id)
+        medical_record = get_medical_record(res['medicalRecordId'], patient_id)
+        es.index(
+            index="medical_records",
+            id=medical_record['recordId'],
+            document={
+                "recordId": medical_record['recordId'],
+                "recordData": strip_html_tags(medical_record['recordData'] or ''),
+                "dateCreated": medical_record['dateCreated'],
+                "doctorFullName": get_doctor_full_name(doctor_id),
+                "recordTypeName": get_record_type_name(medical_record['recordTypeId']),
+                "patientId": patient_id
+            }
+        )
+        res['medicalRecord'] = medical_record
     return res
 
 
@@ -279,10 +294,8 @@ async def resolve_create_conversation(_, info, content, allRecords, conversation
 async def source_message(_, info, patient_id, doctor_id):
     user_id = info.context['user_detail']['userId']
     key = rf"conversation:{user_id}:{patient_id}"
-    print('[key]:', key)
     async with pubsub.subscribe(channel=key) as subscriber:
         async for event in subscriber:
-            print('[event]', event)
             yield json.loads(event.message)
 
 
@@ -353,6 +366,21 @@ def resolve_token_access_token(tokenAccess, *_):
 @token_access.field("doctor")
 @requires_authentication(return_none=True)
 def resolve_token_access_doctor(tokenAccess, *_):
+    """
+    Resolves the doctor field for a token access object.
+
+    This function retrieves the doctor associated with a token access. It requires
+    authentication and returns None if the token ID is not present.
+
+    Parameters:
+    tokenAccess (dict): A dictionary containing token access information,
+                        including 'tokenId' and 'doctorId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the doctor's information if the tokenId
+                  exists and the doctor is found, otherwise None.
+    """
     return None if not tokenAccess['tokenId'] else get_doctor(tokenAccess['doctorId'])
 
 
@@ -360,6 +388,29 @@ def resolve_token_access_doctor(tokenAccess, *_):
 @requires_authentication('deactivateTokenError')
 @requires_patient('deactivateTokenError')
 def resolve_deactivate_token(*_, patient, tokenId):
+    """
+    Deactivate a specific token for a patient.
+
+    This function checks if the given token exists for the patient and deactivates it if found.
+    It requires authentication and patient access to perform the operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    tokenId (str): The ID of the token to be deactivated.
+
+    Returns:
+    dict: A dictionary containing the result of the deactivation attempt.
+        If the token is not found:
+            {'deactivateTokenError': 'Token not found'}
+        If deactivation is successful:
+            {
+                'deactivateTokenConfirmation': True,
+                'token': [deactivated token information]
+            }
+        If deactivation fails:
+            The error message returned by the deactivate_token function.
+    """
     tokens = get_active_tokens_by_patient(patient['patientId'])
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:
@@ -371,11 +422,35 @@ def resolve_deactivate_token(*_, patient, tokenId):
 
 
 @mutation.field("multipleUpload")
-async def resolve_multiple_upload(_, info, recordId, files):
-    if not info.context['authenticated']:
-        return {'fileError': ['Missing authentication']}
-    if info.context['user_detail']['userType'] == 'Doctor' and not info.context['medical_access']:
-        return {'fileError': ['Missing authorization']}
+@requires_authentication(error_field="fileError", return_list=True)
+@requires_patient_or_doctor_access(error_field="fileError", return_list=True)
+async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
+    """
+    Resolves the multiple file upload mutation.
+
+    This asynchronous function handles the upload of multiple files for a specific medical record.
+    It performs various validations, processes each file, extracts text content, and stores the information
+    in both the file system and Elasticsearch.
+
+    Parameters:
+        recordId (int): The ID of the medical record to which the files are being uploaded.
+        files (list): A list of file objects to be uploaded.
+        patient_id (int): The ID of the patient associated with the medical record.
+        doctor_id (int): The ID of the doctor performing the upload (used for access control).
+
+    Returns:
+        dict: A dictionary containing the result of the upload operation.
+            If there are errors:
+                {
+                    'fileError': list of error messages,
+                    'files': list of successfully processed file information
+                }
+            If successful:
+                {
+                    'fileConfirmation': success message,
+                    'files': list of all processed file information
+                }
+    """
     if not validate_files_length(files):
         return {'fileError': ['You can only upload a maximum of 10 files']}
     if not validate_files_size(files):
@@ -418,6 +493,20 @@ async def resolve_multiple_upload(_, info, recordId, files):
             if save_text.get('fileError', True):
                 text = None
 
+            es.index(
+                index="files",
+                id=res['fileId'],
+                document={
+                    "fileId": res['fileId'],
+                    "recordId": recordId,
+                    "fileName": filename,
+                    "mimeType": content_type,
+                    "url": file_url,
+                    "textContent": text,
+                    "patientId": patient_id
+                }
+            )
+
             file_infos.append({
                 "fileId": res['fileId'],
                 "fileName": filename,
@@ -432,3 +521,61 @@ async def resolve_multiple_upload(_, info, recordId, files):
     if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
     return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
+
+
+@query.field("searchMedicalRecords")
+@requires_authentication(return_none=True)
+@requires_patient_or_doctor_access(return_none=True)
+async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
+    """
+    Search for medical records based on a given term.
+
+    This function performs a search on medical records using Elasticsearch. It requires
+    authentication and appropriate access rights (patient or doctor). If a search term
+    is provided, it searches across multiple fields in the medical records.
+
+    Parameters:
+    *_ : Variable positional arguments (ignored).
+    term (str): The search term to query medical records.
+    patient_id (int): The ID of the patient associated with the medical records.
+    doctor_id (int): The ID of the doctor performing the search (for access control).
+
+    Returns:
+    list: A list of medical records that match the search term, with highlighted results.
+          If no term is provided or no matches are found, returns an empty list.
+    """
+    if term:
+        return await search_with_highlights(
+            index="medical_records",
+            term=term,
+            search_fields=["recordData", "doctorFullName", "recordTypeName"],
+            patient_id=patient_id
+        )
+    return []
+
+
+@query.field("searchFiles")
+@requires_authentication(return_none=True)
+@requires_patient_or_doctor_access(return_none=True)
+async def resolve_search_files(*_, term, patient_id, doctor_id):
+    """
+    This function is used to search for files based on a given search term.
+    It uses Elasticsearch to perform a full-text search on the 'textContent' field.
+
+    Parameters:
+    term (str): The search term provided by the user.
+    patient_id (int): The ID of the patient for whom the search is being performed.
+    doctor_id (int): The ID of the doctor for whom the search is being performed.
+
+    Returns:
+    list: A list of files that match the search term. Each file is represented as a dictionary.
+          If no files match the search term, an empty list is returned.
+    """
+    if term:
+        return await search_with_highlights(
+            index="files",
+            term=term,
+            search_fields=["textContent"],
+            patient_id=patient_id
+        )
+    return []

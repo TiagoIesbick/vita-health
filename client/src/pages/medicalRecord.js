@@ -14,8 +14,6 @@ const MedicalRecord = () => {
     const { recordId } = useParams();
     const { medicalRecord, loading, error } = useMedicalRecord(recordId);
 
-
-    console.log(medicalRecord);
     if (loading) return <LoadingSkeleton />;
 
     if (error) {
