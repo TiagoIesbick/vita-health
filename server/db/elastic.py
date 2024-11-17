@@ -83,6 +83,27 @@ es.indices.create(index="files", body=files_mapping, ignore=400)
 
 
 def migrate_medical_records():
+    """
+    Migrates medical records from a MySQL database to an Elasticsearch index.
+
+    This function performs the following steps:
+    1. Executes a SQL query to retrieve medical records data from the MySQL database.
+    2. Processes each record, stripping HTML tags from the record data.
+    3. Indexes each processed record in the Elasticsearch 'medical_records' index.
+
+    The function uses a predefined SQL query to join multiple tables (MedicalRecords, RecordTypes, Doctors, Users)
+    to gather all necessary information for each medical record.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+
+    Side Effects:
+    - Prints the number of migrated records to the console.
+    - Indexes medical records in the Elasticsearch 'medical_records' index.
+    """
     print("Migrating Medical Records...")
 
     query = """
@@ -122,7 +143,24 @@ def migrate_medical_records():
     print(f"{len(records)} medical records migrated.")
 
 
+
 def migrate_files():
+    """
+    This function migrates files from the MySQL database to the Elasticsearch index.
+
+    The function connects to the MySQL database, executes a query to retrieve file data,
+    and then indexes each file document in the Elasticsearch 'files' index.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+
+    Side Effects:
+    - Prints the number of files migrated to the console.
+    - Indexes each file document in the Elasticsearch 'files' index.
+    """
     print("Migrating Files...")
 
     query = """
@@ -158,6 +196,7 @@ def migrate_files():
         )
 
     print(f"{len(files)} files migrated.")
+
 
 
 migrate_medical_records()
