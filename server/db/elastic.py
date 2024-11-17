@@ -198,9 +198,9 @@ def migrate_files():
     print(f"{len(files)} files migrated.")
 
 
-
-migrate_medical_records()
-migrate_files()
+# SQL to Elasticsearch Migration: Uncomment the next two lines to migrate the data
+# migrate_medical_records()
+# migrate_files()
 
 
 def extract_highlighted_field(hit: dict, field_name: str) -> str:
