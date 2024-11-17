@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch
 from os import getenv
+from .mysql_results import mysql_results
+from utils.utils import strip_html_tags
 
 
 elasticsearch_host = getenv('ELASTICSEARCH_HOST')
@@ -67,11 +69,6 @@ files_mapping = {
     }
 }
 
-
-es.indices.create(index="medical_records", body=medical_records_mapping, ignore=400)
-es.indices.create(index="files", body=files_mapping, ignore=400)
-
-
 field_highlight = {
     "type": "unified",
     "fragment_size": 20,
@@ -79,6 +76,92 @@ field_highlight = {
     "pre_tags": ["<span class='font-bold text-primary text-lg'>"],
     "post_tags": ["</span>"]
 }
+
+
+es.indices.create(index="medical_records", body=medical_records_mapping, ignore=400)
+es.indices.create(index="files", body=files_mapping, ignore=400)
+
+
+def migrate_medical_records():
+    print("Migrating Medical Records...")
+
+    query = """
+        SELECT
+            r.recordId,
+            r.recordData,
+            r.dateCreated,
+            r.patientId,
+            r.doctorId,
+            d.userId,
+            rt.recordName AS recordTypeName,
+            CONCAT(u.firstName, ' ', u.lastName) AS doctorFullName
+        FROM MedicalRecords r
+        JOIN RecordTypes rt ON r.recordTypeId = rt.recordTypeId
+        LEFT JOIN Doctors d ON r.doctorId = d.doctorId
+        LEFT JOIN Users u ON d.userId = u.userId
+    """
+
+    records = mysql_results(query)
+
+    for record in records:
+        document = {
+            "recordId": record["recordId"],
+            "recordData": strip_html_tags(record["recordData"]),
+            "dateCreated": record["dateCreated"],
+            "doctorFullName": record.get("doctorFullName", None),
+            "recordTypeName": record["recordTypeName"],
+            "patientId": record["patientId"]
+        }
+
+        es.index(
+            index="medical_records",
+            id=record["recordId"],
+            document=document
+        )
+
+    print(f"{len(records)} medical records migrated.")
+
+
+def migrate_files():
+    print("Migrating Files...")
+
+    query = """
+        SELECT
+            f.fileId,
+            f.recordId,
+            f.fileName,
+            f.mimeType,
+            f.url,
+            f.textContent,
+            r.patientId
+        FROM Files f
+        JOIN MedicalRecords r ON f.recordId = r.recordId
+    """
+
+    files = mysql_results(query)
+
+    for file in files:
+        document = {
+            "fileId": file["fileId"],
+            "recordId": file["recordId"],
+            "fileName": file["fileName"],
+            "mimeType": file["mimeType"],
+            "url": file["url"],
+            "textContent": file.get("textContent", None),
+            "patientId": file["patientId"]
+        }
+
+        es.index(
+            index="files",
+            id=file["fileId"],
+            document=document
+        )
+
+    print(f"{len(files)} files migrated.")
+
+
+migrate_medical_records()
+migrate_files()
 
 
 def extract_highlighted_field(hit: dict, field_name: str) -> str:

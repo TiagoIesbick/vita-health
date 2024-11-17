@@ -168,7 +168,6 @@ def resolve_get_medical_record(*_, recordId, patient_id, doctor_id):
 
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
-    print('[resolve_medical_records_type]', medicalRecords)
     return get_medical_records_type(medicalRecords['recordTypeId'])
 
 
@@ -295,10 +294,8 @@ async def resolve_create_conversation(_, info, content, allRecords, conversation
 async def source_message(_, info, patient_id, doctor_id):
     user_id = info.context['user_detail']['userId']
     key = rf"conversation:{user_id}:{patient_id}"
-    print('[key]:', key)
     async with pubsub.subscribe(channel=key) as subscriber:
         async for event in subscriber:
-            print('[event]', event)
             yield json.loads(event.message)
 
 
