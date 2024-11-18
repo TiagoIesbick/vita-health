@@ -13,6 +13,7 @@ import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 import { useApolloClient } from "@apollo/client";
+import './login.css';
 
 
 const Login = () => {
@@ -73,7 +74,7 @@ const Login = () => {
                         header={passwordHeader}
                         footer={passwordFooter}
                         toggleMask
-                        className="w-full"
+                        className="w-full login-width"
                         {...formik.getFieldProps("password")}
                     />
                     <label htmlFor="password">Password</label>
