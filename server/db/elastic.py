@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from os import getenv
-from .mysql_results import mysql_results
+from .mysql import mysql_client
 from utils.utils import strip_html_tags
 
 
@@ -122,7 +122,7 @@ def migrate_medical_records():
         LEFT JOIN Users u ON d.userId = u.userId
     """
 
-    records = mysql_results(query)
+    records = mysql_client(query)
 
     for record in records:
         document = {
@@ -176,7 +176,7 @@ def migrate_files():
         JOIN MedicalRecords r ON f.recordId = r.recordId
     """
 
-    files = mysql_results(query)
+    files = mysql_client(query)
 
     for file in files:
         document = {

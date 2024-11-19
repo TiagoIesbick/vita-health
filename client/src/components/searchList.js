@@ -40,13 +40,15 @@ const SearchList = ({ searchResults, resultsType='health-data', setTerm=()=>{}, 
                                     dangerouslySetInnerHTML={{ __html: result.recordTypeName }}
                                 ></span>
                             </span>
-                            <span className='flex flex-row gap-1 align-items-center max-w-full'>
-                                <FontAwesomeIcon icon={faUserDoctor} />
-                                <span
-                                    className='text-overflow-ellipsis white-space-nowrap overflow-hidden'
-                                    dangerouslySetInnerHTML={{ __html: result.doctorFullName }}
-                                ></span>
-                            </span>
+                            {result.doctorFullName &&
+                                <span className='flex flex-row gap-1 align-items-center max-w-full'>
+                                    <FontAwesomeIcon icon={faUserDoctor} />
+                                    <span
+                                        className='text-overflow-ellipsis white-space-nowrap overflow-hidden'
+                                        dangerouslySetInnerHTML={{ __html: result.doctorFullName }}
+                                    ></span>
+                                </span>
+                            }
                             <span className='flex flex-row gap-1 align-items-center max-w-full'>
                                 <FontAwesomeIcon icon={faNotesMedical} />
                                 <span

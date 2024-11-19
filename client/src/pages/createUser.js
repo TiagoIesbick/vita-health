@@ -120,7 +120,7 @@ const CreateUser = () => {
                         header={passwordHeader}
                         footer={passwordFooter}
                         toggleMask
-                        className="w-full"
+                        className="w-full login-width"
                         {...formik.getFieldProps("password")}
                     />
                     <label htmlFor="password">Password</label>
