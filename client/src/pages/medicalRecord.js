@@ -1,4 +1,5 @@
 import { Card } from "primereact/card";
+import { Tooltip } from 'primereact/tooltip';
 import { useParams } from 'react-router';
 import { useMedicalRecord } from '../hooks/hooks';
 import { localDateTime } from "../utils/utils";
@@ -38,10 +39,18 @@ const MedicalRecord = () => {
                                     {localDateTime(medicalRecord.dateCreated, 'minus').toLocaleDateString() + ' ' + localDateTime(medicalRecord?.dateCreated, 'minus').toLocaleTimeString(undefined, {timeStyle:'short'})}
                                 </i>
                                 {medicalRecord.doctor &&
-                                    <div className="flex mt-1 align-items-baseline text-xl">
-                                        <FontAwesomeIcon icon={faUserDoctor} className="mr-1"/>
-                                        {medicalRecord.doctor.user.firstName + ' ' + medicalRecord.doctor.user.lastName}
-                                    </div>
+                                    <>
+                                        <Tooltip target=".doctor-tooltip" />
+                                        <div
+                                            className="flex mt-2 align-items-baseline text-xl font-medium text-primary-900 doctor-tooltip"
+                                            data-pr-tooltip='Provider name'
+                                            data-pr-position='top'
+                                            data-pr-at="left+60 top"
+                                        >
+                                            <FontAwesomeIcon icon={faUserDoctor} className="mr-1"/>
+                                            {medicalRecord.doctor.user.firstName + ' ' + medicalRecord.doctor.user.lastName}
+                                        </div>
+                                    </>
                                 }
                             </>
                         }

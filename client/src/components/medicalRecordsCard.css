@@ -28,4 +28,7 @@
     .p-timeline-event:nth-child(odd) .health-data-buttons {
         flex-direction: row-reverse;
     }
+    .p-timeline-event:nth-child(even) .doctor-full-name {
+        justify-content: flex-end;
+    }
 }

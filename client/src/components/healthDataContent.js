@@ -24,15 +24,15 @@ const HealthDataContent = ({item}) => {
                 <>
                     {`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}
                     {item.doctor &&
-                        <div className="flex mt-1 align-items-baseline">
-                            <FontAwesomeIcon icon={faUserDoctor} className="mr-1"/>
+                        <div className="flex gap-1 mt-1 align-items-baseline doctor-full-name">
+                            <FontAwesomeIcon icon={faUserDoctor} />
                             {item.doctor.user.firstName + ' ' + item.doctor.user.lastName}
                         </div>
                     }
                 </>
             }
         >
-            <p className="mt-0">{textSlice}</p>
+            <p className="mt-0 mb-4">{textSlice}</p>
             <div
                 className={
                     classNames("health-data-buttons", {

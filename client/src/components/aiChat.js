@@ -122,9 +122,7 @@ const AIChat = ({ user, allRecords }) => {
                 src={aiIcon}
                 alt="AI-assistant"
                 className="w-3rem cursor-pointer"
-                onClick={() => {
-                    !visible ? show('right') : setVisible(false);
-                }}
+                onClick={() => !visible ? show('right') : setVisible(false)}
             />
             <Dialog
                 header={header}
