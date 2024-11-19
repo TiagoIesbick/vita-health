@@ -6,14 +6,27 @@ from mysql.connector import errorcode
 
 def get_connection() -> connector.MySQLConnection:
     """
-    Establish and return a MySQL database connection.
+    Establishes and returns a connection to the MySQL database.
+
+    This function retrieves database connection parameters from environment variables,
+    creates a connection to the MySQL database, and handles potential connection errors.
 
     Returns:
-        connector.MySQLConnection: A MySQL connection object.
+        connector.MySQLConnection: A connection object to the MySQL database.
 
     Raises:
-        ValueError: If any required environment variable is missing.
-        RuntimeError: For errors related to MySQL connection.
+        ValueError: If one or more required environment variables are not set.
+        RuntimeError: If there's an error in connecting to the database, such as:
+            - Incorrect MySQL user or password
+            - Non-existent specified database
+            - Other MySQL connection errors
+
+    Environment Variables:
+        MYSQL_USER: The username for the MySQL database.
+        MYSQL_PASSWORD: The password for the MySQL database.
+        MYSQL_DATABASE: The name of the database to connect to.
+        HOST: The host address of the MySQL server.
+        PORT: The port number for the MySQL server connection.
     """
     try:
         user = cast(str, getenv('MYSQL_USER'))
@@ -44,26 +57,18 @@ def get_connection() -> connector.MySQLConnection:
 
 def mysql_client(query: str, type: Literal['query', 'procedure'] = 'query', args: Optional[List[Any]] = None) -> List[Dict[str, Any]]:
     """
-    Execute a MySQL query or stored procedure and return the results.
+    Executes a MySQL query or procedure and returns the result as a list of dictionaries.
 
-    This function establishes a database connection, executes the given query
-    or stored procedure, and returns the results as a list of dictionaries.
-
-    Args:
-        query (str): The SQL query to execute or the name of the stored procedure to call.
-        type (Literal['query', 'procedure'], optional): The type of operation to perform. Can be 'query' for regular
-                              SQL queries or 'procedure' for stored procedures. Defaults to 'query'.
-        args (Optional[List[Any]], optional): A list of arguments to pass to the stored procedure.
-                                              Only used when type is 'procedure'. Defaults to None.
+    Parameters:
+    - query (str): The SQL query or procedure name to be executed.
+    - type (Literal['query', 'procedure'], optional): The type of operation to be performed. Defaults to 'query'.
+    - args (Optional[List[Any]], optional): A list of arguments to be passed to the procedure. Defaults to None.
 
     Returns:
-        List[Dict[str, Any]]: A list of dictionaries, where each dictionary represents a row
-                              in the result set. The keys are column names and the values are
-                              the corresponding data.
+    - List[Dict[str, Any]]: A list of dictionaries representing the result of the query or procedure.
 
     Raises:
-        RuntimeError: If there is an error executing the query or stored procedure.
-
+    - RuntimeError: If there is an error executing the query or procedure.
     """
     connection = get_connection()
     if args is None:

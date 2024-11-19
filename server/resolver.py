@@ -333,6 +333,32 @@ def resolve_generate_token(*_, patient, expirationDate):
 @requires_authentication('accessError')
 @requires_doctor('accessError')
 def resolve_save_token_access(_, info, doctor, token):
+    """
+    Save token access for a doctor.
+
+    This function attempts to save token access for a doctor. It first verifies the provided token,
+    checks for medical access authorization, and then creates a token access entry.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    info (any): GraphQL resolver info object containing context information.
+    doctor (dict): A dictionary containing doctor information, including 'doctorId'.
+    token (str): JWT token to be verified.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If token verification fails:
+            {'accessError': <error message>}
+        If medical access is missing:
+            {'accessError': 'Missing authorization'}
+        If token access is successfully created:
+            {
+                'accessConfirmation': True,
+                'tokenAccess': <token access information>
+            }
+        Otherwise:
+            The result returned by the create_token_access function.
+    """
     try:
         jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
     except jwt.exceptions.PyJWTError as exc:
