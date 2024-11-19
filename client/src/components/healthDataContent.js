@@ -5,6 +5,8 @@ import { Badge } from 'primereact/badge';
 import { Link } from "react-router-dom";
 import { classNames } from "primereact/utils";
 import { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserDoctor } from '@fortawesome/free-solid-svg-icons';
 import FileGallery from "./fileGallery";
 
 
@@ -19,7 +21,15 @@ const HealthDataContent = ({item}) => {
         <Card
             title={item.recordType.recordName}
             subTitle={
-                `${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`
+                <>
+                    {`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}
+                    {item.doctor &&
+                        <div className="flex mt-1 align-items-baseline">
+                            <FontAwesomeIcon icon={faUserDoctor} className="mr-1"/>
+                            {item.doctor.user.firstName + ' ' + item.doctor.user.lastName}
+                        </div>
+                    }
+                </>
             }
         >
             <p className="mt-0">{textSlice}</p>

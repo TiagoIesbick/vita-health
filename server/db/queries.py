@@ -45,7 +45,7 @@ def get_doctor(id: int) -> None | dict:
 
 def get_doctor_full_name(id: int) -> None | str:
     query = rf'''SELECT CONCAT(u.firstName, ' ', u.lastName) AS fullName
-        FROM Doctors d JOIN Users u ON d.userId = u.userId;'''
+        FROM Doctors d JOIN Users u ON d.userId = u.userId WHERE d.doctorId = {id};'''
     doctor_full_name = mysql_client(query)
     return None if not doctor_full_name else doctor_full_name[0]['fullName']
 

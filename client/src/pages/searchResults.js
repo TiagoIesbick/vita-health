@@ -6,6 +6,7 @@ import { useUser } from "../providers/userContext";
 import { useFileContext } from '../providers/fileContext';
 import LoadingSkeleton from "../components/skeleton";
 import SearchList from '../components/searchList';
+import './searchResults.css';
 
 
 const SearchResults = () => {
@@ -29,7 +30,7 @@ const SearchResults = () => {
     return (
         <Card
             title={`Search Results for "${query}"`}
-            className="flex justify-content-center align-items-center card-min-height"
+            className="flex justify-content-center align-items-center card-min-height search-results"
         >
             {searchMedicalRecords?.length ? (
                 <>

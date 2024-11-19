@@ -348,18 +348,61 @@ def resolve_save_token_access(_, info, doctor, token):
 @tokens.field("patient")
 @requires_authentication(return_none=True)
 def resolve_tokens_patient(tokens, *_):
+    """
+    Resolves the patient field for a token object.
+
+    This function retrieves the patient associated with a token. It requires
+    authentication and returns None if the patient ID is not present.
+
+    Parameters:
+    tokens (dict): A dictionary containing token information, including 'patientId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the patient's information if the patientId
+                  exists and the patient is found, otherwise None.
+    """
     return None if not tokens['patientId'] else get_patient(tokens['patientId'])
 
 
 @tokens.field("tokenAccess")
 @requires_authentication(return_none=True)
 def resolve_tokens_token_access(tokens, *_):
+    """
+    Resolves the tokenAccess field for a token object.
+
+    This function retrieves the token access information associated with a token.
+    It requires authentication and returns None if the token ID is not present.
+
+    Parameters:
+    tokens (dict): A dictionary containing token information, including 'tokenId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the token access information if the tokenId
+                  exists and the access information is found, otherwise None.
+    """
     return None if not tokens['tokenId'] else get_tokens_token_access(tokens['tokenId'])
 
 
 @token_access.field("token")
 @requires_authentication(return_none=True)
 def resolve_token_access_token(tokenAccess, *_):
+    """
+    Resolves the token field for a token access object.
+
+    This function retrieves the token associated with a token access. It requires
+    authentication and returns None if the token ID is not present.
+
+    Parameters:
+    tokenAccess (dict): A dictionary containing token access information,
+                        including 'tokenId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the token's information if the tokenId
+                  exists and the token is found, otherwise None.
+    """
     return None if not tokenAccess['tokenId'] else get_token(tokenAccess['tokenId'])
 
 
