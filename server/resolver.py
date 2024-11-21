@@ -197,7 +197,7 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
                 "recordId": medical_record['recordId'],
                 "recordData": strip_html_tags(medical_record['recordData'] or ''),
                 "dateCreated": medical_record['dateCreated'],
-                "doctorFullName": get_doctor_full_name(doctor_id),
+                "doctorFullName": None if not doctor_id else get_doctor_full_name(doctor_id),
                 "recordTypeName": get_record_type_name(medical_record['recordTypeId']),
                 "patientId": patient_id
             }
@@ -258,10 +258,20 @@ def resolve_ai_conversation(*_, conversation, key, patient_id, doctor_id):
 @fetch_conversation
 async def resolve_create_conversation(_, info, content, allRecords, conversation, key, patient_id, doctor_id):
     if not allRecords:
+        await pubsub.publish(channel=key, message=json.dumps({'content': 'Error: There is no health data to analyze'}))
         return {'conversationError': 'There is no health data to analyze'}
 
+    if not content:
+        await pubsub.publish(channel=key, message=json.dumps({'content': 'Error: There is no message to send'}))
+        return {'conversationError': 'There is no message to send'}
+
+    clean_content = nh3.clean(content)
+    if not clean_content:
+        await pubsub.publish(channel=key, message=json.dumps({'content': 'Error: There is no message to send'}))
+        return {'conversationError': 'There is no message to send'}
+
     conversation_copy = conversation.copy()
-    new_msg = {"role": "user", "content": content}
+    new_msg = {"role": "user", "content": clean_content}
     conversation.append(new_msg)
 
     redis_client.set(key, json.dumps(conversation))
@@ -272,7 +282,7 @@ async def resolve_create_conversation(_, info, content, allRecords, conversation
 
     await pubsub.publish(channel=key, message=json.dumps(new_msg))
 
-    prompt = rf'''{content}
+    prompt = rf'''{clean_content}
     You are provided with the following medical records: {allRecords}.
     Only use these records to provide your insights and answer the user's questions. Do not use any external sources or assumptions.
     '''
@@ -292,6 +302,22 @@ async def resolve_create_conversation(_, info, content, allRecords, conversation
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 async def source_message(_, info, patient_id, doctor_id):
+    """
+    Source function for the 'message' subscription.
+
+    This asynchronous function sets up a subscription to a Redis channel for real-time messaging.
+    It requires authentication and appropriate access rights (patient or doctor).
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing the context.
+    patient_id (str): The ID of the patient involved in the conversation.
+    doctor_id (str): The ID of the doctor involved in the conversation (for access control).
+
+    Yields:
+    dict: A dictionary representing each message received from the Redis channel,
+          parsed from JSON to a Python object.
+    """
     user_id = info.context['user_detail']['userId']
     key = rf"conversation:{user_id}:{patient_id}"
     async with pubsub.subscribe(channel=key) as subscriber:
@@ -301,6 +327,19 @@ async def source_message(_, info, patient_id, doctor_id):
 
 @subscription.field("message")
 def resolve_message(event, *_):
+    """
+    Resolve the 'message' field for the subscription.
+
+    This function is used to resolve the 'message' field in a GraphQL subscription.
+    It simply returns the event object received from the subscription source.
+
+    Parameters:
+    event (dict): The event object containing the message data from the subscription source.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict: The original event object, representing the message data for the subscription.
+    """
     return event
 
 
@@ -308,6 +347,29 @@ def resolve_message(event, *_):
 @requires_authentication('tokenError')
 @requires_patient('tokenError')
 def resolve_generate_token(*_, patient, expirationDate):
+    """
+    Generate a token for a patient with a specified expiration date.
+
+    This function reserves a token ID, generates a JWT token, and creates a token entry in the database.
+    It requires authentication and patient access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    expirationDate (str): The expiration date of the token in ISO 8601 format.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If token reservation fails:
+            {'tokenError': <error message>}
+        If token creation fails:
+            {'tokenError': <error message>}
+        If token creation is successful:
+            {
+                'tokenConfirmation': True,
+                'token': <token information>
+            }
+    """
     exp = datetime.fromisoformat(expirationDate).strftime("%Y-%m-%d %H:%M:%S")
     unix_timestamp = int(datetime.fromisoformat(expirationDate.replace("Z", "+00:00")).timestamp())
     reserve_tokenId = reserve_token_id(patient['patientId'], exp)

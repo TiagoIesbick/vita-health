@@ -23,7 +23,6 @@ const MedicalRecord = () => {
         navigate('/');
         showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
-    console.log(medicalRecord);
 
     return (
         <>
