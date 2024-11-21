@@ -6,6 +6,7 @@ import { useAIConversation, useCreateConversation } from "../hooks/hooks";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import MessageInput from "./messageInput";
+import AiMessage from "./aiMessage";
 import './aiChat.css';
 
 
@@ -71,31 +72,37 @@ const AIChat = ({ user, allRecords }) => {
     const chatBox = (conversation, index) => {
         if (index === 0) return null;
 
+        const chatMessage = (content, linearGradient) => (
+            <motion.div
+                initial={{ x: 10 }}
+                whileInView={{ x: 0 }}
+                transition={{ type: "spring" }}
+                className="flex justify-content-end mb-3"
+            >
+                <div
+                    style={{
+                        maxWidth: '80%',
+                        width: 'max-content',
+                        wordBreak: 'break-word',
+                        borderRadius: '25px',
+                        background: linearGradient,
+                        color: 'white',
+                        padding: '1rem',
+                        fontWeight: '500'
+                    }}
+                >
+                    {content}
+                </div>
+            </motion.div>
+        );
+
         return (
             <div key={index}>
                 {conversation.role === 'user'
-                    ?   <motion.div
-                            initial={{ x: 10 }}
-                            whileInView={{ x: 0 }}
-                            transition={{ type: "spring" }}
-                            className="flex justify-content-end mb-3"
-                        >
-                            <div
-                                style={{
-                                    maxWidth: '80%',
-                                    width: 'max-content',
-                                    wordBreak: 'break-word',
-                                    borderRadius: '25px',
-                                    background: 'linear-gradient(45deg, darkblue, darkorchid)',
-                                    color: 'white',
-                                    padding: '1rem',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                {conversation.content}
-                            </div>
-                        </motion.div>
-                    :   <p style={{wordBreak: 'break-word'}}>{conversation.content}</p>
+                    ?   chatMessage(conversation.content, 'linear-gradient(45deg, darkblue, darkorchid)')
+                    :   conversation.role === 'assistant'
+                    ?   <AiMessage content={conversation.content}/>
+                    :   chatMessage(conversation.content, 'linear-gradient(98.3deg, rgb(0, 0, 0) 10.6%, rgb(255, 0, 0) 97.7%)')
                 }
             </div>
         );
