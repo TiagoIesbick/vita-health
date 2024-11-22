@@ -230,7 +230,18 @@ VALUES
 ('MRI Scan'),
 ('X-Ray'),
 ('Ultrasound'),
-('ECG') ;
+('ECG'),
+('Neurology'),
+('Nutrition'),
+('Physiotherapy'),
+('Psychology'),
+('Traumatology'),
+('Psychiatry'),
+('Pediatrics'),
+('Dermatology'),
+('Orthopedics'),
+('Cardiology'),
+('Obstetrics') ;
 
 
 -- -----------------------------------------------------

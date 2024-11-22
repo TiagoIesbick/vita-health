@@ -1,6 +1,6 @@
 import { Divider } from 'primereact/divider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast } from '@fortawesome/free-solid-svg-icons';
+import { faXRay, faMagnet, faHeartPulse, faVials, faTowerBroadcast, faBrain, faBowlRice, faPersonWalkingWithCane, faPersonCircleQuestion, faUserInjured, faHeadSideVirus, faBaby, faHandDots, faBone, faHeart, faPersonPregnant } from '@fortawesome/free-solid-svg-icons';
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie, getCredentials, storeToken } from "../graphql/auth";
 import { activeDoctorTokensQuery } from "../graphql/queries";
 
@@ -53,11 +53,22 @@ export const localDateTime = (date, operation) => {
 
 export const customizedMarker = (item) => {
     const recordStyle = {
-        'Blood Test': {icon: <FontAwesomeIcon icon={faVials} />, color: '--red-300'},
-        'MRI Scan': {icon: <FontAwesomeIcon icon={faMagnet} />, color: '--bluegray-500'},
-        'X-Ray': {icon: <FontAwesomeIcon icon={faXRay} />, color: '--primary-900'},
-        'Ultrasound': {icon: <FontAwesomeIcon icon={faTowerBroadcast} />, color: '--indigo-500'},
-        'ECG': {icon: <FontAwesomeIcon icon={faHeartPulse} />, color: '--pink-500'}
+        'Blood Test': {icon: <FontAwesomeIcon icon={faVials}/>, color: '--red-300'},
+        'MRI Scan': {icon: <FontAwesomeIcon icon={faMagnet}/>, color: '--bluegray-500'},
+        'X-Ray': {icon: <FontAwesomeIcon icon={faXRay}/>, color: '--primary-900'},
+        'Ultrasound': {icon: <FontAwesomeIcon icon={faTowerBroadcast}/>, color: '--indigo-500'},
+        'ECG': {icon: <FontAwesomeIcon icon={faHeartPulse}/>, color: '--pink-500'},
+        'Neurology': {icon: <FontAwesomeIcon icon={faBrain}/>, color: '--cyan-500'},
+        'Nutrition': {icon: <FontAwesomeIcon icon={faBowlRice}/>, color: '--yellow-500'},
+        'Physiotherapy': {icon: <FontAwesomeIcon icon={faPersonWalkingWithCane}/>, color: '--orange-500'},
+        'Psychology': {icon: <FontAwesomeIcon icon={faPersonCircleQuestion}/>, color: '--teal-500'},
+        'Traumatology': {icon: <FontAwesomeIcon icon={faUserInjured}/>, color: '--green-500'},
+        'Psychiatry': {icon: <FontAwesomeIcon icon={faHeadSideVirus}/>, color: '--purple-500'},
+        'Pediatrics': {icon: <FontAwesomeIcon icon={faBaby}/>, color: '--primary-300'},
+        'Dermatology': {icon: <FontAwesomeIcon icon={faHandDots}/>, color: '--yellow-300'},
+        'Orthopedics': {icon: <FontAwesomeIcon icon={faBone}/>, color: '--blue-500'},
+        'Cardiology': {icon: <FontAwesomeIcon icon={faHeart}/>, color: '--red-500'},
+        'Obstetrics': {icon: <FontAwesomeIcon icon={faPersonPregnant}/>, color: '--pink-400'},
     };
 
     return (

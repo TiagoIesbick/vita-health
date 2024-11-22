@@ -236,6 +236,22 @@ def resolve_doctors_active_tokens(*_, doctor):
 @requires_authentication(return_none=True)
 @requires_patient(return_none=True)
 def resolve_inactive_tokens(*_, patient, limit, offset):
+    """
+    Resolve and return a paginated list of inactive tokens for a patient.
+
+    This function fetches inactive tokens for a given patient, applying pagination.
+    It requires authentication and patient access.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    limit (int): The maximum number of items to return.
+    offset (int): The number of items to skip before starting to collect the result set.
+
+    Returns:
+    dict or None: A dictionary containing the total count of inactive tokens and the paginated items.
+                  Returns None if there are no inactive tokens for the patient.
+    """
     items = get_inactive_tokens(patient['patientId'], limit, offset)
     total_inactive_tokens = count_inactive_tokens(patient['patientId'])
     if not total_inactive_tokens:
@@ -249,6 +265,22 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
 @requires_patient_or_doctor_access(return_none=True)
 @fetch_conversation
 def resolve_ai_conversation(*_, conversation, key, patient_id, doctor_id):
+    """
+    Resolve and return an AI conversation for a patient or doctor.
+
+    This function retrieves an AI conversation based on the provided key. It requires
+    authentication and appropriate access rights (patient or doctor).
+
+    Parameters:
+    *_ : Variable length argument list for any additional parameters (unused).
+    conversation (list): The fetched conversation history.
+    key (str): The unique identifier for the conversation.
+    patient_id (str): The ID of the patient involved in the conversation.
+    doctor_id (str): The ID of the doctor involved in the conversation (for access control).
+
+    Returns:
+    list: The conversation history, which is a list of message objects.
+    """
     return conversation
 
 
@@ -257,6 +289,30 @@ def resolve_ai_conversation(*_, conversation, key, patient_id, doctor_id):
 @requires_patient_or_doctor_access("conversationError")
 @fetch_conversation
 async def resolve_create_conversation(_, info, content, allRecords, conversation, key, patient_id, doctor_id):
+    """
+    Resolves the 'createConversation' mutation.
+
+    This function handles the creation of a conversation between a user and an AI assistant.
+    It checks for the presence of health data, validates the content of the conversation,
+    and processes the conversation using OpenAI's GPT-4o-mini model.
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing the context.
+    content (str): The content of the conversation message.
+    allRecords (str): The health records associated with the conversation.
+    conversation (list): The current conversation history.
+    key (str): The Redis key for the conversation.
+    patient_id (str): The ID of the patient involved in the conversation.
+    doctor_id (str): The ID of the doctor involved in the conversation.
+
+    Returns:
+    dict: A dictionary containing the result of the conversation creation.
+        If there are errors:
+            {'conversationError': <error message>}
+        If successful:
+            {'conversationConfirmation': 'Conversation Added!', 'conversation': <conversation>}
+    """
     if not allRecords:
         await pubsub.publish(channel=key, message=json.dumps({'content': 'Error: There is no health data to analyze'}))
         return {'conversationError': 'There is no health data to analyze'}
