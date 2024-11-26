@@ -180,6 +180,21 @@ def resolve_medical_records_files(medicalRecords, *_):
 @medical_records.field("doctor")
 @requires_authentication(return_none=True)
 def resolve_medical_records_doctor(medicalRecords, *_):
+    """
+    Resolve the doctor field for a medical record.
+
+    This function retrieves the doctor associated with a medical record.
+    It requires authentication and returns None if the doctor ID is not present.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'doctorId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the doctor's information if the doctorId
+                  exists and the doctor is found, otherwise None.
+    """
     return None if not medicalRecords['doctorId'] else get_doctor(medicalRecords['doctorId'])
 
 
@@ -187,6 +202,27 @@ def resolve_medical_records_doctor(medicalRecords, *_):
 @requires_authentication('medicalRecordError')
 @requires_patient_or_doctor_access('medicalRecordError')
 def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doctor_id):
+    """
+    Create a new medical record and index it in Elasticsearch.
+
+    This function creates a new medical record for a patient, optionally associated with a doctor.
+    If the creation is successful, it indexes the record in Elasticsearch for efficient searching.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    recordTypeId (str): The ID of the record type for this medical record.
+    recordData (str): The data content of the medical record.
+    patient_id (str): The ID of the patient for whom the record is being created.
+    doctor_id (str): The ID of the doctor creating the record, if applicable.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful, includes:
+            - 'medicalRecordConfirmation': True
+            - 'medicalRecord': The created medical record object
+        If unsuccessful, includes:
+            - 'medicalRecordError': An error message describing the failure
+    """
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         medical_record = get_medical_record(res['medicalRecordId'], patient_id)
@@ -208,12 +244,39 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
 
 @query.field("recordTypes")
 def resolve_record_types(*_):
+    """
+    Retrieve a list of available medical record types.
+
+    This function retrieves a list of all available medical record types from the database.
+
+    Parameters:
+    None
+
+    Returns:
+    list: A list of strings representing the available medical record types.
+    """
     return get_record_types()
 
 
 @mutation.field("createRecordType")
 @requires_authentication('recordTypeError')
 def resolve_create_record_type(*_, recordName):
+    """
+    Create a new record type with the given name.
+
+    This function creates a new record type after sanitizing and formatting the provided name.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    recordName (str): The name of the record type to be created.
+
+    Returns:
+    dict: The result of the create_record_type function, which typically includes:
+        - A confirmation message if the record type was successfully created.
+        - An error message if the creation failed.
+        - The newly created record type information if successful.
+    """
     recordName = ' '.join(nh3.clean(recordName).split()).title()
     return create_record_type(recordName)
 
@@ -222,6 +285,20 @@ def resolve_create_record_type(*_, recordName):
 @requires_authentication(return_none=True)
 @requires_patient(return_none=True)
 def resolve_patients_active_tokens(*_, patient):
+    """
+    Retrieve the active tokens for a given patient.
+
+    This function fetches all active tokens associated with a specific patient.
+    It requires authentication and patient access to perform the operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+
+    Returns:
+    list: A list of active token information associated with the given patient.
+          If the patient ID is not present or the patient is not found, returns None.
+    """
     return get_active_tokens_by_patient(patient['patientId'])
 
 
@@ -229,6 +306,20 @@ def resolve_patients_active_tokens(*_, patient):
 @requires_authentication(return_none=True)
 @requires_doctor(return_none=True)
 def resolve_doctors_active_tokens(*_, doctor):
+    """
+    Retrieve the active tokens associated with a specific doctor.
+
+    This function retrieves the active tokens for a given doctor. It requires
+    authentication and doctor access to perform the operation.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    doctor (dict): A dictionary containing doctor information, including 'doctorId'.
+
+    Returns:
+    list: A list of active token information associated with the given doctor.
+          If the doctor ID is not present or the doctor is not found, returns None.
+    """
     return get_active_tokens_by_doctor(doctor['doctorId'])
 
 
