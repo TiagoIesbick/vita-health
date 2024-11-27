@@ -163,17 +163,61 @@ def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 def resolve_get_medical_record(*_, recordId, patient_id, doctor_id):
+    """
+    Resolve and retrieve a specific medical record.
+
+    This function fetches a single medical record based on the provided record ID and patient ID.
+    It requires authentication and appropriate access rights (patient or doctor).
+
+    Parameters:
+    *_ : Variable length argument list for any additional parameters (unused).
+    recordId (str): The unique identifier of the medical record to retrieve.
+    patient_id (str): The ID of the patient associated with the medical record.
+    doctor_id (str): The ID of the doctor requesting access (for access control, unused in the function body).
+
+    Returns:
+    dict: A dictionary containing the medical record information if found.
+          Returns None if the record is not found or if access is denied.
+    """
     return get_medical_record(recordId, patient_id)
 
 
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
+    """
+    Resolve the record type for a medical record.
+
+    This function retrieves the type of a medical record based on its record type ID.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'recordTypeId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict: A dictionary containing information about the medical record type.
+    """
     return get_medical_records_type(medicalRecords['recordTypeId'])
 
 
 @medical_records.field("files")
 @requires_authentication(return_none=True)
 def resolve_medical_records_files(medicalRecords, *_):
+    """
+    Resolves the 'files' field for the 'medicalRecords' GraphQL object.
+
+    This function retrieves the files associated with a specific medical record.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'recordId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    list: A list of file information associated with the medical record.
+          Returns None if authentication is not provided.
+    """
     return get_medical_records_files(medicalRecords['recordId'])
 
 
