@@ -132,6 +132,25 @@ def resolve_update_patient_user(_, info, patient, input):
 @requires_authentication('userError')
 @requires_doctor('userError')
 def resolve_update_doctor_user(_, info, doctor, input):
+    """
+    Update the information of a doctor user.
+
+    This function updates the specialty and license number of a doctor user.
+    It requires authentication and doctor access rights.
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing the context.
+    doctor (dict): A dictionary containing the doctor's information.
+    input (dict): A dictionary containing the updated information:
+                  - 'specialty': The doctor's new specialty.
+                  - 'licenseNumber': The doctor's new license number.
+
+    Returns:
+    dict: A dictionary containing the result of the update operation:
+          - If successful, includes 'userConfirmation' (True) and 'user' (updated user info).
+          - If unsuccessful, includes 'userError' with an error message.
+    """
     res = update_doctor_user(nh3.clean(input['specialty'].strip().capitalize()), nh3.clean(input['licenseNumber'].strip()), doctor['doctorId'])
     if res['userConfirmation']:
         res['user'] = get_user(info.context['user_detail']['userId'])
@@ -140,6 +159,27 @@ def resolve_update_doctor_user(_, info, doctor, input):
 
 @mutation.field("login")
 def resolve_login(*_, email, password):
+    """
+    Authenticate a user and generate a JWT token upon successful login.
+
+    This function attempts to authenticate a user with the provided email and password.
+    If successful, it generates a JWT token for the user.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    email (str): The email address of the user attempting to log in.
+    password (str): The password of the user attempting to log in.
+
+    Returns:
+    dict: A dictionary containing the result of the login attempt.
+        If successful:
+            {
+                'user': User object containing user details,
+                'token': JWT token string for authenticated session
+            }
+        If unsuccessful:
+            {'error': 'Invalid email or password'}
+    """
     user = get_user_by_email_password(email, password)
     if user:
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
@@ -151,6 +191,23 @@ def resolve_login(*_, email, password):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
+    """
+    Resolves and returns a paginated list of medical records for a patient.
+
+    This function fetches a list of medical records for a given patient, applying pagination.
+    It requires authentication and patient or doctor access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    limit (int): The maximum number of items to return.
+    offset (int): The number of items to skip before starting to collect the result set.
+    patient_id (str): The ID of the patient whose medical records are to be fetched.
+    doctor_id (str): The ID of the doctor involved in the operation (for access control).
+
+    Returns:
+    dict or None: A dictionary containing the total count of medical records and the paginated items.
+                  Returns None if there are no medical records for the patient.
+    """
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
     if not total_medical_records:
