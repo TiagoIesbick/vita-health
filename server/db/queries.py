@@ -137,8 +137,21 @@ def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
 
 def count_inactive_tokens(id: int) -> None | dict:
     query = rf"SELECT COUNT(tokenId) AS totalCount FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}';"
-    total_count= mysql_client(query)
+    total_count = mysql_client(query)
     return None if not total_count else total_count[0]
+
+
+def get_doctor_patients(id: int) -> None | dict:
+    query = rf'''SELECT p.patientId, CONCAT(u.firstName, ' ', u.lastName) AS patientFullName,
+        mr.dateCreated AS lastRecordCreated FROM (
+            SELECT *, ROW_NUMBER() OVER (PARTITION BY patientId ORDER BY dateCreated DESC) AS row_num
+            FROM MedicalRecords WHERE doctorId = {id}
+        ) mr
+        JOIN Patients p ON mr.patientId = p.patientId
+        JOIN Users u ON p.userId = u.userId
+        WHERE mr.row_num = 1 ORDER BY patientFullName ASC;'''
+    doctor_patients = mysql_client(query)
+    return None if not doctor_patients else doctor_patients
 
 
 def get_medical_records_files(id: int) -> list[dict]:

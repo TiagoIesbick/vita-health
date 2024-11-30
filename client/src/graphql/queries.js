@@ -86,6 +86,17 @@ export const inactiveTokensQuery = gql`
 `;
 
 
+export const doctorPatientsQuery = gql`
+    query DoctorPatients {
+        doctorPatients {
+            patientId
+            patientFullName
+            lastRecordCreated
+        }
+    }
+`;
+
+
 export const aiConversationQuery = gql`
     query AIConversation {
         aiConversation {

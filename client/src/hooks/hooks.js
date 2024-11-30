@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useApolloClient, useSubscription } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, recordTypesQuery, searchFilesQuery, searchMedicalRecordsQuery, userQuery } from "../graphql/queries";
+import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, doctorPatientsQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, recordTypesQuery, searchFilesQuery, searchMedicalRecordsQuery, userQuery } from "../graphql/queries";
 import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
@@ -303,6 +303,12 @@ export const useInactiveTokens = (limit, offset) => {
 export const useRecordTypes = () => {
     const { data, loading, error } = useQuery(recordTypesQuery);
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
+};
+
+
+export const useDoctorPatients = () => {
+    const { data, loading, error } = useQuery(doctorPatientsQuery);
+    return {doctorPatients: data?.doctorPatients, loadingDoctorPatients: loading, errorDoctorPatients: Boolean(error)};
 };
 
 

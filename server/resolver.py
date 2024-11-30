@@ -92,6 +92,30 @@ def resolve_create_user(*_, input):
 
 @mutation.field("createPatientOrDoctorUser")
 def resolve_create_patient_or_doctor_user(*_, userId, userType):
+    """
+    Create a patient or doctor user based on the provided user ID and user type.
+
+    This function creates a new patient or doctor user entry in the database,
+    associated with an existing user account.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    userId (str): The unique identifier of the existing user account.
+    userType (str): The type of user to create ('Patient' or 'Doctor').
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful:
+            {
+                'userConfirmation': True,
+                'user': <user_object>
+            }
+        If unsuccessful:
+            {
+                'userConfirmation': False,
+                'error': <error_message>
+            }
+    """
     res = create_patient_or_doctor_user(userId, userType)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
@@ -101,6 +125,29 @@ def resolve_create_patient_or_doctor_user(*_, userId, userType):
 @mutation.field("updateUser")
 @requires_authentication('userError')
 def resolve_update_user(_, info, input):
+    """
+    Resolve the updateUser mutation to update a user's information.
+
+    This function updates a user's email, first name, and last name. It performs
+    validation on the input data and updates the user information in the database.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Contains the context and execution information.
+    input (dict): A dictionary containing the user's updated information:
+                  - 'email': The user's new email address.
+                  - 'firstName': The user's new first name.
+                  - 'lastName': The user's new last name.
+
+    Returns:
+    dict: A dictionary containing the result of the update operation:
+          - If validation fails: {'userError': <error_message>}
+          - If update is successful: {
+                'userConfirmation': True,
+                'user': <updated_user_object>,
+                'token': <new_jwt_token>
+            }
+    """
     email, firstName, lastName, userId = \
         input['email'], input['firstName'].strip().capitalize(), \
         input['lastName'].strip().capitalize(), info.context['user_detail']['userId']
@@ -121,6 +168,26 @@ def resolve_update_user(_, info, input):
 @requires_authentication('userError')
 @requires_patient('userError')
 def resolve_update_patient_user(_, info, patient, input):
+    """
+    Update the patient user's information.
+
+    This function updates the patient user's date of birth and gender. It requires
+    authentication and patient access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing context information.
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    input (dict): A dictionary containing the updated user information, including 'dateOfBirth' and 'gender'.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful:
+            - 'userConfirmation': True
+            - 'user': The updated user information
+        If unsuccessful:
+            - 'userError': An error message describing the failure
+    """
     dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).strftime("%Y-%m-%d")
     res = update_patient_user(dateOfBirth, input['gender'], patient['patientId'])
     if res['userConfirmation']:
@@ -450,6 +517,27 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
         return None
     total_inactive_tokens['items'] = items
     return total_inactive_tokens
+
+
+@query.field("doctorPatients")
+@requires_authentication(return_none=True)
+@requires_doctor(return_none=True)
+def resolve_doctor_patients(*_, doctor):
+    """
+    Retrieve the patients associated with a specific doctor.
+
+    This function retrieves the patients for a given doctor. It requires
+    authentication and doctor access to perform the operation.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    doctor (dict): A dictionary containing doctor information, including 'doctorId'.
+
+    Returns:
+    list: A list of patients associated with the given doctor.
+          If the doctor ID is not present or the doctor is not found, returns None.
+    """
+    return get_doctor_patients(doctor['doctorId'])
 
 
 @query.field("aiConversation")

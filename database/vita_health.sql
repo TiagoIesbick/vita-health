@@ -93,6 +93,8 @@ CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
   INDEX `medicalRecordsPatientId_idx` (`patientId` ASC) VISIBLE,
   INDEX `medicalRecordsTypeId_idx` (`recordTypeId` ASC) VISIBLE,
   INDEX `medicalRecordsDoctorId_idx` (`doctorId` ASC) VISIBLE,
+  INDEX `medicalRecordsDateCreated_idx` (`dateCreated` ASC),
+  INDEX `medicalRecordsPatientIdDateCreated_idx` (`patientId` ASC, `dateCreated` DESC),
   CONSTRAINT `medicalRecordsPatientId`
     FOREIGN KEY (`patientId`)
     REFERENCES `vita_health`.`Patients` (`patientId`)

@@ -5,6 +5,8 @@ import { logout } from "../graphql/auth";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../providers/userContext";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 
 const UserBar = () => {
@@ -22,6 +24,11 @@ const UserBar = () => {
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },
+        ...(user.userType === 'Doctor' ? [{
+            label: 'Patients',
+            icon: <FontAwesomeIcon icon={faUsers} className='mr-2 text-color-secondary pi w-1rem'/>,
+            command: () => navigate("/patients")
+        }] : []),
         ...(user.userType === 'Patient' ? [{
             label: 'Inactive Tokens',
             icon: 'pi pi-eye-slash',
