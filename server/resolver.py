@@ -61,12 +61,50 @@ def resolve_doctors_user(doctors, *_):
 
 @doctors.field("tokensAccess")
 @requires_authentication(return_none=True)
-def resolve_doctors_user(doctors, *_):
+def resolve_doctor_tokens_access(doctors, *_):
+    """
+    Resolve the 'tokensAccess' field for a doctor.
+
+    This function retrieves the tokens access information for a given doctor.
+    It requires authentication and returns None if the doctor ID is not present.
+
+    Parameters:
+    doctors (dict): A dictionary containing doctor information, including 'doctorId' and 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    list or None: A list of token access information for the doctor if the doctorId exists,
+                  otherwise None.
+    """
     return None if not doctors['doctorId'] else get_doctors_tokens_access(doctors['userId'])
 
 
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
+    """
+    Resolve the createUser mutation to create a new user account.
+
+    This function validates user input, creates a new user account, and returns the result.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    input (dict): A dictionary containing user information with the following keys:
+        - 'email': The user's email address.
+        - 'firstName': The user's first name.
+        - 'lastName': The user's last name.
+        - 'password': The user's password.
+        - 'userType': The type of user account.
+        - 'acceptTerms': Boolean indicating if the user accepted the terms.
+
+    Returns:
+    dict: A dictionary containing the result of the user creation:
+        - If validation fails: {'userError': <error_message>}
+        - If creation is successful: {
+            'userConfirmation': True,
+            'user': <user_object>
+          }
+        - If creation fails: The result from the create_user function.
+    """
     email, firstName, lastName, password, userType, acceptTerms = \
         input['email'], input['firstName'].strip().capitalize(), input['lastName'].strip().capitalize(), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
@@ -277,6 +315,35 @@ def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
     """
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
+    if not total_medical_records:
+        return None
+    total_medical_records['items'] = items
+    return total_medical_records
+
+
+@query.field("patientRecordsbyDoctor")
+@requires_authentication(return_none=True)
+@requires_doctor(return_none=True)
+def resolve_patient_records_by_doctor(*_, limit, offset, patientId, doctor):
+    """
+    Resolves and returns a paginated list of medical records for a patient.
+
+    This function fetches a list of medical records for a given patient, applying pagination.
+    It requires authentication and patient or doctor access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    limit (int): The maximum number of items to return.
+    offset (int): The number of items to skip before starting to collect the result set.
+    patient_id (str): The ID of the patient whose medical records are to be fetched.
+    doctor_id (str): The ID of the doctor involved in the operation (for access control).
+
+    Returns:
+    dict or None: A dictionary containing the total count of medical records and the paginated items.
+                  Returns None if there are no medical records for the patient.
+    """
+    items = get_patient_records_by_doctor(patientId, doctor['doctorId'], limit, offset)
+    total_medical_records = count_patient_records_by_doctor(patientId, doctor['doctorId'])
     if not total_medical_records:
         return None
     total_medical_records['items'] = items

@@ -12,6 +12,7 @@ type Query {
     searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [SearchFilesResult]
     doctorPatients: [DoctorPatients]
+    patientRecordsbyDoctor(limit: Int, offset: Int, patientId: ID!): MedicalRecordsSubList
 }
 
 type MedicalRecords {

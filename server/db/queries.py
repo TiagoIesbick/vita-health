@@ -84,6 +84,18 @@ def count_medical_records(id: int) -> None | dict:
     return None if not total_count else total_count[0]
 
 
+def get_patient_records_by_doctor(patientId: int, doctorId: int, limit: int, offset: int) -> None | list[dict]:
+    query = rf'SELECT * FROM MedicalRecords WHERE patientId = {patientId} AND doctorId = {doctorId} ORDER BY dateCreated DESC LIMIT {limit} OFFSET {offset};'
+    records = mysql_client(query)
+    return None if not records else records
+
+
+def count_patient_records_by_doctor(patientId: int, doctorId: int) -> None | dict:
+    query = rf"SELECT COUNT(recordId) AS totalCount FROM MedicalRecords WHERE patientId = {patientId} AND doctorId = {doctorId};"
+    total_count= mysql_client(query)
+    return None if not total_count else total_count[0]
+
+
 def get_medical_records_type(id: int) -> None | dict:
     query = rf'SELECT * FROM RecordTypes WHERE recordTypeId = {id};'
     record_type = mysql_client(query)
