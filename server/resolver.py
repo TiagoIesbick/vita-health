@@ -56,6 +56,20 @@ def resolve_patients_tokens(patients, *_):
 
 @doctors.field("user")
 def resolve_doctors_user(doctors, *_):
+    """
+    Resolve the 'user' field for a doctor.
+
+    This function retrieves the user information associated with a doctor.
+    If the doctor's userId is not present, it returns None.
+
+    Parameters:
+    doctors (dict): A dictionary containing doctor information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing user information if the userId exists,
+                  otherwise None.
+    """
     return None if not doctors['userId'] else get_user(doctors['userId'])
 
 

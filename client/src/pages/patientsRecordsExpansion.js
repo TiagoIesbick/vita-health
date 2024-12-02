@@ -28,7 +28,7 @@ const PatientsRecordsExpansion = ({ data }) => {
                 {/* <Column field="status" header="Status" body={statusOrderBodyTemplate} sortable></Column>
                 <Column headerStyle={{ width: '4rem' }} body={searchBodyTemplate}></Column> */}
             </DataTable>
-            <Paginator first={first} rows={rows} totalRecords={patientRecordsbyDoctor?.totalCount} onPageChange={onPageChange} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
+            {!loading && <Paginator first={first} rows={rows} totalRecords={patientRecordsbyDoctor?.totalCount} onPageChange={onPageChange} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />}
         </div>
     );
 };

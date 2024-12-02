@@ -27,7 +27,7 @@ const Patients = () => {
     const expandAll = () => {
         let _expandedRows = {};
 
-        //products.forEach((p) => (_expandedRows[`${p.id}`] = true));
+        doctorPatients.forEach((p) => (_expandedRows[`${p.patientId}`] = true));
 
         setExpandedRows(_expandedRows);
     };
@@ -68,12 +68,6 @@ const Patients = () => {
         return //<Tag value={rowData.inventoryStatus} severity={getProductSeverity(rowData)}></Tag>;
     };
 
-
-
-    const allowExpansion = (rowData) => {
-        return true //rowData.orders.length > 0;
-    };
-
     const header = (
         <div className="flex flex-wrap justify-content-end gap-2">
             <Button icon="pi pi-plus" label="Expand All" onClick={expandAll} text />
@@ -92,9 +86,10 @@ const Patients = () => {
     return (
         <Card className="card-min-height" title="Patients">
             <DataTable value={doctorPatients} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
-                    onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={(data) => <PatientsRecordsExpansion data={data} />}
-                    dataKey="patientId" header={header} tableStyle={{ minWidth: '60rem' }}>
-                <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={(data) => <PatientsRecordsExpansion data={data} />}
+                dataKey="patientId" header={header} tableStyle={{ minWidth: '100%' }} sortField="patientFullName" sortOrder={1}
+            >
+                <Column expander style={{ width: '5rem' }} />
                 <Column field="patientFullName" header="Name" sortable />
                 <Column field="lastRecordCreated" header="Last Record" sortable />
             </DataTable>
