@@ -6,6 +6,7 @@ import { useDoctorPatients } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
 import { useState } from "react";
+import { FilterMatchMode } from 'primereact/api';
 import LoadingSkeleton from "../components/skeleton";
 import PatientsRecordsExpansion from './patientsRecordsExpansion';
 
@@ -15,6 +16,11 @@ const Patients = () => {
     const { showMessage } = useUser();
     const {doctorPatients, loadingDoctorPatients, errorDoctorPatients} = useDoctorPatients();
     const [expandedRows, setExpandedRows] = useState(null);
+
+    const filters = {
+        patientFullName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        lastRecordCreated: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+    };
 
     const onRowExpand = (event) => {
         console.log('[onRowExpand]:', event);
@@ -88,10 +94,11 @@ const Patients = () => {
             <DataTable value={doctorPatients} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
                 onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={(data) => <PatientsRecordsExpansion data={data} />}
                 dataKey="patientId" header={header} tableStyle={{ minWidth: '100%' }} sortField="patientFullName" sortOrder={1}
+                filterDisplay="row" emptyMessage="No patients found." filters={filters}
             >
                 <Column expander style={{ width: '5rem' }} />
-                <Column field="patientFullName" header="Name" sortable />
-                <Column field="lastRecordCreated" header="Last Record" sortable />
+                <Column field="patientFullName" header="Name" filter sortable />
+                <Column field="lastRecordCreated" header="Last Record" filter sortable />
             </DataTable>
         </Card>
     );
