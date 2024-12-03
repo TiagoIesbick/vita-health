@@ -11,7 +11,7 @@ nh3 = "*"
 pytz = "*"
 aiofiles = "*"
 ariadne = {extras = ["asgi"], version = "*"}
-python-multipart = "*"
+python-multipart = ">=0.0.18"
 openai = "*"
 redis = "*"
 pymupdf = "*"

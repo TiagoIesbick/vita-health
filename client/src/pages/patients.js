@@ -32,8 +32,9 @@ const Patients = () => {
 
     const expandAll = () => {
         let _expandedRows = {};
+        const patients = doctorPatients || [];
 
-        doctorPatients.forEach((p) => (_expandedRows[`${p.patientId}`] = true));
+        patients.forEach((p) => (_expandedRows[`${p.patientId}`] = true));
 
         setExpandedRows(_expandedRows);
     };
