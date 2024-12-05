@@ -30,27 +30,93 @@ token_access = ObjectType("TokenAccess")
 
 @query.field("user")
 def resolve_user(*_, userId):
+    """
+    Resolves and retrieves a user based on the provided user ID.
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    userId (str): The unique identifier of the user to retrieve.
+
+    Returns:
+    dict: A dictionary containing the user's information if found, or None if not found.
+    """
     return get_user(userId)
 
 
 @users.field("patient")
 def resolve_users_patient(users, *_):
+    """
+    Resolve the 'patient' field for a user.
+
+    This function retrieves the doctor information associated with a user.
+    If the user's userId is not present, it returns None.
+
+    Parameters:
+    users (dict): A dictionary containing user information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing patient information if the userId exists,
+                  otherwise None.
+    """
     return None if not users['userId'] else get_users_patient(users['userId'])
 
 
 @users.field("doctor")
 def resolve_users_patient(users, *_):
+    """
+    Resolve the 'doctor' field for a user.
+
+    This function retrieves the doctor information associated with a user.
+    If the user's userId is not present, it returns None.
+
+    Parameters:
+    users (dict): A dictionary containing user information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing doctor information if the userId exists,
+                  otherwise None.
+    """
     return None if not users['userId'] else get_users_doctor(users['userId'])
 
 
 @patients.field("user")
 def resolve_patients_user(patients, *_):
+    """
+    Resolve the 'user' field for a patient.
+
+    This function retrieves the user information associated with a patient.
+    If the patient's userId is not present, it returns None.
+
+    Parameters:
+    patients (dict): A dictionary containing patient information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing user information if the userId exists,
+                  otherwise None.
+    """
     return None if not patients['userId'] else get_user(patients['userId'])
 
 
 @patients.field("tokens")
 @requires_authentication(return_none=True)
 def resolve_patients_tokens(patients, *_):
+    """
+    Resolves and retrieves the tokens associated with a patient.
+
+    This function fetches the tokens associated with a specific patient.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    patients (dict): A dictionary containing patient information, including 'patientId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    list or None: A list of tokens associated with the given patient if the patient ID is present.
+                   Returns None if the patient ID is not present.
+    """
     return None if not patients['patientId'] else get_patients_tokens(patients['patientId'])
 
 

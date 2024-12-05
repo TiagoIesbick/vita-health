@@ -1,4 +1,5 @@
 import { Button } from 'primereact/button';
+import { Calendar } from 'primereact/calendar';
 import { Card } from "primereact/card";
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -6,9 +7,10 @@ import { useDoctorPatients } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
 import { useNavigate } from 'react-router';
 import { useState } from "react";
-import { FilterMatchMode } from 'primereact/api';
+import { FilterMatchMode, FilterOperator, FilterService } from 'primereact/api';
 import LoadingSkeleton from "../components/skeleton";
 import PatientsRecordsExpansion from './patientsRecordsExpansion';
+import { dateTemplate } from '../utils/utils';
 
 
 const Patients = () => {
@@ -19,7 +21,7 @@ const Patients = () => {
 
     const filters = {
         patientFullName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        lastRecordCreated: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+        lastRecordCreated: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] }
     };
 
     const onRowExpand = (event) => {
@@ -43,36 +45,8 @@ const Patients = () => {
         setExpandedRows(null);
     };
 
-    const formatCurrency = (value) => {
-        return value//.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    };
-
-    const amountBodyTemplate = (rowData) => {
-        return //formatCurrency(rowData.amount);
-    };
-
-    const statusOrderBodyTemplate = (rowData) => {
-        return //<Tag value={rowData.status.toLowerCase()} severity={getOrderSeverity(rowData)}></Tag>;
-    };
-
-    const searchBodyTemplate = () => {
-        return <Button icon="pi pi-search" />;
-    };
-
-    const imageBodyTemplate = (rowData) => {
-        return //<img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} width="64px" className="shadow-4" />;
-    };
-
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    };
-
-    const ratingBodyTemplate = (rowData) => {
-        return //<Rating value={rowData.rating} readOnly cancel={false} />;
-    };
-
-    const statusBodyTemplate = (rowData) => {
-        return //<Tag value={rowData.inventoryStatus} severity={getProductSeverity(rowData)}></Tag>;
+    const dateFilterTemplate = (options) => {
+        return <Calendar value={options.value} selectionMode="range" onChange={(e) => options.filterCallback(e.value, options.index)} />;
     };
 
     const header = (
@@ -99,7 +73,7 @@ const Patients = () => {
             >
                 <Column expander style={{ width: '5rem' }} />
                 <Column field="patientFullName" header="Name" filter sortable />
-                <Column field="lastRecordCreated" header="Last Record" filter sortable />
+                <Column field="lastRecordCreated" header="Last Record" dataType="date" filter sortable body={(rowData) => dateTemplate(rowData.lastRecordCreated)} filterElement={dateFilterTemplate} />
             </DataTable>
         </Card>
     );

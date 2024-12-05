@@ -4,12 +4,38 @@ from datetime import datetime
 
 
 def get_user(id: int) -> None | dict:
+    """
+    Retrieve user information from the database based on the user ID.
+
+    This function queries the Users table in the database to fetch all information
+    associated with the specified user ID.
+
+    Args:
+        id (int): The unique identifier of the user to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the user's information if found,
+                     or None if no user matches the given ID.
+    """
     query = rf'SELECT * FROM Users WHERE userId = {id};'
     user = mysql_client(query)
     return None if not user else user[0]
 
 
 def get_patient(id: int) -> None | dict:
+    """
+    Retrieve patient information from the database based on the patient ID.
+
+    This function queries the Patients table in the database to fetch all information
+    associated with the specified patient ID.
+
+    Args:
+        id (int): The unique identifier of the patient to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the patient's information if found,
+                     or None if no patient matches the given ID.
+    """
     query = rf'SELECT * FROM Patients WHERE patientId = {id};'
     patient = mysql_client(query)
     return None if not patient else patient[0]

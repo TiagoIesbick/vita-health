@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Paginator } from 'primereact/paginator';
 import { usePatientRecordsbyDoctor } from '../hooks/hooks';
 import { useState } from 'react';
-import { stripHtmlTags } from '../utils/utils';
+import { stripHtmlTags, dateTemplate } from '../utils/utils';
 
 
 const PatientsRecordsExpansion = ({ data }) => {
@@ -29,7 +29,7 @@ const PatientsRecordsExpansion = ({ data }) => {
         <div className="p-3">
             <h5>Redords for {data.patientFullName}</h5>
             <DataTable value={patientRecordsbyDoctor?.items} loading={loading} dataKey="recordId" sortField="dateCreated" sortOrder={-1} selectionMode="single">
-                <Column field="dateCreated" header="Date"></Column>
+                <Column field="dateCreated" header="Date" body={(rowData) => dateTemplate(rowData.dateCreated)}></Column>
                 <Column field="recordType.recordName" header="Record Type"></Column>
                 <Column field="recordData" header="Notes" body={notesFormat}></Column>
                 <Column field="files" header="N° Files" body={filesLength}></Column>

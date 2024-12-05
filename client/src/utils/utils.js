@@ -51,6 +51,12 @@ export const localDateTime = (date, operation) => {
 };
 
 
+export const dateTemplate = (date) => {
+    let _date = localDateTime(date, 'minus');
+    return `${_date.toLocaleDateString()} ${_date.toLocaleTimeString(undefined, {timeStyle:'short'})}`
+};
+
+
 export const customizedMarker = (item) => {
     const recordStyle = {
         'Blood Test': {icon: <FontAwesomeIcon icon={faVials}/>, color: '--red-300'},

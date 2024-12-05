@@ -4,6 +4,7 @@ import { useUser } from "../providers/userContext";
 import { useState, useEffect } from "react";
 import Search from "./search";
 import Navbar from "./navbar";
+import LocalLanguage from "./localLanguage";
 import logo from "../assets/logos/logo-vita-no-bg.png";
 import './header.css';
 
@@ -32,6 +33,7 @@ const Header = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 />
             </Link>
+            <LocalLanguage />
             {visible && <Search expanded={expanded} setExpanded={setExpanded} />}
             <Navbar expanded={expanded} />
         </header>
