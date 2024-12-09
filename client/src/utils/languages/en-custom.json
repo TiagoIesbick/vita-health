@@ -1,0 +1,47 @@
+{
+    "en": {
+        "confirm": "Confirm",
+        "createUser": {
+            "acceptTerms": "Accept Terms",
+            "acceptTermsValidation": "You must accept the terms and conditions",
+            "firstName": "First Name",
+            "firstNameValidation": "First name must start with at least 2 word characters",
+            "lastName": "Last Name",
+            "lastNameValidation": "Last name must start with at least 2 word characters",
+            "userType": "User Type"
+        },
+        "doctor": "Healthcare professional",
+        "error": {
+            "error": "Error",
+            "errorMessage": "Data not available. Try again later."
+        },
+        "home": {
+            "insights_info": "Uncover key patterns and trends in your health history. Vita’s AI empowers you and your provider to make more informed decisions.",
+            "security_info": "Your health, your data, your control. With Vita, securely access and manage your medical information anytime, anywhere, backed by intelligent insights.",
+            "subtitle": "Manage Your Medical History with AI-Driven Insights",
+            "title": "Take Control of Your Health:",
+            "token_info": "Securely share your medical history with healthcare professionals using temporary tokens. Enable accurate updates and see how AI enhances the quality of your care."
+        },
+        "lastRecord": "Last Record",
+        "login": {
+            "loggedIn": "Logged In",
+            "lowercaseValidation": "At least one lowercase",
+            "minChars": "Minimum {count} characters",
+            "noAccount": "Don't have an account?",
+            "noEmail": "Invalid e-mail",
+            "numericValidation": "At least one numeric",
+            "password": "Password",
+            "pickPassword": "Pick a password",
+            "rules": "Rules",
+            "uppercaseValidation": "At least one uppercase",
+            "validation": "At least one lowercase, one uppercase and one numeric",
+            "welcome": "Welcome"
+        },
+        "navbar": {
+            "login": "Login",
+            "signUp": "Sign Up"
+        },
+        "patient": "Patient",
+        "required": "Required"
+    }
+}

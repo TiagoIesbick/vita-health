@@ -1,0 +1,47 @@
+{
+    "pt-br": {
+        "confirm": "Confirme",
+        "createUser": {
+            "acceptTerms": "Aceitar os Termos",
+            "acceptTermsValidation": "Você deve aceitar os termos e condições",
+            "firstName": "Nome",
+            "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
+            "lastName": "Sobrenome",
+            "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
+            "userType": "Tipo de Usuário"
+        },
+        "doctor": "Profissional de saúde",
+        "error": {
+            "error": "Erro",
+            "errorMessage": "Dados não disponíveis. Tente novamente mais tarde."
+        },
+        "home": {
+            "insights_info": "Descubra padrões e tendências importantes no seu histórico de saúde. A IA da Vita ajuda você e seu profissional a tomarem decisões mais informadas.",
+            "security_info": "Sua saúde, seus dados, seu controle. Com a Vita, acesse e gerencie com segurança suas informações médicas a qualquer momento, em qualquer lugar, com o suporte de análises inteligentes.",
+            "subtitle": "Controle seu histórico médico com percepções baseadas em Inteligência Artificial",
+            "title": "Transforme sua Saúde:",
+            "token_info": "Use tokens temporários para compartilhar seu histórico de forma segura com profissionais de saúde. Permita atualizações precisas e explore como a IA torna seu cuidado mais eficiente."
+        },
+        "lastRecord": "Último Registro",
+        "login": {
+            "loggedIn": "Conectado(a)",
+            "lowercaseValidation": "Pelo menos uma minúscula",
+            "minChars": "Mínimo {count} caracteres",
+            "noAccount": "Não tem uma conta?",
+            "noEmail": "E-mail inválido",
+            "numericValidation": "Pelo menos um numérico",
+            "password": "Senha",
+            "pickPassword": "Escolha uma senha",
+            "rules": "Regras",
+            "uppercaseValidation": "Pelo menos uma maiúscula",
+            "validation": "Pelo menos uma minúscula, uma maiúscula e um número",
+            "welcome": "Bem-vindo(a)"
+        },
+        "navbar": {
+            "login": "Entre",
+            "signUp": "Cadastre-se"
+        },
+        "patient": "Paciente",
+        "required": "Obrigatório"
+    }
+}

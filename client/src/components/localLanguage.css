@@ -1,5 +1,5 @@
 .flag {
-    background: url(https://primefaces.org/cdn/primereact/images/flag/flags_responsive.png) no-repeat;
+    background: url(../assets/images/flags_responsive.png) no-repeat;
     background-size: 100%;
     vertical-align: middle;
 }

@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import { passwordHeader, passwordFooter } from '../utils/utils';
 import { useCreatePatientOrDoctor, useCreateUser, useLogin } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useNavigate } from "react-router-dom";
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 import { useApolloClient } from "@apollo/client";
@@ -18,6 +19,7 @@ import { useApolloClient } from "@apollo/client";
 const CreateUser = () => {
     const navigate = useNavigate();
     const client = useApolloClient();
+    const { translations } = useLanguage();
     const { setUser, showMessage } = useUser();
     const { addUser, loadingUser, errorUser } = useCreateUser();
     const { addPatientOrDoctor, loadingPatientOrDoctor, errorPatientOrDoctor } = useCreatePatientOrDoctor();
@@ -34,15 +36,15 @@ const CreateUser = () => {
         onSubmit: async (values, { resetForm }) => {
             const resUser = await addUser(values);
             if (resUser.userError) {
-                showMessage('error', 'Error', resUser.userError)
+                showMessage('error', translations?.error?.error, resUser.userError)
             } else {
                 const resPatientOrDoctor = await addPatientOrDoctor(resUser.user.userId, resUser.user.userType);
                 if (resPatientOrDoctor.userError) {
-                    showMessage('error', 'Error', resPatientOrDoctor.userError)
+                    showMessage('error', translations?.error?.error, resPatientOrDoctor.userError)
                 } else {
                     const login = await doLogin({ email: values.email, password: values.password});
                     if (login.error) {
-                        showMessage('error', 'Error', login.error);
+                        showMessage('error', translations?.error?.error, login.error);
                         logout();
                         setUser(null);
                     } else if (login.token) {
@@ -51,35 +53,35 @@ const CreateUser = () => {
                         resetForm();
                         client.resetStore();
                         login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
-                        showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`)
+                        showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName}`)
                     };
                 };
             };
         },
         validationSchema: Yup.object({
-            firstName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
-                .matches(/^\s*?\w{2,}.*/, 'First name must start with at least 2 word characters'),
-            lastName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
-                .matches(/^\s*?\w{2,}.*/, 'Last name must start with at least 2 word characters'),
-            email: Yup.string().email('Invalid e-mail').required('Required'),
-            password: Yup.string().required('Required').min(8, 'Minimum 8 characters')
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'At least one lowercase, one uppercase and one numeric'),
-            userType: Yup.string().required('Required'),
-            acceptTerms: Yup.bool().oneOf([true], 'You must accept the terms and conditions')
+            firstName: Yup.string().required(translations?.required).min(2, translations?.login?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.createUser?.firstNameValidation),
+            lastName: Yup.string().required(translations?.required).min(2, translations?.login?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.createUser?.lastNameValidation),
+            email: Yup.string().email(translations?.login?.noEmail).required(translations?.required),
+            password: Yup.string().required(translations?.required).min(8, translations?.login?.minChars?.replace(/{(\w+)}/g, '8'))
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.login?.validation),
+            userType: Yup.string().required(translations?.required),
+            acceptTerms: Yup.bool().oneOf([true], translations?.createUser?.acceptTermsValidation)
         }),
     });
     const userType = [
-        { type: 'Patient', name: 'Patient'},
-        { type: 'Doctor', name: 'Healthcare professional'}
+        { type: 'Patient', name: translations?.patient},
+        { type: 'Doctor', name: translations?.doctor}
     ]
     if (errorUser || errorPatientOrDoctor || error) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.error, translations?.error?.errorMessage, true);
     };
 
     return (
         <Card
-            title="Sign Up"
+            title={translations?.navbar?.signUp}
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
@@ -90,7 +92,7 @@ const CreateUser = () => {
                         className="w-full"
                         {...formik.getFieldProps("firstName")}
                     />
-                    <label htmlFor="firstName">First Name</label>
+                    <label htmlFor="firstName">{translations?.createUser?.firstName}</label>
                     {formik.touched.firstName && formik.errors.firstName &&<div className="text-red-500 text-xs">{formik.errors.firstName}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -100,7 +102,7 @@ const CreateUser = () => {
                         className="w-full"
                         {...formik.getFieldProps("lastName")}
                     />
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="lastName">{translations?.createUser?.lastName}</label>
                     {formik.touched.lastName && formik.errors.lastName &&<div className="text-red-500 text-xs">{formik.errors.lastName}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -117,13 +119,13 @@ const CreateUser = () => {
                     <Password
                         inputId="password"
                         autoComplete="current-password"
-                        header={passwordHeader}
-                        footer={passwordFooter}
+                        header={passwordHeader(translations)}
+                        footer={passwordFooter(translations)}
                         toggleMask
                         className="w-full login-width"
                         {...formik.getFieldProps("password")}
                     />
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">{translations?.login?.password}</label>
                     {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -135,7 +137,7 @@ const CreateUser = () => {
                         className="w-full"
                         {...formik.getFieldProps("userType")}
                     />
-                    <label htmlFor="user-type">User Type</label>
+                    <label htmlFor="user-type">{translations?.createUser?.userType}</label>
                     {formik.touched.userType && formik.errors.userType &&<div className="text-red-500 text-xs">{formik.errors.userType}</div>}
                 </FloatLabel>
                 <div>
@@ -146,10 +148,10 @@ const CreateUser = () => {
                         }}
                         inputId="acceptTerms"
                         checked={formik.values.acceptTerms} />
-                    <label htmlFor="acceptTerms" className="ml-1 text-sm">Accept Terms</label>
+                    <label htmlFor="acceptTerms" className="ml-1 text-sm">{translations?.createUser?.acceptTerms}</label>
                     {formik.touched.acceptTerms && formik.errors.acceptTerms &&<div className="text-red-500 text-xs">{formik.errors.acceptTerms}</div>}
                 </div>
-                <Button type="submit" label="Sign Up" disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
+                <Button type="submit" label={translations?.confirm} disabled={!formik.isValid || loadingUser || loadingPatientOrDoctor || loading} loading={loadingUser || loadingPatientOrDoctor || loading} />
             </form>
         </Card>
     );

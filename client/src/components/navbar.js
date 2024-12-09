@@ -1,12 +1,14 @@
 import { classNames } from 'primereact/utils';
 import { Link } from "react-router-dom";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import UserBar from "./userBar";
 import './navbar.css';
 
 
 const Navbar = ({ expanded }) => {
     const { user, patient } = useUser();
+    const { translations } = useLanguage();
 
     return (
         <nav
@@ -38,8 +40,8 @@ const Navbar = ({ expanded }) => {
             }
             {!user &&
                 <ul className="flex flex-row align-items-center justify-content-end gap-2 p-0" style={{gridColumn: "1 / span 9"}}>
-                    <li className="btn-nav"><Link to="/login" >Login</Link></li>
-                    <li className="btn-nav"><Link to="/sign-up" >Sign up</Link></li>
+                    <li><Link className='btn-nav' to="/login" >{translations?.navbar?.login}</Link></li>
+                    <li><Link className="btn-nav" to="/sign-up" >{translations?.navbar?.signUp}</Link></li>
                 </ul>
             }
         </nav>
