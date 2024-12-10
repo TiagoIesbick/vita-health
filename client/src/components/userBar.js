@@ -4,31 +4,40 @@ import { useRef } from 'react';
 import { logout } from "../graphql/auth";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 
 const UserBar = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { user, setUser, setPatient, showMessage } = useUser();
     const userMenu = useRef(null);
     const items = [
         ...(user.userType === 'Patient' ? [{
-            label: 'Add Health Data',
+            label: translations?.userbar?.addData,
             icon: 'pi pi-plus-circle',
             command: () => navigate("/insert-medical-record")
         }] : []),
         {
-            label: 'Active Tokens',
+            label: translations?.userbar?.activeTokens,
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },
+        ...(user.userType === 'Doctor' ? [{
+            label: `${translations?.patient}s`,
+            icon: <FontAwesomeIcon icon={faUsers} className='mr-2 text-color-secondary pi w-1rem'/>,
+            command: () => navigate("/patients")
+        }] : []),
         ...(user.userType === 'Patient' ? [{
-            label: 'Inactive Tokens',
+            label: translations?.userbar?.inactiveTokens,
             icon: 'pi pi-eye-slash',
             command: () => navigate("/inactive-tokens")
         }] : []),
         {
-            label: 'Edit Profile',
+            label: translations?.userbar?.editProfile,
             icon: 'pi pi-user-edit',
             command: () => navigate("/edit-profile")
         },
@@ -36,11 +45,11 @@ const UserBar = () => {
             separator: true
         },
         {
-            label: 'Logout',
+            label: translations?.userbar?.logout,
             icon: 'pi pi-sign-out',
             command: () => {
                 logout();
-                showMessage('info', 'Logged Out', `Bye ${user.firstName}`);
+                showMessage('info', translations?.userbar?.loggedOut, `${translations?.userbar?.bye} ${user.firstName}`);
                 setUser(null);
                 setPatient(null);
                 navigate("/");

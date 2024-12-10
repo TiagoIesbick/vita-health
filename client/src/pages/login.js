@@ -10,6 +10,7 @@ import { passwordHeader, passwordFooter } from '../utils/utils';
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useNavigate } from 'react-router';
 import { logout, storeToken, ACCESS_TOKEN_KEY } from "../graphql/auth";
 import { useApolloClient } from "@apollo/client";
@@ -19,6 +20,7 @@ import './login.css';
 const Login = () => {
     const navigate = useNavigate();
     const client = useApolloClient();
+    const { translations } = useLanguage();
     const { setUser, showMessage } = useUser();
     const { doLogin, loading, error } = useLogin();
     const formik = useFormik({
@@ -29,7 +31,7 @@ const Login = () => {
         onSubmit: async (values) => {
             const login = await doLogin(values);
             if (login.error) {
-                showMessage('error', 'Error', login.error, true);
+                showMessage('error', translations?.error?.error, login.error, true);
                 logout();
                 setUser(null);
             } else if (login.token) {
@@ -37,18 +39,18 @@ const Login = () => {
                 setUser(login.user);
                 client.resetStore();
                 login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
-                showMessage('success', 'Logged In', `Welcome ${login.user.firstName}`);
+                showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName}`);
             };
         },
         validationSchema: Yup.object({
-            email: Yup.string().email('Invalid e-mail').required('Required'),
-            password: Yup.string().required('Required').min(8, 'Minimum 8 characters')
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, 'At least one lowercase, one uppercase and one numeric')
+            email: Yup.string().email(translations?.login?.noEmail).required(translations?.required),
+            password: Yup.string().required(translations?.required).min(8, translations?.login?.min8Chars)
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.login?.validation)
         }),
     });
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.error, translations?.error?.errorMessage, true);
     };
 
     return (
@@ -71,21 +73,21 @@ const Login = () => {
                     <Password
                         inputId="password"
                         autoComplete="current-password"
-                        header={passwordHeader}
-                        footer={passwordFooter}
+                        header={passwordHeader(translations)}
+                        footer={passwordFooter(translations)}
                         toggleMask
                         className="w-full login-width"
                         {...formik.getFieldProps("password")}
                     />
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">{translations?.login?.password}</label>
                     {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Login" disabled={loading || !formik.isValid} loading={loading}  />
+                <Button type="submit" label={translations?.navbar?.login} disabled={loading || !formik.isValid} loading={loading}  />
             </form>
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">
-                Don't have an account?
-                <Link className='mt-1' to="/sign-up">Sign up</Link>
+                {translations?.login?.noAccount}
+                <Link className='mt-1' to="/sign-up">{translations?.navbar?.signUp}</Link>
             </div>
         </Card>
     );

@@ -11,6 +11,8 @@ type Query {
     aiConversation: [Conversation]
     searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [SearchFilesResult]
+    doctorPatients: [DoctorPatients]
+    patientRecordsbyDoctor(limit: Int, offset: Int, patientId: ID!): MedicalRecordsSubList
 }
 
 type MedicalRecords {
@@ -85,6 +87,12 @@ type Doctors {
     licenseNumber: String
     user: Users
     tokensAccess: [TokenAccess]
+}
+
+type DoctorPatients {
+    patientId: ID!
+    patientFullName: String!
+    lastRecordCreated: String!
 }
 
 type Conversation {

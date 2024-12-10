@@ -17,18 +17,18 @@ export const stripHtmlTags = (html) => {
 export const supportedFileFormats = ["image/jpeg", "image/png", "image/svg+xml", "image/webp", "application/pdf"];
 
 
-export const passwordHeader = <div className="font-bold mb-3">Pick a password</div>;
+export const passwordHeader = (translations) => <div className="font-bold mb-3">{translations?.login?.pickPassword}</div>;
 
 
-export const passwordFooter = (
+export const passwordFooter = (translations) => (
     <>
         <Divider />
-        <p className="mt-2">Rules</p>
+        <p className="mt-2">{translations?.login?.rules}</p>
         <ul className="pl-2 ml-2 mt-0 line-height-3">
-            <li>At least one lowercase</li>
-            <li>At least one uppercase</li>
-            <li>At least one numeric</li>
-            <li>Minimum 8 characters</li>
+            <li>{translations?.login?.lowercaseValidation}</li>
+            <li>{translations?.login?.uppercaseValidation}</li>
+            <li>{translations?.login?.numericValidation}</li>
+            <li>{translations?.login?.minChars?.replace(/{(\w+)}/g, '8')}</li>
         </ul>
     </>
 );
@@ -48,6 +48,12 @@ export const localDateTime = (date, operation) => {
     let localDate = new Date(date);
     if (operation === 'minus') return new Date(localDate.setHours(localDate.getHours() - timeZoneOffset));
     return new Date(localDate.setHours(localDate.getHours() + timeZoneOffset));
+};
+
+
+export const dateTemplate = (date) => {
+    let _date = localDateTime(date, 'minus');
+    return `${_date.toLocaleDateString()} ${_date.toLocaleTimeString(undefined, {timeStyle:'short'})}`
 };
 
 

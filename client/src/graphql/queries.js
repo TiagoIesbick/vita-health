@@ -43,6 +43,19 @@ export const medicalRecordsQuery = gql`
 `;
 
 
+export const patientRecordsbyDoctorQuery = gql`
+    query PatientRecordsByDoctor ($limit: Int, $offset: Int, $patientId: ID!) {
+        patientRecordsbyDoctor (limit: $limit, offset: $offset, patientId: $patientId) {
+            items {
+                ...MedicalRecordsDetail
+            }
+            totalCount
+        }
+    }
+    ${medicalRecordsFragment}
+`;
+
+
 export const medicalRecordQuery = gql`
     query MedicalRecord ($recordId: ID!) {
         medicalRecord (recordId: $recordId) {
@@ -83,6 +96,17 @@ export const inactiveTokensQuery = gql`
         }
     }
     ${tokenFragment}
+`;
+
+
+export const doctorPatientsQuery = gql`
+    query DoctorPatients {
+        doctorPatients {
+            patientId
+            patientFullName
+            lastRecordCreated
+        }
+    }
 `;
 
 

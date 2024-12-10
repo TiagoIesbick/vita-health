@@ -150,6 +150,7 @@ const InsertMedicalRecord = () => {
                         options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": 'Other...'}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
                         optionLabel="recordName"
+                        filter
                         className="w-full"
                         {...formik.getFieldProps("recordTypeId")}
                     />

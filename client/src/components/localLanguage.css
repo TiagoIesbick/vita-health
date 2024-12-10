@@ -1,0 +1,21 @@
+.flag {
+    background: url(../assets/images/flags_responsive.png) no-repeat;
+    background-size: 100%;
+    vertical-align: middle;
+}
+
+.flag-br {
+    background-position: 0 11.983471%;
+}
+
+.flag-us {
+    background-position: 0 93.38843%;
+}
+
+.languages-overlay .p-overlaypanel-content {
+    padding: 0.5rem 0;
+}
+
+.languages-overlay .p-listbox-list {
+    padding: 0;
+}

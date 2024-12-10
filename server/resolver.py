@@ -30,43 +30,161 @@ token_access = ObjectType("TokenAccess")
 
 @query.field("user")
 def resolve_user(*_, userId):
+    """
+    Resolves and retrieves a user based on the provided user ID.
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    userId (str): The unique identifier of the user to retrieve.
+
+    Returns:
+    dict: A dictionary containing the user's information if found, or None if not found.
+    """
     return get_user(userId)
 
 
 @users.field("patient")
 def resolve_users_patient(users, *_):
+    """
+    Resolve the 'patient' field for a user.
+
+    This function retrieves the doctor information associated with a user.
+    If the user's userId is not present, it returns None.
+
+    Parameters:
+    users (dict): A dictionary containing user information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing patient information if the userId exists,
+                  otherwise None.
+    """
     return None if not users['userId'] else get_users_patient(users['userId'])
 
 
 @users.field("doctor")
 def resolve_users_patient(users, *_):
+    """
+    Resolve the 'doctor' field for a user.
+
+    This function retrieves the doctor information associated with a user.
+    If the user's userId is not present, it returns None.
+
+    Parameters:
+    users (dict): A dictionary containing user information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing doctor information if the userId exists,
+                  otherwise None.
+    """
     return None if not users['userId'] else get_users_doctor(users['userId'])
 
 
 @patients.field("user")
 def resolve_patients_user(patients, *_):
+    """
+    Resolve the 'user' field for a patient.
+
+    This function retrieves the user information associated with a patient.
+    If the patient's userId is not present, it returns None.
+
+    Parameters:
+    patients (dict): A dictionary containing patient information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing user information if the userId exists,
+                  otherwise None.
+    """
     return None if not patients['userId'] else get_user(patients['userId'])
 
 
 @patients.field("tokens")
 @requires_authentication(return_none=True)
 def resolve_patients_tokens(patients, *_):
+    """
+    Resolves and retrieves the tokens associated with a patient.
+
+    This function fetches the tokens associated with a specific patient.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    patients (dict): A dictionary containing patient information, including 'patientId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    list or None: A list of tokens associated with the given patient if the patient ID is present.
+                   Returns None if the patient ID is not present.
+    """
     return None if not patients['patientId'] else get_patients_tokens(patients['patientId'])
 
 
 @doctors.field("user")
 def resolve_doctors_user(doctors, *_):
+    """
+    Resolve the 'user' field for a doctor.
+
+    This function retrieves the user information associated with a doctor.
+    If the doctor's userId is not present, it returns None.
+
+    Parameters:
+    doctors (dict): A dictionary containing doctor information, including 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing user information if the userId exists,
+                  otherwise None.
+    """
     return None if not doctors['userId'] else get_user(doctors['userId'])
 
 
 @doctors.field("tokensAccess")
 @requires_authentication(return_none=True)
-def resolve_doctors_user(doctors, *_):
+def resolve_doctor_tokens_access(doctors, *_):
+    """
+    Resolve the 'tokensAccess' field for a doctor.
+
+    This function retrieves the tokens access information for a given doctor.
+    It requires authentication and returns None if the doctor ID is not present.
+
+    Parameters:
+    doctors (dict): A dictionary containing doctor information, including 'doctorId' and 'userId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    list or None: A list of token access information for the doctor if the doctorId exists,
+                  otherwise None.
+    """
     return None if not doctors['doctorId'] else get_doctors_tokens_access(doctors['userId'])
 
 
 @mutation.field("createUser")
 def resolve_create_user(*_, input):
+    """
+    Resolve the createUser mutation to create a new user account.
+
+    This function validates user input, creates a new user account, and returns the result.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    input (dict): A dictionary containing user information with the following keys:
+        - 'email': The user's email address.
+        - 'firstName': The user's first name.
+        - 'lastName': The user's last name.
+        - 'password': The user's password.
+        - 'userType': The type of user account.
+        - 'acceptTerms': Boolean indicating if the user accepted the terms.
+
+    Returns:
+    dict: A dictionary containing the result of the user creation:
+        - If validation fails: {'userError': <error_message>}
+        - If creation is successful: {
+            'userConfirmation': True,
+            'user': <user_object>
+          }
+        - If creation fails: The result from the create_user function.
+    """
     email, firstName, lastName, password, userType, acceptTerms = \
         input['email'], input['firstName'].strip().capitalize(), input['lastName'].strip().capitalize(), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
@@ -92,6 +210,30 @@ def resolve_create_user(*_, input):
 
 @mutation.field("createPatientOrDoctorUser")
 def resolve_create_patient_or_doctor_user(*_, userId, userType):
+    """
+    Create a patient or doctor user based on the provided user ID and user type.
+
+    This function creates a new patient or doctor user entry in the database,
+    associated with an existing user account.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    userId (str): The unique identifier of the existing user account.
+    userType (str): The type of user to create ('Patient' or 'Doctor').
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful:
+            {
+                'userConfirmation': True,
+                'user': <user_object>
+            }
+        If unsuccessful:
+            {
+                'userConfirmation': False,
+                'error': <error_message>
+            }
+    """
     res = create_patient_or_doctor_user(userId, userType)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
@@ -101,6 +243,29 @@ def resolve_create_patient_or_doctor_user(*_, userId, userType):
 @mutation.field("updateUser")
 @requires_authentication('userError')
 def resolve_update_user(_, info, input):
+    """
+    Resolve the updateUser mutation to update a user's information.
+
+    This function updates a user's email, first name, and last name. It performs
+    validation on the input data and updates the user information in the database.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Contains the context and execution information.
+    input (dict): A dictionary containing the user's updated information:
+                  - 'email': The user's new email address.
+                  - 'firstName': The user's new first name.
+                  - 'lastName': The user's new last name.
+
+    Returns:
+    dict: A dictionary containing the result of the update operation:
+          - If validation fails: {'userError': <error_message>}
+          - If update is successful: {
+                'userConfirmation': True,
+                'user': <updated_user_object>,
+                'token': <new_jwt_token>
+            }
+    """
     email, firstName, lastName, userId = \
         input['email'], input['firstName'].strip().capitalize(), \
         input['lastName'].strip().capitalize(), info.context['user_detail']['userId']
@@ -121,6 +286,26 @@ def resolve_update_user(_, info, input):
 @requires_authentication('userError')
 @requires_patient('userError')
 def resolve_update_patient_user(_, info, patient, input):
+    """
+    Update the patient user's information.
+
+    This function updates the patient user's date of birth and gender. It requires
+    authentication and patient access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing context information.
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+    input (dict): A dictionary containing the updated user information, including 'dateOfBirth' and 'gender'.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful:
+            - 'userConfirmation': True
+            - 'user': The updated user information
+        If unsuccessful:
+            - 'userError': An error message describing the failure
+    """
     dateOfBirth = datetime.fromisoformat(input['dateOfBirth']).strftime("%Y-%m-%d")
     res = update_patient_user(dateOfBirth, input['gender'], patient['patientId'])
     if res['userConfirmation']:
@@ -132,6 +317,25 @@ def resolve_update_patient_user(_, info, patient, input):
 @requires_authentication('userError')
 @requires_doctor('userError')
 def resolve_update_doctor_user(_, info, doctor, input):
+    """
+    Update the information of a doctor user.
+
+    This function updates the specialty and license number of a doctor user.
+    It requires authentication and doctor access rights.
+
+    Parameters:
+    _ (Any): Placeholder parameter (unused).
+    info (GraphQLResolveInfo): Resolver info object containing the context.
+    doctor (dict): A dictionary containing the doctor's information.
+    input (dict): A dictionary containing the updated information:
+                  - 'specialty': The doctor's new specialty.
+                  - 'licenseNumber': The doctor's new license number.
+
+    Returns:
+    dict: A dictionary containing the result of the update operation:
+          - If successful, includes 'userConfirmation' (True) and 'user' (updated user info).
+          - If unsuccessful, includes 'userError' with an error message.
+    """
     res = update_doctor_user(nh3.clean(input['specialty'].strip().capitalize()), nh3.clean(input['licenseNumber'].strip()), doctor['doctorId'])
     if res['userConfirmation']:
         res['user'] = get_user(info.context['user_detail']['userId'])
@@ -140,6 +344,27 @@ def resolve_update_doctor_user(_, info, doctor, input):
 
 @mutation.field("login")
 def resolve_login(*_, email, password):
+    """
+    Authenticate a user and generate a JWT token upon successful login.
+
+    This function attempts to authenticate a user with the provided email and password.
+    If successful, it generates a JWT token for the user.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    email (str): The email address of the user attempting to log in.
+    password (str): The password of the user attempting to log in.
+
+    Returns:
+    dict: A dictionary containing the result of the login attempt.
+        If successful:
+            {
+                'user': User object containing user details,
+                'token': JWT token string for authenticated session
+            }
+        If unsuccessful:
+            {'error': 'Invalid email or password'}
+    """
     user = get_user_by_email_password(email, password)
     if user:
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
@@ -151,8 +376,54 @@ def resolve_login(*_, email, password):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
+    """
+    Resolves and returns a paginated list of medical records for a patient.
+
+    This function fetches a list of medical records for a given patient, applying pagination.
+    It requires authentication and patient or doctor access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    limit (int): The maximum number of items to return.
+    offset (int): The number of items to skip before starting to collect the result set.
+    patient_id (str): The ID of the patient whose medical records are to be fetched.
+    doctor_id (str): The ID of the doctor involved in the operation (for access control).
+
+    Returns:
+    dict or None: A dictionary containing the total count of medical records and the paginated items.
+                  Returns None if there are no medical records for the patient.
+    """
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
+    if not total_medical_records:
+        return None
+    total_medical_records['items'] = items
+    return total_medical_records
+
+
+@query.field("patientRecordsbyDoctor")
+@requires_authentication(return_none=True)
+@requires_doctor(return_none=True)
+def resolve_patient_records_by_doctor(*_, limit, offset, patientId, doctor):
+    """
+    Resolves and returns a paginated list of medical records for a patient.
+
+    This function fetches a list of medical records for a given patient, applying pagination.
+    It requires authentication and patient or doctor access.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    limit (int): The maximum number of items to return.
+    offset (int): The number of items to skip before starting to collect the result set.
+    patient_id (str): The ID of the patient whose medical records are to be fetched.
+    doctor_id (str): The ID of the doctor involved in the operation (for access control).
+
+    Returns:
+    dict or None: A dictionary containing the total count of medical records and the paginated items.
+                  Returns None if there are no medical records for the patient.
+    """
+    items = get_patient_records_by_doctor(patientId, doctor['doctorId'], limit, offset)
+    total_medical_records = count_patient_records_by_doctor(patientId, doctor['doctorId'])
     if not total_medical_records:
         return None
     total_medical_records['items'] = items
@@ -163,23 +434,82 @@ def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
 def resolve_get_medical_record(*_, recordId, patient_id, doctor_id):
+    """
+    Resolve and retrieve a specific medical record.
+
+    This function fetches a single medical record based on the provided record ID and patient ID.
+    It requires authentication and appropriate access rights (patient or doctor).
+
+    Parameters:
+    *_ : Variable length argument list for any additional parameters (unused).
+    recordId (str): The unique identifier of the medical record to retrieve.
+    patient_id (str): The ID of the patient associated with the medical record.
+    doctor_id (str): The ID of the doctor requesting access (for access control, unused in the function body).
+
+    Returns:
+    dict: A dictionary containing the medical record information if found.
+          Returns None if the record is not found or if access is denied.
+    """
     return get_medical_record(recordId, patient_id)
 
 
 @medical_records.field("recordType")
 def resolve_medical_records_type(medicalRecords, *_):
+    """
+    Resolve the record type for a medical record.
+
+    This function retrieves the type of a medical record based on its record type ID.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'recordTypeId'.
+    *_ : Variable length argument list for any additional parameters (unused).
+
+    Returns:
+    dict: A dictionary containing information about the medical record type.
+    """
     return get_medical_records_type(medicalRecords['recordTypeId'])
 
 
 @medical_records.field("files")
 @requires_authentication(return_none=True)
 def resolve_medical_records_files(medicalRecords, *_):
+    """
+    Resolves the 'files' field for the 'medicalRecords' GraphQL object.
+
+    This function retrieves the files associated with a specific medical record.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'recordId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    list: A list of file information associated with the medical record.
+          Returns None if authentication is not provided.
+    """
     return get_medical_records_files(medicalRecords['recordId'])
 
 
 @medical_records.field("doctor")
 @requires_authentication(return_none=True)
 def resolve_medical_records_doctor(medicalRecords, *_):
+    """
+    Resolve the doctor field for a medical record.
+
+    This function retrieves the doctor associated with a medical record.
+    It requires authentication and returns None if the doctor ID is not present.
+
+    Parameters:
+    medicalRecords (dict): A dictionary containing medical record information,
+                           including 'doctorId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the doctor's information if the doctorId
+                  exists and the doctor is found, otherwise None.
+    """
     return None if not medicalRecords['doctorId'] else get_doctor(medicalRecords['doctorId'])
 
 
@@ -187,6 +517,27 @@ def resolve_medical_records_doctor(medicalRecords, *_):
 @requires_authentication('medicalRecordError')
 @requires_patient_or_doctor_access('medicalRecordError')
 def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doctor_id):
+    """
+    Create a new medical record and index it in Elasticsearch.
+
+    This function creates a new medical record for a patient, optionally associated with a doctor.
+    If the creation is successful, it indexes the record in Elasticsearch for efficient searching.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    recordTypeId (str): The ID of the record type for this medical record.
+    recordData (str): The data content of the medical record.
+    patient_id (str): The ID of the patient for whom the record is being created.
+    doctor_id (str): The ID of the doctor creating the record, if applicable.
+
+    Returns:
+    dict: A dictionary containing the result of the operation.
+        If successful, includes:
+            - 'medicalRecordConfirmation': True
+            - 'medicalRecord': The created medical record object
+        If unsuccessful, includes:
+            - 'medicalRecordError': An error message describing the failure
+    """
     res = create_medical_record(patient_id, doctor_id, recordTypeId, recordData)
     if res['medicalRecordConfirmation']:
         medical_record = get_medical_record(res['medicalRecordId'], patient_id)
@@ -208,12 +559,39 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
 
 @query.field("recordTypes")
 def resolve_record_types(*_):
+    """
+    Retrieve a list of available medical record types.
+
+    This function retrieves a list of all available medical record types from the database.
+
+    Parameters:
+    None
+
+    Returns:
+    list: A list of strings representing the available medical record types.
+    """
     return get_record_types()
 
 
 @mutation.field("createRecordType")
 @requires_authentication('recordTypeError')
 def resolve_create_record_type(*_, recordName):
+    """
+    Create a new record type with the given name.
+
+    This function creates a new record type after sanitizing and formatting the provided name.
+    It requires authentication to perform this operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    recordName (str): The name of the record type to be created.
+
+    Returns:
+    dict: The result of the create_record_type function, which typically includes:
+        - A confirmation message if the record type was successfully created.
+        - An error message if the creation failed.
+        - The newly created record type information if successful.
+    """
     recordName = ' '.join(nh3.clean(recordName).split()).title()
     return create_record_type(recordName)
 
@@ -222,6 +600,20 @@ def resolve_create_record_type(*_, recordName):
 @requires_authentication(return_none=True)
 @requires_patient(return_none=True)
 def resolve_patients_active_tokens(*_, patient):
+    """
+    Retrieve the active tokens for a given patient.
+
+    This function fetches all active tokens associated with a specific patient.
+    It requires authentication and patient access to perform the operation.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    patient (dict): A dictionary containing patient information, including 'patientId'.
+
+    Returns:
+    list: A list of active token information associated with the given patient.
+          If the patient ID is not present or the patient is not found, returns None.
+    """
     return get_active_tokens_by_patient(patient['patientId'])
 
 
@@ -229,6 +621,20 @@ def resolve_patients_active_tokens(*_, patient):
 @requires_authentication(return_none=True)
 @requires_doctor(return_none=True)
 def resolve_doctors_active_tokens(*_, doctor):
+    """
+    Retrieve the active tokens associated with a specific doctor.
+
+    This function retrieves the active tokens for a given doctor. It requires
+    authentication and doctor access to perform the operation.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    doctor (dict): A dictionary containing doctor information, including 'doctorId'.
+
+    Returns:
+    list: A list of active token information associated with the given doctor.
+          If the doctor ID is not present or the doctor is not found, returns None.
+    """
     return get_active_tokens_by_doctor(doctor['doctorId'])
 
 
@@ -258,6 +664,27 @@ def resolve_inactive_tokens(*_, patient, limit, offset):
         return None
     total_inactive_tokens['items'] = items
     return total_inactive_tokens
+
+
+@query.field("doctorPatients")
+@requires_authentication(return_none=True)
+@requires_doctor(return_none=True)
+def resolve_doctor_patients(*_, doctor):
+    """
+    Retrieve the patients associated with a specific doctor.
+
+    This function retrieves the patients for a given doctor. It requires
+    authentication and doctor access to perform the operation.
+
+    Parameters:
+    _ (any): Placeholder parameter (unused).
+    doctor (dict): A dictionary containing doctor information, including 'doctorId'.
+
+    Returns:
+    list: A list of patients associated with the given doctor.
+          If the doctor ID is not present or the doctor is not found, returns None.
+    """
+    return get_doctor_patients(doctor['doctorId'])
 
 
 @query.field("aiConversation")
