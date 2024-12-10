@@ -35,13 +35,28 @@
             "rules": "Rules",
             "uppercaseValidation": "At least one uppercase",
             "validation": "At least one lowercase, one uppercase and one numeric",
-            "welcome": "Welcome"
+            "welcome": "Welcome,"
         },
         "navbar": {
+            "history": "History",
             "login": "Login",
             "signUp": "Sign Up"
         },
         "patient": "Patient",
-        "required": "Required"
+        "required": "Required",
+        "search": {
+            "files": "Files",
+            "healthData": "Health Data",
+            "search": "Search"
+        },
+        "userbar": {
+            "activeTokens": "Active Tokens",
+            "addData": "Add Health Data",
+            "bye": "Bye,",
+            "editProfile": "Edit Profile",
+            "inactiveTokens": "Inactive Tokens",
+            "loggedOut": "Logged Out",
+            "logout": "Logout"
+        }
     }
 }

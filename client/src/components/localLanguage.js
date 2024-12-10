@@ -25,7 +25,7 @@ const countryTemplate = (option) => {
     );
 };
 
-const LocalLanguage = () => {
+const LocalLanguage = ({ expanded, screenWidth }) => {
     const { language, setLanguage } = useLanguage();
     const selectedLanguage = languages.find((lang) => lang.name.toLowerCase() === language);
     const op = useRef(null);
@@ -38,12 +38,17 @@ const LocalLanguage = () => {
     };
 
     return (
-        <div className="card flex justify-content-center">
+        <>
             <img
                 alt='language'
                 src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
                 className={`flag flag-${selectedLanguage.code.toLocaleLowerCase()}`}
-                style={{ width: '1.25rem', marginRight: '.5rem' }}
+                style={{
+                    width: '1.25rem',
+                    margin: screenWidth <= 375 ? '0' : '0 0.875rem',
+                    cursor: 'pointer',
+                    display: expanded ? 'none' : undefined
+                }}
                 onClick={(e) => op.current.toggle(e)}
             />
             <OverlayPanel ref={op} className='languages-overlay'>
@@ -57,7 +62,7 @@ const LocalLanguage = () => {
                     listStyle={{ maxHeight: '250px' }}
                 />
             </OverlayPanel>
-        </div>
+        </>
     );
 };
 export default LocalLanguage;

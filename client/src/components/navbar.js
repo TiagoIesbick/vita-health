@@ -28,12 +28,12 @@ const Navbar = ({ expanded }) => {
                 >
                     {user.userType === 'Patient' &&
                         <>
-                            <li className="nav-button"><Link to="/medical-records">History</Link></li>
-                            <li className="nav-button"><Link to="/generate-access-token">Token</Link></li>
+                            <li><Link className="nav-button" to="/medical-records">{translations?.navbar?.history}</Link></li>
+                            <li><Link className="nav-button" to="/generate-access-token">Token</Link></li>
                         </>
                     }
                     {user.userType === 'Doctor' && <li className="nav-button"><Link to="/insert-token">Token</Link></li>}
-                    {user && user.userType === 'Doctor' && patient && <li className="nav-button"><Link to="/medical-records-access">History</Link></li>}
+                    {user && user.userType === 'Doctor' && patient && <li className="nav-button"><Link to="/medical-records-access">{translations?.navbar?.history}</Link></li>}
                 </ul>
                 <UserBar />
                 </>

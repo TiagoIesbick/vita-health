@@ -3,6 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { OverlayPanel } from 'primereact/overlaypanel';
+import { useLanguage } from "../providers/languageContext";
 import { useRef, useState, useEffect } from 'react';
 import { useSearchFiles, useSearchMedicalRecords } from '../hooks/hooks';
 import { useOverlayListener } from 'primereact/hooks';
@@ -12,14 +13,14 @@ import SearchList from './searchList';
 import './search.css';
 
 
-const Search = ({ expanded, setExpanded }) => {
+const Search = ({ expanded, setExpanded, screenWidth }) => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const overlayRef = useRef(null);
     const searchInput = useRef(null);
     const [term, setTerm] =  useState('');
     const [debouncedTerm, setDebouncedTerm] = useState('');
     const { setFile, setFileVisible } = useFileContext();
-    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(debouncedTerm);
     const { searchFiles, loadingFiles, errorFiles } = useSearchFiles(debouncedTerm);
 
@@ -77,15 +78,6 @@ const Search = ({ expanded, setExpanded }) => {
     };
 
     useEffect(() => {
-        const resizeListener = () => {
-            setScreenWidth(window.innerWidth);
-            if (expanded && window.innerWidth <= 600) setExpanded(false);
-        }
-        window.addEventListener('resize', resizeListener);
-        return () => window.removeEventListener('resize', resizeListener);
-    }, [expanded, setExpanded]);
-
-    useEffect(() => {
         if (expanded) searchInput?.current?.focus();
 
         const handleClickOutside = (e) => {
@@ -108,21 +100,18 @@ const Search = ({ expanded, setExpanded }) => {
         };
     }, [expanded, setExpanded]);
 
-
     return (
         <>
             <div
                 style={{
-                    width: !expanded && screenWidth <= 600 ? undefined : '100%',
-                    maxWidth: !expanded && screenWidth <= 600 ? undefined : '300px',
-                    marginLeft: !expanded && screenWidth > 600 ? '1rem' : undefined
+                    marginLeft: !expanded && screenWidth > 600 ? '0.6rem' : undefined
                 }}
             >
                 {!expanded && screenWidth <= 600 && (
                     <Button
                         icon="pi pi-search"
                         rounded text
-                        aria-label="Search"
+                        aria-label={translations?.search?.search}
                         className="mobile-search-button"
                         onClick={handleButtonClick}
                     />
@@ -131,12 +120,12 @@ const Search = ({ expanded, setExpanded }) => {
                     <IconField
                         iconPosition="left"
                         style={{
-                            minWidth: expanded ? '61vw' : undefined
+                            minWidth: expanded ? 'calc(100vw - (100vw/6) - 48px - 2.5rem)' : undefined
                         }}
                     >
                         <InputIcon className={loading || loadingFiles ? "pi pi-spin pi-spinner-dotted" : "pi pi-search"} />
                         <InputText
-                            placeholder="Search"
+                            placeholder={translations?.search?.search}
                             value={term}
                             onChange={handleTerm}
                             onKeyDown={handleKeyDown}
@@ -159,20 +148,20 @@ const Search = ({ expanded, setExpanded }) => {
                 >
                     {searchMedicalRecords?.length ? (
                         <>
-                            <h4>Health Data</h4>
+                            <h4>{translations?.search?.healthData}</h4>
                             <SearchList searchResults={searchMedicalRecords} setTerm={setTerm} />
                         </>
                     ) : null}
                     {searchFiles?.length ? (
                         <>
-                            <h4>Files</h4>
+                            <h4>{translations?.search?.files}</h4>
                             <SearchList searchResults={searchFiles} resultsType={'files'} setTerm={setTerm} setFile={setFile} setVisible={setFileVisible}/>
                         </>
                     ) : null}
                     {!searchMedicalRecords?.length && !searchFiles?.length &&
                         <p>{term}</p>
                     }
-                    {error || errorFiles ? <p>Data unavailable</p> : null}
+                    {error || errorFiles ? <p>{translations?.error?.errorMessage}</p> : null}
                 </OverlayPanel>
             </div>
         </>

@@ -24,7 +24,7 @@
         },
         "lastRecord": "Último Registro",
         "login": {
-            "loggedIn": "Conectado(a)",
+            "loggedIn": "Conectado",
             "lowercaseValidation": "Pelo menos uma minúscula",
             "minChars": "Mínimo {count} caracteres",
             "noAccount": "Não tem uma conta?",
@@ -35,13 +35,28 @@
             "rules": "Regras",
             "uppercaseValidation": "Pelo menos uma maiúscula",
             "validation": "Pelo menos uma minúscula, uma maiúscula e um número",
-            "welcome": "Bem-vindo(a)"
+            "welcome": "Olá,"
         },
         "navbar": {
+            "history": "Histórico",
             "login": "Entre",
             "signUp": "Cadastre-se"
         },
         "patient": "Paciente",
-        "required": "Obrigatório"
+        "required": "Obrigatório",
+        "search": {
+            "files": "Arquivos",
+            "healthData": "Dados de Saúde",
+            "search": "Pesquisar"
+        },
+        "userbar": {
+            "activeTokens": "Tokens Ativos",
+            "addData": "Adicionar Dados de Saúde",
+            "bye": "Até logo,",
+            "editProfile": "Editar Perfil",
+            "inactiveTokens": "Tokens Inativos",
+            "loggedOut": "Desconectado",
+            "logout": "Sair"
+        }
     }
 }

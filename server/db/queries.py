@@ -298,18 +298,60 @@ def get_patient_records_by_doctor(patientId: int, doctorId: int, limit: int, off
 
 
 def count_patient_records_by_doctor(patientId: int, doctorId: int) -> None | dict:
+    """
+    Count the total number of medical records for a specific patient and doctor.
+
+    This function queries the MedicalRecords table in the database to count
+    the number of records associated with the given patient ID and doctor ID.
+
+    Parameters:
+    patientId (int): The unique identifier of the patient whose medical records are to be counted.
+    doctorId (int): The unique identifier of the doctor associated with the records.
+
+    Returns:
+    None | dict: A dictionary containing the total count of medical records if found,
+                 with the key 'totalCount', or None if no records are found for the given patient ID and doctor ID.
+    """
     query = rf"SELECT COUNT(recordId) AS totalCount FROM MedicalRecords WHERE patientId = {patientId} AND doctorId = {doctorId};"
-    total_count= mysql_client(query)
+    total_count = mysql_client(query)
     return None if not total_count else total_count[0]
 
 
 def get_medical_records_type(id: int) -> None | dict:
+    """
+    Retrieve information about a specific medical record type from the database.
+
+    This function queries the RecordTypes table in the database to fetch all information
+    associated with the specified record type ID.
+
+    Args:
+        id (int): The unique identifier of the record type to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the record type information if found,
+                     or None if no record type matches the given ID.
+                     The dictionary includes details such as recordTypeId, recordName,
+                     and any other fields present in the RecordTypes table.
+    """
     query = rf'SELECT * FROM RecordTypes WHERE recordTypeId = {id};'
     record_type = mysql_client(query)
     return None if not record_type else record_type[0]
 
 
 def get_record_type_name(id: int) -> None | str:
+    """
+    Retrieve the name of a medical record type from the database based on its ID.
+
+    This function queries the RecordTypes table to fetch the name of the record type
+    associated with the given record type ID.
+
+    Args:
+        id (int): The unique identifier of the record type.
+
+    Returns:
+        None | str: The name of the record type if found, or None if no record type
+                    matches the given ID.
+    """
     query = rf'SELECT recordName FROM RecordTypes WHERE recordTypeId = {id};'
     record_name = mysql_client(query)
     return None if not record_name else record_name[0]['recordName']
