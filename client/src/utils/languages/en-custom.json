@@ -12,15 +12,41 @@
         },
         "doctor": "Healthcare professional",
         "error": {
-            "error": "Error",
-            "errorMessage": "Data not available. Try again later."
+            "title": "Error",
+            "message": "Data not available. Try again later."
         },
+        "generateToken": {
+            "dateFormat": "yy-mm-dd",
+            "expTime": "Expiration Time",
+            "expTimeFirstValidation": "The date cannot be in the past",
+            "expTimeSecondValidation": "Maximum 90 days",
+            "title": "Generate an Access Token"
+        },
+        "healthHistory": {
+            "title": "Health History",
+            "noData": {
+                "firstP": "You have no health history yet.",
+                "secondP1st": "Start by adding your health data",
+                "secondP2nd": "to begin building your records.",
+                "thirdP1st": "Alternatively, generate a token",
+                "thirdP2nd": "to share with your health professional so they can add new information."
+            }
+        },
+        "here": "here",
         "home": {
             "insights_info": "Uncover key patterns and trends in your health history. Vita’s AI empowers you and your provider to make more informed decisions.",
             "security_info": "Your health, your data, your control. With Vita, securely access and manage your medical information anytime, anywhere, backed by intelligent insights.",
             "subtitle": "Manage Your Medical History with AI-Driven Insights",
             "title": "Take Control of Your Health:",
             "token_info": "Securely share your medical history with healthcare professionals using temporary tokens. Enable accurate updates and see how AI enhances the quality of your care."
+        },
+        "insertMedicalRecord": {
+            "category": "Health Data Category",
+            "dragFiles": "Drag and Drop Files Here",
+            "newCategory": "New Category",
+            "newCategoryLabel": "Category",
+            "notesPlaceholder": "Enter your notes here...",
+            "title": "Add Health Data"
         },
         "lastRecord": "Last Record",
         "login": {
@@ -51,7 +77,6 @@
         },
         "userbar": {
             "activeTokens": "Active Tokens",
-            "addData": "Add Health Data",
             "bye": "Bye,",
             "editProfile": "Edit Profile",
             "inactiveTokens": "Inactive Tokens",

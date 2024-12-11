@@ -17,7 +17,7 @@ const UserBar = () => {
     const userMenu = useRef(null);
     const items = [
         ...(user.userType === 'Patient' ? [{
-            label: translations?.userbar?.addData,
+            label: translations?.insertMedicalRecord?.title,
             icon: 'pi pi-plus-circle',
             command: () => navigate("/insert-medical-record")
         }] : []),

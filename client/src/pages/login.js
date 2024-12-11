@@ -50,7 +50,7 @@ const Login = () => {
     });
     if (error) {
         navigate('/');
-        showMessage('error', translations?.error?.error, translations?.error?.errorMessage, true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (

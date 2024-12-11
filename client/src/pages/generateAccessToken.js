@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import { Dialog } from 'primereact/dialog';
 import { useGenerateToken } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -16,6 +17,7 @@ import CopyButton from "../components/copyButton";
 
 const GenerateAccessToken = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { showMessage } = useUser();
     const { addToken, loading, error } = useGenerateToken();
     const [visible, setVisible] = useState(false);
@@ -27,7 +29,7 @@ const GenerateAccessToken = () => {
         onSubmit: async (values, { resetForm }) => {
             const resToken = await addToken(values.tokenExpirationDateTime);
             if (resToken.tokenError){
-                showMessage('error', 'Error', resToken.tokenError);
+                showMessage('error', translations?.error?.title, resToken.tokenError);
             } else {
                 resetForm();
                 setToken(resToken.token.token);
@@ -35,19 +37,20 @@ const GenerateAccessToken = () => {
             };
         },
         validationSchema: Yup.object({
-            tokenExpirationDateTime: Yup.date().required('Required')
-                .min(toDay, 'The date cannot be in the past')
-                .max(toDayPlus90, 'Maximum 90 days')
+            tokenExpirationDateTime: Yup.date().required(translations?.required)
+                .min(toDay, translations?.generateToken?.expTimeFirstValidation)
+                .max(toDayPlus90, translations?.generateToken?.expTimeSecondValidation)
         }),
     });
+
     if (error) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (
         <Card
-            title="Generate Token"
+            title={translations?.generateToken?.title}
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
@@ -55,7 +58,7 @@ const GenerateAccessToken = () => {
                     <Calendar
                         className="w-full"
                         inputId="token-expiration-date-time"
-                        dateFormat="yy-mm-dd"
+                        dateFormat={translations?.generateToken?.dateFormat}
                         minDate={toDay}
                         maxDate={toDayPlus90}
                         showIcon
@@ -63,10 +66,10 @@ const GenerateAccessToken = () => {
                         hourFormat="24"
                         {...formik.getFieldProps("tokenExpirationDateTime")}
                     />
-                    <label htmlFor="token-expiration-date-time">Expiration Time</label>
+                    <label htmlFor="token-expiration-date-time">{translations?.generateToken?.expTime}</label>
                     {formik.touched.tokenExpirationDateTime && formik.errors.tokenExpirationDateTime &&<div className="text-red-500 text-xs">{formik.errors.tokenExpirationDateTime}</div>}
                 </FloatLabel>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loading} loading={loading} />
+                <Button type="submit" label={translations?.confirm} disabled={!formik.isValid || loading} loading={loading} />
             </form>
             <Dialog
                 visible={visible}

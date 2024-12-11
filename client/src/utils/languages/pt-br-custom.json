@@ -12,15 +12,41 @@
         },
         "doctor": "Profissional de saúde",
         "error": {
-            "error": "Erro",
-            "errorMessage": "Dados não disponíveis. Tente novamente mais tarde."
+            "title": "Erro",
+            "message": "Dados não disponíveis. Tente novamente mais tarde."
         },
+        "generateToken": {
+            "dateFormat": "dd/mm/yy",
+            "expTime": "Tempo de Expiração",
+            "expTimeFirstValidation": "A data não pode ser no passado",
+            "expTimeSecondValidation": "Máximo 90 dias",
+            "title": "Gere um Token de Acesso"
+        },
+        "healthHistory": {
+            "title": "Histórico de Saúde",
+            "noData": {
+                "firstP": "Você ainda não tem dados de saúde salvos.",
+                "secondP1st": "Adicione seus dados de saúde",
+                "secondP2nd": "para começar a construir seu histórico.",
+                "thirdP1st": "Alternativamente, gere um token",
+                "thirdP2nd": "para compartilhar com seu profissional de saúde, permitindo que ele adicione novas informações."
+            }
+        },
+        "here": "aqui",
         "home": {
             "insights_info": "Descubra padrões e tendências importantes no seu histórico de saúde. A IA da Vita ajuda você e seu profissional a tomarem decisões mais informadas.",
             "security_info": "Sua saúde, seus dados, seu controle. Com a Vita, acesse e gerencie com segurança suas informações médicas a qualquer momento, em qualquer lugar, com o suporte de análises inteligentes.",
             "subtitle": "Controle seu histórico médico com percepções baseadas em Inteligência Artificial",
             "title": "Transforme sua Saúde:",
             "token_info": "Use tokens temporários para compartilhar seu histórico de forma segura com profissionais de saúde. Permita atualizações precisas e explore como a IA torna seu cuidado mais eficiente."
+        },
+        "insertMedicalRecord": {
+            "category": "Categoria do Dado de Saúde",
+            "dragFiles": "Arraste e Solte Arquivos Aqui",
+            "newCategory": "Nova Categoria",
+            "newCategoryLabel": "Categoria",
+            "notesPlaceholder": "Digite suas anotações aqui...",
+            "title": "Adicionar Dados de Saúde"
         },
         "lastRecord": "Último Registro",
         "login": {
@@ -51,7 +77,6 @@
         },
         "userbar": {
             "activeTokens": "Tokens Ativos",
-            "addData": "Adicionar Dados de Saúde",
             "bye": "Até logo,",
             "editProfile": "Editar Perfil",
             "inactiveTokens": "Tokens Inativos",
