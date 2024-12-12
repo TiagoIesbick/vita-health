@@ -418,12 +418,43 @@ def get_tokens_token_access(id: int) -> None | list[dict]:
 
 
 def get_token_access(id: int) -> None | dict:
+    """
+    Retrieve token access information from the database based on the token access ID.
+
+    This function queries the TokenAccess table in the database to fetch all information
+    associated with the specified token access ID.
+
+    Args:
+        id (int): The unique identifier of the token access record to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the token access information if found,
+                     or None if no token access record matches the given ID.
+                     The dictionary includes details such as tokenAccessId, tokenId,
+                     doctorId, and any other fields present in the TokenAccess table.
+    """
     query = rf'SELECT * FROM TokenAccess WHERE tokenAccessId = {id};'
     token_access = mysql_client(query)
     return None if not token_access else token_access[0]
 
 
 def get_active_tokens_by_doctor(id: int) -> None | list[dict]:
+    """
+    Retrieve active tokens accessible to a specific doctor from the database.
+
+    This function queries the Tokens and TokenAccess tables to fetch all active tokens
+    that a doctor has access to. Active tokens are those with an expiration date
+    later than the current date and time. The results are ordered by expiration date.
+
+    Args:
+        id (int): The unique identifier of the doctor whose accessible active tokens are to be retrieved.
+
+    Returns:
+        None | list[dict]: A list of dictionaries, where each dictionary represents an active token,
+                           or None if no active tokens are found for the given doctor ID.
+                           Each dictionary contains details about the token such as
+                           tokenId, token, patientId, and expirationDate.
+    """
     query = rf'''SELECT a.tokenId, a.token, a.patientId, a.expirationDate from Tokens a INNER JOIN
         (SELECT DISTINCT tokenId FROM TokenAccess WHERE doctorId = {id}) v ON a.tokenId = v.tokenId
         WHERE expirationDate > '{datetime.now()}' ORDER BY expirationDate;'''
