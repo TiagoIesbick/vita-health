@@ -5,12 +5,14 @@ import { Badge } from 'primereact/badge';
 import { Link } from "react-router-dom";
 import { classNames } from "primereact/utils";
 import { useState } from "react";
+import { useLanguage } from "../providers/languageContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserDoctor } from '@fortawesome/free-solid-svg-icons';
 import FileGallery from "./fileGallery";
 
 
 const HealthDataContent = ({item}) => {
+    const { translations } = useLanguage();
     const [show, setShow] = useState(false);
     let date = localDateTime(item.dateCreated, 'minus');
     const filesLength = item.files.length;
@@ -19,7 +21,7 @@ const HealthDataContent = ({item}) => {
 
     return (
         <Card
-            title={item.recordType.recordName}
+            title={translations?.insertMedicalRecord?.recordTypes?.[item.recordType.recordName] || item.recordType.recordName}
             subTitle={
                 <>
                     {`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}

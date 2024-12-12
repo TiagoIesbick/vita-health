@@ -35,6 +35,7 @@ const InsertMedicalRecord = () => {
     const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
     const clickableWarning = useRef(null);
     const [visible, setVisible] = useState(false);
+
     const formik = useFormik({
         initialValues: {
             recordTypeId: '',
@@ -98,6 +99,7 @@ const InsertMedicalRecord = () => {
                 })
         })
     });
+
     const formikCategory = useFormik({
         initialValues: {
             category: ''
@@ -141,6 +143,12 @@ const InsertMedicalRecord = () => {
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
+    const translatedRecordTypes = recordTypes?.map(record => ({
+        ...record,
+        recordName: translations?.insertMedicalRecord?.recordTypes?.[record.recordName] || record.recordName
+    })).sort((a, b) => a.recordName.localeCompare(b.recordName));
+
+
     return (
         <Card title={translations?.insertMedicalRecord?.title} className="flex justify-content-center align-items-center card-min-height">
             {user.userType === 'Doctor' && <CountDown patient={patient} setPatient={setPatient} showMessage={showMessage} patientDetail={userDetail} />}
@@ -149,7 +157,7 @@ const InsertMedicalRecord = () => {
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": 'Other...'}] : formik.initialValues.recordTypeId }
+                        options={!loadingRecordTypes ? [...translatedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
                         optionLabel="recordName"
                         filter

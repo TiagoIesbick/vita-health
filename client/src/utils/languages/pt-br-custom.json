@@ -46,7 +46,26 @@
             "newCategory": "Nova Categoria",
             "newCategoryLabel": "Categoria",
             "notesPlaceholder": "Digite suas anotações aqui...",
-            "title": "Adicionar Dados de Saúde"
+            "title": "Adicionar Dados de Saúde",
+            "recordTypes": {
+                "Blood Test": "Exame de Sangue",
+                "Cardiology": "Cardiologia",
+                "Dermatology": "Dermatologia",
+                "ECG": "Eletrocardiograma",
+                "MRI Scan": "Ressonância Magnética",
+                "Neurology": "Neurologia",
+                "Nutrition": "Nutrição",
+                "Obstetrics": "Obstetrícia",
+                "Orthopedics": "Ortopedia",
+                "Pediatrics": "Pediatria",
+                "Physiotherapy": "Fisioterapia",
+                "Psychiatry": "Psiquiatria",
+                "Psychology": "Psicologia",
+                "Traumatology": "Traumatologia",
+                "Ultrasound": "Ultrasom",
+                "X-Ray": "Raio-X",
+                "Other": "Outro"
+            }
         },
         "lastRecord": "Último Registro",
         "login": {
