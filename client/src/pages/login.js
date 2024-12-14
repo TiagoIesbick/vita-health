@@ -44,13 +44,13 @@ const Login = () => {
         },
         validationSchema: Yup.object({
             email: Yup.string().email(translations?.login?.noEmail).required(translations?.required),
-            password: Yup.string().required(translations?.required).min(8, translations?.login?.min8Chars)
+            password: Yup.string().required(translations?.required).min(8, translations?.login?.minChars?.replace(/{(\w+)}/g, '8'))
                 .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.login?.validation)
         }),
     });
     if (error) {
         navigate('/');
-        showMessage('error', translations?.error?.error, translations?.error?.errorMessage, true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (

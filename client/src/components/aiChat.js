@@ -3,6 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from 'react';
 import { useAIConversation, useCreateConversation } from "../hooks/hooks";
+import { useLanguage } from "../providers/languageContext";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import MessageInput from "./messageInput";
@@ -11,6 +12,7 @@ import './aiChat.css';
 
 
 const AIChat = ({ user, allRecords }) => {
+    const { translations } = useLanguage();
     const [visible, setVisible] = useState(false);
     const [position, setPosition] = useState('center');
     const { aiConversation, loading } = useAIConversation();
@@ -27,8 +29,8 @@ const AIChat = ({ user, allRecords }) => {
             await addConversation(values);
         },
         validationSchema: Yup.object({
-            content: Yup.string().required('Required')
-                .min(3, 'Minimum 3 characters')
+            content: Yup.string().required(translations?.required)
+                .min(3, translations?.login?.minChars?.replace(/{(\w+)}/g, '3'))
         }),
     })
 
@@ -65,7 +67,7 @@ const AIChat = ({ user, allRecords }) => {
     const header = () => (
         <div className="flex align-items-center flex-wrap">
             <img src={aiIcon} alt="AI-assistant" className="w-3rem h-3rem mr-2" />
-            Health Assistant
+            {translations?.healthAssistant?.title}
         </div>
     );
 
@@ -110,7 +112,7 @@ const AIChat = ({ user, allRecords }) => {
 
     const footer = () => (
         <form onSubmit={formik.handleSubmit}>
-            <MessageInput formik={formik} loading={loading} loadingConversation={loadingConversation}/>
+            <MessageInput formik={formik} loading={loading} loadingConversation={loadingConversation} translations={translations}/>
         </form>
     );
 
@@ -147,22 +149,22 @@ const AIChat = ({ user, allRecords }) => {
                 <div className="text-justify">
                     {user.userType === 'Patient'
                         ?   <>
-                                <p className="mt-0">Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.</p>
-                                <p>For example, you can ask me things like:</p>
+                                <p className="mt-0">{translations?.healthAssistant?.firstP}</p>
+                                <p>{translations?.healthAssistant?.secondP}</p>
                                 <ul className="suggested-questions-list">
-                                    <li>Are there any patterns in my health history that suggest a serious condition?</li>
-                                    <li>Can you highlight any critical changes in my recent medical records?</li>
+                                    <li>{translations?.healthAssistant?.firstLi}</li>
+                                    <li>{translations?.healthAssistant?.secondLi}</li>
                                 </ul>
-                                <p>How can I assist you today?</p>
+                                <p>{translations?.healthAssistant?.thirdP}</p>
                             </>
                         :   <>
-                                <p className="mt-0">Hello! I'm your health assistant, here to help you understand your patient's medical history. You can ask me questions about their health records, lab results, and any other medical information.</p>
-                                <p>For example, you can ask me things like:</p>
+                                <p className="mt-0">{translations?.healthAssistant?.firstPDoctorUser}</p>
+                                <p>{translations?.healthAssistant?.secondP}</p>
                                 <ul className="suggested-questions-list">
-                                    <li>Are there any patterns in my patient’s health history that suggest a serious condition?</li>
-                                    <li>Can you highlight any critical changes in the patient’s recent medical records?</li>
+                                    <li>{translations?.healthAssistant?.firstLiDoctorUser}</li>
+                                    <li>{translations?.healthAssistant?.secondLiDoctorUser}</li>
                                 </ul>
-                                <p>How can I assist you in better understanding your patient's health today?</p>
+                                <p>{translations?.healthAssistant?.thirdPDoctorUser}</p>
                             </>
                     }
                     {!loading && aiConversation.length > 0 && aiConversation.map((conversation, index) => chatBox(conversation, index))}

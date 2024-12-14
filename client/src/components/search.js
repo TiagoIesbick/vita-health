@@ -161,7 +161,7 @@ const Search = ({ expanded, setExpanded, screenWidth }) => {
                     {!searchMedicalRecords?.length && !searchFiles?.length &&
                         <p>{term}</p>
                     }
-                    {error || errorFiles ? <p>{translations?.error?.errorMessage}</p> : null}
+                    {error || errorFiles ? <p>{translations?.error?.message}</p> : null}
                 </OverlayPanel>
             </div>
         </>

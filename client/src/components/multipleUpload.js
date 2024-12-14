@@ -10,7 +10,7 @@ import FileRenderer from './fileRenderer';
 import './multipleUpload.css';
 
 
-const MultipleUpload = ({ formik }) => {
+const MultipleUpload = ({ formik, translations }) => {
     const [totalSize, setTotalSize] = useState(0);
     const fileUploadRef = useRef(null);
 
@@ -99,7 +99,7 @@ const MultipleUpload = ({ formik }) => {
             <div className="flex align-items-center flex-column">
                 <i className="pi pi-file-arrow-up mt-3 p-5" style={{ fontSize: '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)' }}></i>
                 <span style={{ fontSize: '1.2em', color: 'var(--text-color-secondary)' }} className="my-5">
-                    Drag and Drop Files Here
+                    {translations?.insertMedicalRecord?.dragFiles}
                 </span>
             </div>
         );
@@ -110,8 +110,8 @@ const MultipleUpload = ({ formik }) => {
 
     return (
         <div>
-            <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
-            <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
+            <Tooltip target=".custom-choose-btn" content={translations?.choose} position="bottom" />
+            <Tooltip target=".custom-cancel-btn" content={translations?.clear} position="bottom" />
 
             <FileUpload ref={fileUploadRef} name="files" url="/uploads" multiple accept={supportedFileFormats} maxFileSize={5 * 1024 * 1024}
                 onSelect={onTemplateSelect} onError={onTemplateClear} onClear={onTemplateClear}

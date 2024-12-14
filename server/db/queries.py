@@ -358,30 +358,103 @@ def get_record_type_name(id: int) -> None | str:
 
 
 def get_token(id: int) -> None | dict:
+    """
+    Retrieve a specific token from the database based on the token ID.
+
+    Parameters:
+    id (int): The unique identifier of the token to retrieve.
+
+    Returns:
+    None | dict: A dictionary containing the token information if found,
+                 or None if no token matches the given ID.
+                 The dictionary includes details such as tokenId, token, patientId, expirationDate, etc.
+    """
     query = rf'SELECT * FROM Tokens WHERE tokenId = {id};'
     token = mysql_client(query)
     return None if not token else token[0]
 
 
 def get_active_tokens_by_patient(id: int) -> None | list[dict]:
+    """
+    Retrieve active tokens for a specific patient from the database.
+
+    This function queries the Tokens table to fetch all active tokens associated
+    with the given patient ID. Active tokens are those with an expiration date
+    later than the current date and time. The results are ordered by expiration date.
+
+    Args:
+        id (int): The unique identifier of the patient whose active tokens are to be retrieved.
+
+    Returns:
+        None | list[dict]: A list of dictionaries, where each dictionary represents an active token,
+                           or None if no active tokens are found for the given patient ID.
+                           Each dictionary contains details about the token such as
+                           tokenId, token, patientId, expirationDate, etc.
+    """
     query = rf"SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate > '{datetime.now()}' ORDER BY expirationDate;"
     tokens = mysql_client(query)
     return None if not tokens else tokens
 
 
 def get_tokens_token_access(id: int) -> None | list[dict]:
+    """
+    Retrieve all token access records for a specific token from the database.
+
+    This function queries the TokenAccess table in the database to fetch all access
+    records associated with the given token ID.
+
+    Args:
+        id (int): The unique identifier of the token whose access records are to be retrieved.
+
+    Returns:
+        None | list[dict]: A list of dictionaries, where each dictionary represents a token access record,
+                           or None if no access records are found for the given token ID.
+                           Each dictionary in the list contains details about the token access,
+                           such as the tokenAccessId, tokenId, doctorId, and any other relevant information.
+    """
     query = rf'SELECT * FROM TokenAccess WHERE tokenId = {id};'
     token_accesses = mysql_client(query)
     return None if not token_accesses else token_accesses
 
 
 def get_token_access(id: int) -> None | dict:
+    """
+    Retrieve token access information from the database based on the token access ID.
+
+    This function queries the TokenAccess table in the database to fetch all information
+    associated with the specified token access ID.
+
+    Args:
+        id (int): The unique identifier of the token access record to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the token access information if found,
+                     or None if no token access record matches the given ID.
+                     The dictionary includes details such as tokenAccessId, tokenId,
+                     doctorId, and any other fields present in the TokenAccess table.
+    """
     query = rf'SELECT * FROM TokenAccess WHERE tokenAccessId = {id};'
     token_access = mysql_client(query)
     return None if not token_access else token_access[0]
 
 
 def get_active_tokens_by_doctor(id: int) -> None | list[dict]:
+    """
+    Retrieve active tokens accessible to a specific doctor from the database.
+
+    This function queries the Tokens and TokenAccess tables to fetch all active tokens
+    that a doctor has access to. Active tokens are those with an expiration date
+    later than the current date and time. The results are ordered by expiration date.
+
+    Args:
+        id (int): The unique identifier of the doctor whose accessible active tokens are to be retrieved.
+
+    Returns:
+        None | list[dict]: A list of dictionaries, where each dictionary represents an active token,
+                           or None if no active tokens are found for the given doctor ID.
+                           Each dictionary contains details about the token such as
+                           tokenId, token, patientId, and expirationDate.
+    """
     query = rf'''SELECT a.tokenId, a.token, a.patientId, a.expirationDate from Tokens a INNER JOIN
         (SELECT DISTINCT tokenId FROM TokenAccess WHERE doctorId = {id}) v ON a.tokenId = v.tokenId
         WHERE expirationDate > '{datetime.now()}' ORDER BY expirationDate;'''
@@ -390,6 +463,20 @@ def get_active_tokens_by_doctor(id: int) -> None | list[dict]:
 
 
 def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
+    """
+    Retrieve inactive tokens for a specific patient from the database.
+
+    Parameters:
+    id (int): The unique identifier of the patient whose inactive tokens are to be retrieved.
+    limit (int): The maximum number of records to retrieve per page.
+    offset (int): The number of records to skip before starting to retrieve records.
+
+    Returns:
+    None | list[dict]: A list of dictionaries, where each dictionary represents an inactive token,
+                       or None if no inactive tokens are found for the given patient ID.
+                       Each dictionary contains details about the token such as
+                       tokenId, token, patientId, and expirationDate.
+    """
     query = rf'''SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}'
         ORDER BY expirationDate DESC LIMIT {limit} OFFSET {offset};'''
     tokens = mysql_client(query)
@@ -397,12 +484,46 @@ def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
 
 
 def count_inactive_tokens(id: int) -> None | dict:
+    """
+    Count the number of inactive tokens for a specific patient.
+
+    This function queries the Tokens table to count the number of tokens
+    associated with the given patient ID that have expired (i.e., their
+    expiration date is earlier than the current date and time).
+
+    Args:
+        id (int): The unique identifier of the patient whose inactive tokens are to be counted.
+
+    Returns:
+        None | dict: A dictionary containing the count of inactive tokens if found,
+                     with the key 'totalCount', or None if no inactive tokens are found
+                     for the given patient ID.
+    """
     query = rf"SELECT COUNT(tokenId) AS totalCount FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}';"
     total_count = mysql_client(query)
     return None if not total_count else total_count[0]
 
 
 def get_doctor_patients(id: int) -> None | dict:
+    """
+    Retrieve a list of patients associated with a specific doctor, including their most recent medical record date.
+
+    This function queries the database to fetch information about patients who have medical records
+    created by the specified doctor. It returns the patient's ID, full name, and the date of their
+    most recent medical record created by this doctor.
+
+    Args:
+        id (int): The unique identifier of the doctor whose patients are to be retrieved.
+
+    Returns:
+        None | dict: A dictionary containing patient information if found, or None if no patients
+                     are associated with the given doctor ID. The dictionary includes the following
+                     for each patient:
+                     - patientId (int): The unique identifier of the patient.
+                     - patientFullName (str): The full name of the patient (firstName + lastName).
+                     - lastRecordCreated (datetime): The date of the most recent medical record
+                       created for this patient by the specified doctor.
+    """
     query = rf'''SELECT p.patientId, CONCAT(u.firstName, ' ', u.lastName) AS patientFullName,
         mr.dateCreated AS lastRecordCreated FROM (
             SELECT *, ROW_NUMBER() OVER (PARTITION BY patientId ORDER BY dateCreated DESC) AS row_num

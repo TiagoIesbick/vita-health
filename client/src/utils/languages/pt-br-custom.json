@@ -1,5 +1,16 @@
 {
     "pt-br": {
+        "activeTokens": {
+            "noData": {
+                "firstP": "Você não tem tokens ativos.",
+                "firstPDoctorUser": "Insira um token compartilhado pelo seu paciente",
+                "secondPDoctorUser": "Isso lhe concederá acesso temporário ao histórico médico dele e permitirá adicionar novos dados.",
+                "secondP1st": "Gere um token",
+                "secondP2nd": "para compartilhar com seu profissional de saúde.",
+                "thirdP": "Isso concederá a eles acesso temporário ao seu histórico médico e permitirá que adicionem novos dados."
+            },
+            "title": "Tokens Ativos"
+        },
         "confirm": "Confirme",
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
@@ -12,15 +23,77 @@
         },
         "doctor": "Profissional de saúde",
         "error": {
-            "error": "Erro",
-            "errorMessage": "Dados não disponíveis. Tente novamente mais tarde."
+            "title": "Erro",
+            "message": "Dados não disponíveis. Tente novamente mais tarde."
         },
+        "generateToken": {
+            "dateFormat": "dd/mm/yy",
+            "expTime": "Tempo de Expiração",
+            "expTimeFirstValidation": "A data não pode ser no passado",
+            "expTimeSecondValidation": "Máximo 90 dias",
+            "title": "Gere um Token de Acesso"
+        },
+        "healthAssistant": {
+            "firstP": "Olá! Sou seu assistente de saúde, estou aqui para lhe ajudar a entender seus dados médicos. Você pode me fazer perguntas sobre seus registros de saúde, resultados de laboratório e qualquer outra informação médica.",
+            "firstPDoctorUser": "Olá! Sou seu assistente de saúde, estou aqui para lhe ajudar a entender o histórico médico de seu paciente. Você pode me fazer perguntas sobre os registros de saúde dele, resultados laboratoriais e qualquer outra informação médica.",
+            "secondP": "Por exemplo, você pode me perguntar coisas como:",
+            "firstLi": "Há algum padrão no meu histórico de saúde que sugira uma condição grave?",
+            "firstLiDoctorUser": "Há algum padrão no histórico de saúde de meu paciente que sugira uma condição grave?",
+            "secondLi": "Você pode destacar alguma mudança crítica em meus registros médicos recentes?",
+            "secondLiDoctorUser": "Você pode destacar alguma alteração crítica nos registros médicos recentes de meu paciente?",
+            "thirdP": "Como posso lhe ajudar hoje?",
+            "thirdPDoctorUser": "Como posso lhe ajudar a entender melhor a saúde de seu paciente hoje?",
+            "inputPlaceholder": "Faça uma pergunta...",
+            "title": "Assistente de Saúde"
+        },
+        "healthHistory": {
+            "noData": {
+                "firstP": "Você ainda não tem dados de saúde salvos.",
+                "secondP1st": "Adicione seus dados de saúde",
+                "secondP2nd": "para começar a construir seu histórico.",
+                "thirdP1st": "Alternativamente, gere um token",
+                "thirdP2nd": "para compartilhar com seu profissional de saúde, permitindo que ele adicione novas informações."
+            },
+            "readMore": "Leia mais",
+            "title": "Histórico de Saúde"
+        },
+        "here": "aqui",
         "home": {
             "insights_info": "Descubra padrões e tendências importantes no seu histórico de saúde. A IA da Vita ajuda você e seu profissional a tomarem decisões mais informadas.",
             "security_info": "Sua saúde, seus dados, seu controle. Com a Vita, acesse e gerencie com segurança suas informações médicas a qualquer momento, em qualquer lugar, com o suporte de análises inteligentes.",
             "subtitle": "Controle seu histórico médico com percepções baseadas em Inteligência Artificial",
             "title": "Transforme sua Saúde:",
             "token_info": "Use tokens temporários para compartilhar seu histórico de forma segura com profissionais de saúde. Permita atualizações precisas e explore como a IA torna seu cuidado mais eficiente."
+        },
+        "insertMedicalRecord": {
+            "category": "Categoria do Dado de Saúde",
+            "dragFiles": "Arraste e Solte Arquivos Aqui",
+            "newCategory": "Nova Categoria",
+            "newCategoryLabel": "Categoria",
+            "notesPlaceholder": "Digite suas anotações aqui...",
+            "title": "Adicionar Dados de Saúde",
+            "recordTypes": {
+                "Blood Test": "Exame de Sangue",
+                "Cardiology": "Cardiologia",
+                "Dermatology": "Dermatologia",
+                "ECG": "Eletrocardiograma",
+                "MRI Scan": "Ressonância Magnética",
+                "Neurology": "Neurologia",
+                "Nutrition": "Nutrição",
+                "Obstetrics": "Obstetrícia",
+                "Orthopedics": "Ortopedia",
+                "Pediatrics": "Pediatria",
+                "Physiotherapy": "Fisioterapia",
+                "Psychiatry": "Psiquiatria",
+                "Psychology": "Psicologia",
+                "Traumatology": "Traumatologia",
+                "Ultrasound": "Ultrasom",
+                "X-Ray": "Raio-X",
+                "Other": "Outro"
+            }
+        },
+        "insertToken": {
+            "title": "Insira um  Token de Acesso"
         },
         "lastRecord": "Último Registro",
         "login": {
@@ -50,8 +123,6 @@
             "search": "Pesquisar"
         },
         "userbar": {
-            "activeTokens": "Tokens Ativos",
-            "addData": "Adicionar Dados de Saúde",
             "bye": "Até logo,",
             "editProfile": "Editar Perfil",
             "inactiveTokens": "Tokens Inativos",

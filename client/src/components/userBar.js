@@ -17,12 +17,12 @@ const UserBar = () => {
     const userMenu = useRef(null);
     const items = [
         ...(user.userType === 'Patient' ? [{
-            label: translations?.userbar?.addData,
+            label: translations?.insertMedicalRecord?.title,
             icon: 'pi pi-plus-circle',
             command: () => navigate("/insert-medical-record")
         }] : []),
         {
-            label: translations?.userbar?.activeTokens,
+            label: translations?.activeTokens?.title,
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },

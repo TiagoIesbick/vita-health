@@ -12,6 +12,7 @@ import { useEffect, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { InputText } from "primereact/inputtext";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useApolloClient } from "@apollo/client";
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { delTokenFromActiveDoctorTokensCache } from "../graphql/cache";
@@ -24,6 +25,7 @@ import './insertMedicalRecord.css';
 
 const InsertMedicalRecord = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId || 0);
@@ -33,6 +35,7 @@ const InsertMedicalRecord = () => {
     const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
     const clickableWarning = useRef(null);
     const [visible, setVisible] = useState(false);
+
     const formik = useFormik({
         initialValues: {
             recordTypeId: '',
@@ -71,8 +74,8 @@ const InsertMedicalRecord = () => {
             };
         },
         validationSchema: Yup.object({
-            recordTypeId: Yup.string().required('Required').matches(/\d+$/, "Register new category"),
-            recordData: Yup.string().required('Required')
+            recordTypeId: Yup.string().required(translations?.required).matches(/\d+$/, "Register new category"),
+            recordData: Yup.string().required(translations?.required)
                 .test('min-length-no-html', 'Minimum 3 characters', (value) => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
@@ -96,6 +99,7 @@ const InsertMedicalRecord = () => {
                 })
         })
     });
+
     const formikCategory = useFormik({
         initialValues: {
             category: ''
@@ -136,25 +140,31 @@ const InsertMedicalRecord = () => {
 
     if (errorRecordTypes || errorRecordType || errorMedicalRecord || errorFiles || (user.userType === 'Doctor' && errorUser)) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
+    const translatedRecordTypes = recordTypes?.map(record => ({
+        ...record,
+        recordName: translations?.insertMedicalRecord?.recordTypes?.[record.recordName] || record.recordName
+    })).sort((a, b) => a.recordName.localeCompare(b.recordName));
+
+
     return (
-        <Card title="Add Health Data" className="flex justify-content-center align-items-center card-min-height">
+        <Card title={translations?.insertMedicalRecord?.title} className="flex justify-content-center align-items-center card-min-height">
             {user.userType === 'Doctor' && <CountDown patient={patient} setPatient={setPatient} showMessage={showMessage} patientDetail={userDetail} />}
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
                 <FloatLabel>
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": 'Other...'}] : formik.initialValues.recordTypeId }
+                        options={!loadingRecordTypes ? [...translatedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
                         optionLabel="recordName"
                         filter
                         className="w-full"
                         {...formik.getFieldProps("recordTypeId")}
                     />
-                    <label htmlFor="record-type">Health Data Category</label>
+                    <label htmlFor="record-type">{translations?.insertMedicalRecord?.category}</label>
                     {formik.touched.recordTypeId && formik.errors.recordTypeId &&<div ref={clickableWarning} onClick={handleClick} className="text-red-500 text-xs">{formik.errors.recordTypeId}</div>}
                 </FloatLabel>
                 <div>
@@ -170,7 +180,7 @@ const InsertMedicalRecord = () => {
                         init={{
                         height: 500,
                         menubar: false,
-                        placeholder: "Enter your notes here...",
+                        placeholder: translations?.insertMedicalRecord?.notesPlaceholder,
                         plugins: [
                             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -185,11 +195,11 @@ const InsertMedicalRecord = () => {
                     />
                     {formik.touched.recordData && formik.errors.recordData && <div className="text-red-500 text-xs">{formik.errors.recordData}</div>}
                 </div>
-                <MultipleUpload formik={formik} />
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord || loadingFiles} loading={loadingRecordTypes || loadingMedicalRecord || loadingFiles} />
+                <MultipleUpload formik={formik} translations={translations} />
+                <Button type="submit" label={translations?.confirm} disabled={!formik.isValid || loadingRecordTypes || loadingMedicalRecord || loadingFiles} loading={loadingRecordTypes || loadingMedicalRecord || loadingFiles} />
             </form>
             <Dialog
-                header="New Category"
+                header={translations?.insertMedicalRecord?.newCategory}
                 visible={visible}
                 className="dialog-custom-header"
                 onHide={() => {if (!visible) return; setVisible(false);}}
@@ -201,10 +211,10 @@ const InsertMedicalRecord = () => {
                             className="w-full"
                             {...formikCategory.getFieldProps("category")}
                         />
-                        <label htmlFor="category">Category</label>
+                        <label htmlFor="category">{translations?.insertMedicalRecord?.newCategoryLabel}</label>
                         {formikCategory.touched.category && formikCategory.errors.category && <div className="text-red-500 text-xs">{formikCategory.errors.category}</div>}
                     </FloatLabel>
-                    <Button type="submit" label="Confirm" disabled={!formikCategory.isValid || loadingRecordType} loading={loadingRecordType} />
+                    <Button type="submit" label={translations?.confirm} disabled={!formikCategory.isValid || loadingRecordType} loading={loadingRecordType} />
                 </form>
             </Dialog>
         </Card>
