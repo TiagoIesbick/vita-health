@@ -1,5 +1,16 @@
 {
     "en": {
+        "activeTokens": {
+            "noData": {
+                "firstP": "You have no active tokens.",
+                "firstPDoctorUser": "Enter a token shared by your patient",
+                "secondPDoctorUser": "This will grant you temporary access to their medical history and allow you to add new data.",
+                "secondP1st": "Generate a token",
+                "secondP2nd": "to share with your health professional.",
+                "thirdP": "This will grant them temporary access to your medical history and allow them to add new data."
+            },
+            "title": "Active Tokens"
+        },
         "confirm": "Confirm",
         "createUser": {
             "acceptTerms": "Accept Terms",
@@ -22,15 +33,29 @@
             "expTimeSecondValidation": "Maximum 90 days",
             "title": "Generate an Access Token"
         },
+        "healthAssistant": {
+            "firstP": "Hello! I'm your health assistant, here to help you understand your medical data. You can ask me questions about your health records, lab results, and any other medical information.",
+            "firstPDoctorUser": "Hello! I'm your health assistant, here to help you understand your patient's medical history. You can ask me questions about their health records, lab results, and any other medical information.",
+            "secondP": "For example, you can ask me things like:",
+            "firstLi": "Are there any patterns in my health history that suggest a serious condition?",
+            "firstLiDoctorUser": "Are there any patterns in my patient’s health history that suggest a serious condition?",
+            "secondLi": "Can you highlight any critical changes in my recent medical records?",
+            "secondLiDoctorUser": "Can you highlight any critical changes in the patient’s recent medical records?",
+            "thirdP": "How can I assist you today?",
+            "thirdPDoctorUser": "How can I assist you in better understanding your patient's health today?",
+            "inputPlaceholder": "Ask me a question...",
+            "title": "Health Assistant"
+        },
         "healthHistory": {
-            "title": "Health History",
             "noData": {
                 "firstP": "You have no health history yet.",
                 "secondP1st": "Start by adding your health data",
                 "secondP2nd": "to begin building your records.",
                 "thirdP1st": "Alternatively, generate a token",
                 "thirdP2nd": "to share with your health professional so they can add new information."
-            }
+            },
+            "readMore": "Read more",
+            "title": "Health History"
         },
         "here": "here",
         "home": {
@@ -67,6 +92,9 @@
                 "Other": "Other"
             }
         },
+        "insertToken": {
+            "title": "Insert an Access Token"
+        },
         "lastRecord": "Last Record",
         "login": {
             "loggedIn": "Logged In",
@@ -95,7 +123,6 @@
             "search": "Search"
         },
         "userbar": {
-            "activeTokens": "Active Tokens",
             "bye": "Bye,",
             "editProfile": "Edit Profile",
             "inactiveTokens": "Inactive Tokens",

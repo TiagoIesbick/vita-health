@@ -1,5 +1,16 @@
 {
     "pt-br": {
+        "activeTokens": {
+            "noData": {
+                "firstP": "Você não tem tokens ativos.",
+                "firstPDoctorUser": "Insira um token compartilhado pelo seu paciente",
+                "secondPDoctorUser": "Isso lhe concederá acesso temporário ao histórico médico dele e permitirá adicionar novos dados.",
+                "secondP1st": "Gere um token",
+                "secondP2nd": "para compartilhar com seu profissional de saúde.",
+                "thirdP": "Isso concederá a eles acesso temporário ao seu histórico médico e permitirá que adicionem novos dados."
+            },
+            "title": "Tokens Ativos"
+        },
         "confirm": "Confirme",
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
@@ -22,15 +33,29 @@
             "expTimeSecondValidation": "Máximo 90 dias",
             "title": "Gere um Token de Acesso"
         },
+        "healthAssistant": {
+            "firstP": "Olá! Sou seu assistente de saúde, estou aqui para lhe ajudar a entender seus dados médicos. Você pode me fazer perguntas sobre seus registros de saúde, resultados de laboratório e qualquer outra informação médica.",
+            "firstPDoctorUser": "Olá! Sou seu assistente de saúde, estou aqui para lhe ajudar a entender o histórico médico de seu paciente. Você pode me fazer perguntas sobre os registros de saúde dele, resultados laboratoriais e qualquer outra informação médica.",
+            "secondP": "Por exemplo, você pode me perguntar coisas como:",
+            "firstLi": "Há algum padrão no meu histórico de saúde que sugira uma condição grave?",
+            "firstLiDoctorUser": "Há algum padrão no histórico de saúde de meu paciente que sugira uma condição grave?",
+            "secondLi": "Você pode destacar alguma mudança crítica em meus registros médicos recentes?",
+            "secondLiDoctorUser": "Você pode destacar alguma alteração crítica nos registros médicos recentes de meu paciente?",
+            "thirdP": "Como posso lhe ajudar hoje?",
+            "thirdPDoctorUser": "Como posso lhe ajudar a entender melhor a saúde de seu paciente hoje?",
+            "inputPlaceholder": "Faça uma pergunta...",
+            "title": "Assistente de Saúde"
+        },
         "healthHistory": {
-            "title": "Histórico de Saúde",
             "noData": {
                 "firstP": "Você ainda não tem dados de saúde salvos.",
                 "secondP1st": "Adicione seus dados de saúde",
                 "secondP2nd": "para começar a construir seu histórico.",
                 "thirdP1st": "Alternativamente, gere um token",
                 "thirdP2nd": "para compartilhar com seu profissional de saúde, permitindo que ele adicione novas informações."
-            }
+            },
+            "readMore": "Leia mais",
+            "title": "Histórico de Saúde"
         },
         "here": "aqui",
         "home": {
@@ -67,6 +92,9 @@
                 "Other": "Outro"
             }
         },
+        "insertToken": {
+            "title": "Insira um  Token de Acesso"
+        },
         "lastRecord": "Último Registro",
         "login": {
             "loggedIn": "Conectado",
@@ -95,7 +123,6 @@
             "search": "Pesquisar"
         },
         "userbar": {
-            "activeTokens": "Tokens Ativos",
             "bye": "Até logo,",
             "editProfile": "Editar Perfil",
             "inactiveTokens": "Tokens Inativos",

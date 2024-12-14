@@ -22,7 +22,7 @@ const UserBar = () => {
             command: () => navigate("/insert-medical-record")
         }] : []),
         {
-            label: translations?.userbar?.activeTokens,
+            label: translations?.activeTokens?.title,
             icon: 'pi pi-ticket',
             command: () => navigate("/active-tokens")
         },

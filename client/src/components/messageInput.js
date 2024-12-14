@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 import './messageInput.css';
 
 
-const MessageInput = ({ formik, loading, loadingConversation }) => {
+const MessageInput = ({ formik, loading, loadingConversation, translations }) => {
     const textareaRef = useRef(null);
 
     const handleKeyDown = (e) => {
@@ -32,7 +32,7 @@ const MessageInput = ({ formik, loading, loadingConversation }) => {
         <div className="flex overflow-hidden align-items-center message-container">
             <textarea
                 type="text"
-                placeholder="Ask a question..."
+                placeholder={translations?.healthAssistant?.inputPlaceholder}
                 {...formik.getFieldProps("content")}
                 className='custom-textarea'
                 onKeyDown={handleKeyDown}

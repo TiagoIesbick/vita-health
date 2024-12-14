@@ -463,6 +463,20 @@ def get_active_tokens_by_doctor(id: int) -> None | list[dict]:
 
 
 def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
+    """
+    Retrieve inactive tokens for a specific patient from the database.
+
+    Parameters:
+    id (int): The unique identifier of the patient whose inactive tokens are to be retrieved.
+    limit (int): The maximum number of records to retrieve per page.
+    offset (int): The number of records to skip before starting to retrieve records.
+
+    Returns:
+    None | list[dict]: A list of dictionaries, where each dictionary represents an inactive token,
+                       or None if no inactive tokens are found for the given patient ID.
+                       Each dictionary contains details about the token such as
+                       tokenId, token, patientId, and expirationDate.
+    """
     query = rf'''SELECT * FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}'
         ORDER BY expirationDate DESC LIMIT {limit} OFFSET {offset};'''
     tokens = mysql_client(query)
@@ -470,12 +484,46 @@ def get_inactive_tokens(id: int, limit: int, offset: int) -> None | list[dict]:
 
 
 def count_inactive_tokens(id: int) -> None | dict:
+    """
+    Count the number of inactive tokens for a specific patient.
+
+    This function queries the Tokens table to count the number of tokens
+    associated with the given patient ID that have expired (i.e., their
+    expiration date is earlier than the current date and time).
+
+    Args:
+        id (int): The unique identifier of the patient whose inactive tokens are to be counted.
+
+    Returns:
+        None | dict: A dictionary containing the count of inactive tokens if found,
+                     with the key 'totalCount', or None if no inactive tokens are found
+                     for the given patient ID.
+    """
     query = rf"SELECT COUNT(tokenId) AS totalCount FROM Tokens WHERE patientId = {id} AND expirationDate < '{datetime.now()}';"
     total_count = mysql_client(query)
     return None if not total_count else total_count[0]
 
 
 def get_doctor_patients(id: int) -> None | dict:
+    """
+    Retrieve a list of patients associated with a specific doctor, including their most recent medical record date.
+
+    This function queries the database to fetch information about patients who have medical records
+    created by the specified doctor. It returns the patient's ID, full name, and the date of their
+    most recent medical record created by this doctor.
+
+    Args:
+        id (int): The unique identifier of the doctor whose patients are to be retrieved.
+
+    Returns:
+        None | dict: A dictionary containing patient information if found, or None if no patients
+                     are associated with the given doctor ID. The dictionary includes the following
+                     for each patient:
+                     - patientId (int): The unique identifier of the patient.
+                     - patientFullName (str): The full name of the patient (firstName + lastName).
+                     - lastRecordCreated (datetime): The date of the most recent medical record
+                       created for this patient by the specified doctor.
+    """
     query = rf'''SELECT p.patientId, CONCAT(u.firstName, ' ', u.lastName) AS patientFullName,
         mr.dateCreated AS lastRecordCreated FROM (
             SELECT *, ROW_NUMBER() OVER (PARTITION BY patientId ORDER BY dateCreated DESC) AS row_num

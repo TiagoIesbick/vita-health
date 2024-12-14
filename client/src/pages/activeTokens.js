@@ -4,6 +4,7 @@ import { Card } from "primereact/card";
 import { DataView } from 'primereact/dataview';
 import { useState } from "react";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { Link } from "react-router-dom";
 import LoadingSkeleton from "../components/skeleton";
 import ConfirmDeactivateToken from "../components/confirmDeactivateToken";
@@ -15,6 +16,7 @@ import './activeTokens.css';
 
 const ActiveTokens = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { user, showMessage } = useUser();
     const { activePatientTokens, loadingActivePatientTokens, errorActivePatientTokens } = useActivePatientTokens();
     const { activeDoctorTokens, loadingActiveDoctorTokens, errorActiveDoctorTokens } = useActiveDoctorTokens();
@@ -29,25 +31,25 @@ const ActiveTokens = () => {
     if ((user.userType === 'Patient' && errorActivePatientTokens) ||
         (user.userType === 'Doctor' && errorActiveDoctorTokens)) {
             navigate('/');
-            showMessage('error', 'Error', 'Data not available. Try again later.', true);
+            showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     if ((user.userType === 'Patient' && (!activePatientTokens || activePatientTokens.length === 0)) ||
         (user.userType === 'Doctor' && (!activeDoctorTokens || activeDoctorTokens.length === 0))) {
         return (
             <Card
-                title="Active Tokens"
+                title={translations?.activeTokens?.title}
                 className="flex justify-content-center align-items-center card-min-height"
             >
-                <p>You have no active tokens.</p>
+                <p>{translations?.activeTokens?.noData?.firstP}</p>
                 {user.userType === 'Patient' ?
                     <>
-                        <p>Generate a token <Link to="/generate-access-token" >here</Link> to share with your health professional.</p>
-                        <p>This will grant them temporary access to your medical history and allow them to add new data.</p>
+                        <p>{translations?.activeTokens?.noData?.secondP1st} <Link to="/generate-access-token" >{translations?.here}</Link> {translations?.activeTokens?.noData?.secondP2nd}</p>
+                        <p>{translations?.activeTokens?.noData?.thirdP}</p>
                     </> :
                     <>
-                        <p>Enter a token shared by your patient <Link to="/insert-token" >here</Link>.</p>
-                        <p>This will grant you temporary access to their medical history and allow you to add new data.</p>
+                        <p>{translations?.activeTokens?.noData?.firstPDoctorUser} <Link to="/insert-token" >{translations?.here}</Link>.</p>
+                        <p>{translations?.activeTokens?.noData?.secondPDoctorUser}</p>
                     </>
                 }
             </Card>
@@ -67,7 +69,7 @@ const ActiveTokens = () => {
 
     return (
         <TokenProvider>
-            <Card className="card-min-height" title="Active Tokens">
+            <Card className="card-min-height" title={translations?.activeTokens?.title}>
                 <DataView
                     value={user.userType === 'Patient' ? activePatientTokens: activeDoctorTokens}
                     listTemplate={listTemplate}

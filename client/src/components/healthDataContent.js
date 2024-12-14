@@ -55,7 +55,7 @@ const HealthDataContent = ({item}) => {
                         <FileGallery files={item.files} layout={'thumbnail'} show={show} setShow={setShow} />
                     </>
                 }
-                <Link to={`/medical-record/${item.recordId}`}><Button label="Read more" outlined></Button></Link>
+                <Link to={`/medical-record/${item.recordId}`}><Button label={translations?.healthHistory?.readMore} outlined></Button></Link>
             </div>
         </Card>
     );
