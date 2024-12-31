@@ -1066,9 +1066,9 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
                 }
     """
     if not validate_files_length(files):
-        return {'fileError': ['You can only upload a maximum of 10 files']}
+        return {'fileError': ["maxFiles"]}
     if not validate_files_size(files):
-        return {'fileError': ['Total size of uploaded files must not exceed 10 MB']}
+        return {'fileError': ["totalSize"]}
 
     file_infos = []
     file_errors = []
@@ -1076,10 +1076,10 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
     for file in files:
         content_type = file.content_type
         if not validate_file_format(content_type):
-            file_errors.append(rf"{file.filename}: Uploaded file has unsupported format")
+            file_errors.append(rf"{file.filename}: fileFormat")
             continue
         if not validate_file_size(file.size):
-            file_errors.append(rf"{file.filename}: Uploaded file is too big (max 5 MB)")
+            file_errors.append(rf"{file.filename}: maxFiles")
             continue
 
         filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
@@ -1134,7 +1134,7 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
 
     if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
-    return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
+    return { 'fileConfirmation': 'filesSaved', 'files': file_infos }
 
 
 @query.field("searchMedicalRecords")

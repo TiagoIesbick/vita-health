@@ -689,10 +689,10 @@ BEGIN
     EXECUTE CountMedicalRecord USING @patientId;
     IF @countMedicalRecord - @countPreviousMedicalRecord = 1 THEN
         COMMIT;
-        SET medicalRecordConfirmation = 'Health Data Created!';
+        SET medicalRecordConfirmation = "healthDataCreated";
     ELSE
         ROLLBACK;
-        SET medicalRecordError = 'Health Data NOT created!';
+        SET medicalRecordError = "healthDataNotCreated";
     END IF;
 
     SELECT * FROM (
@@ -760,16 +760,16 @@ SET @url = URL ;
 EXECUTE CountFileName USING @fileName ;
 IF @countFileName > 0 THEN
 	ROLLBACK ;
-    SET fileError = 'The file name already exists' ;
+    SET fileError = 'fileExists' ;
 ELSE
 	EXECUTE InsertFile USING @recordId, @fileName, @mimeType, @url ;
     EXECUTE CountFileName USING @fileName ;
     IF @countFileName = 1 THEN
 		COMMIT ;
-		SET fileConfirmation = 'Saved file!' ;
+		SET fileConfirmation = 'fileSaved' ;
 	ELSE
 		ROLLBACK ;
-        SET fileError = 'File not saved' ;
+        SET fileError = 'fileNotSaved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(

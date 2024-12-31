@@ -24,7 +24,31 @@
         "doctor": "Profissional de saúde",
         "error": {
             "title": "Erro",
-            "message": "Dados não disponíveis. Tente novamente mais tarde."
+            "message": "Dados não disponíveis. Tente novamente mais tarde.",
+            "missAuth": "Autenticação ausente",
+            "missAuthorization": "Autorização ausente",
+            "missDoctorCredential": "Ausência de credencial de profissional de saúde",
+            "missPatientCredential": "Credencial de paciente ausente",
+            "notDoctor": "Usuário não é Profissional de Saúde",
+            "notPatient": "Usuário não é Paciente",
+            "notPatientOrDoctor": "Usuário não é Paciente nem Professional de Saúde",
+            "fileExists": "O nome do arquivo já existe",
+            "fileFormat": "O arquivo enviado tem formato incompatível",
+            "fileNotSaved": "Arquivo não salvo",
+            "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
+            "maxFiles": "Você só pode enviar no máximo 10 arquivos",
+            "totalSize": "O tamanho total dos arquivos enviados não deve exceder 10 MB",
+            "healthDataNotCreated": "Dados de saúde NÃO salvos!"
+        },
+        "success": {
+            "title": "Sucesso",
+            "fileSaved": "Arquivo salvo!",
+            "filesSaved": "Arquivos salvos!",
+            "healthDataCreated": "Dados de saúde salvos!"
+        },
+        "warn": {
+            "title": "Aviso",
+            "message": "Os dados de saúde foram salvos, mas alguns arquivos apresentaram erros"
         },
         "generateToken": {
             "dateFormat": "dd/mm/yy",
@@ -90,7 +114,8 @@
                 "Ultrasound": "Ultrasom",
                 "X-Ray": "Raio-X",
                 "Other": "Outro"
-            }
+            },
+            "registerNewCategory": "Registre uma nova categoria"
         },
         "insertToken": {
             "title": "Insira um  Token de Acesso"

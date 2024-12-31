@@ -24,7 +24,31 @@
         "doctor": "Healthcare professional",
         "error": {
             "title": "Error",
-            "message": "Data not available. Try again later."
+            "message": "Data not available. Try again later.",
+            "missAuth": "Missing authentication",
+            "missAuthorization": "Missing authorization",
+            "missDoctorCredential": "Missing healthcare professional credential",
+            "missPatientCredential": "Missing patient credential",
+            "notPatient": "User is not a Patient",
+            "notDoctor": "User is not a Healthcare Professional",
+            "notPatientOrDoctor": "User is neither a Patient nor a Healthcare Professional",
+            "fileExists": "The file name already exists",
+            "fileFormat": "Uploaded file has unsupported format",
+            "fileNotSaved": "File not saved",
+            "fileSize": "Uploaded file is too big (max 5 MB)",
+            "maxFiles": "You can only upload a maximum of 10 files",
+            "totalSize": "Total size of uploaded files must not exceed 10 MB",
+            "healthDataNotCreated": "Health Data NOT created!"
+        },
+        "success": {
+            "title": "Success",
+            "fileSaved": "Saved file!",
+            "filesSaved": "Saved files!",
+            "healthDataCreated": "Health Data Created!"
+        },
+        "warn": {
+            "title": "Warning",
+            "message": "Health data was created, but some files had errors"
         },
         "generateToken": {
             "dateFormat": "yy-mm-dd",
@@ -90,7 +114,8 @@
                 "Ultrasound": "Ultrasound",
                 "X-Ray": "X-Ray",
                 "Other": "Other"
-            }
+            },
+            "registerNewCategory": "Register new category"
         },
         "insertToken": {
             "title": "Insert an Access Token"

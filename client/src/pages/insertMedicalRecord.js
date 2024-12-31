@@ -46,8 +46,8 @@ const InsertMedicalRecord = () => {
             const { files: _, ...recordValues } = values;
             const resMedicalRecord = await addMedicalRecord(recordValues);
             if (resMedicalRecord.medicalRecordError) {
-                showMessage('error', 'Error', resMedicalRecord.medicalRecordError);
-                if (resMedicalRecord.medicalRecordError === 'Missing authorization') {
+                showMessage('error', translations?.error?.title, translations?.error?.[resMedicalRecord.medicalRecordError]);
+                if (resMedicalRecord.medicalRecordError === "missAuthorization") {
                     delTokenFromActiveDoctorTokensCache(client.cache, patient.tokenId);
                     setPatient(null);
                     deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
@@ -57,42 +57,58 @@ const InsertMedicalRecord = () => {
             } else if (values.files.length > 0) {
                 const resAddFiles = await addFiles(resMedicalRecord.medicalRecord.recordId, values.files);
                 if (resAddFiles.fileError) {
-                    showMessage('warn', 'Warning', 'Health data was created, but some files had errors', true);
-                    resAddFiles.fileError.forEach(error => showMessage('error', 'Error', error, true));
+                    showMessage('warn', translations?.warn?.title, translations?.warn?.message, true);
+                    resAddFiles.fileError.forEach(error => {
+                        let matchedErrorKey = translations?.error?.[error] ? error : null;
+                        let filename = null;
+                        if (!matchedErrorKey && error.includes(':')) {
+                            const [file, key] = error.split(':').map(part => part.trim());
+                            if (translations?.error?.[key]) {
+                                matchedErrorKey = key;
+                                filename = file;
+                            }
+                        }
+                        const translatedMessage = matchedErrorKey
+                            ? (filename
+                                ? `${filename}: ${translations.error[matchedErrorKey]}`
+                                : translations.error[matchedErrorKey])
+                            : error;
+                        showMessage('error', translations?.error?.title, translatedMessage, true)
+                    });
                     resetForm();
                 } else {
                     setStatus({ success: resAddFiles.fileConfirmation});
-                    showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
-                    showMessage('success', 'Success', resAddFiles.fileConfirmation);
+                    showMessage('success', translations?.success?.title, translations?.success?.[resMedicalRecord.medicalRecordConfirmation]);
+                    showMessage('success', translations?.success?.title, translations?.success?.[resAddFiles.fileConfirmation]);
                     if (user.userType === 'Doctor') navigate('/medical-records-access');
                 };
             } else {
                 resetForm();
-                showMessage('success', 'Success', resMedicalRecord.medicalRecordConfirmation);
+                showMessage('success', translations?.success?.title, translations?.success?.[resMedicalRecord.medicalRecordConfirmation]);
                 if (user.userType === 'Doctor') navigate('/medical-records-access');
                 // user.userType === 'Doctor' ? navigate('/medical-records-access') : navigate(`/medical-record/${resMedicalRecord.medicalRecord.recordId}`);
             };
         },
         validationSchema: Yup.object({
-            recordTypeId: Yup.string().required(translations?.required).matches(/\d+$/, "Register new category"),
+            recordTypeId: Yup.string().required(translations?.required).matches(/\d+$/, translations?.insertMedicalRecord?.registerNewCategory),
             recordData: Yup.string().required(translations?.required)
-                .test('min-length-no-html', 'Minimum 3 characters', (value) => {
+                .test('min-length-no-html', translations?.login?.minChars?.replace(/{(\w+)}/g, '3'), (value) => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
                 }),
             files: Yup.array().nullable().notRequired().of(
                 Yup.mixed()
-                    .test('FILE_FORMAT', "Uploaded file has unsupported format", (file) => {
+                    .test('FILE_FORMAT', translations?.error?.fileFormat, (file) => {
                         return file ? supportedFileFormats.includes(file.type) : true;
                     })
-                    .test('FILE_SIZE', "Uploaded file is too big (max 5 MB)", (file) => {
+                    .test('FILE_SIZE', translations?.error?.fileSize, (file) => {
                         return file ? file.size <= 5 * 1024 * 1024 : true;
                     })
                 )
-                .test('MAX_FILES', 'You can only upload a maximum of 10 files', (files) => {
+                .test('MAX_FILES', translations?.error?.maxFiles, (files) => {
                     return files ? files.length <= 10 : true;
                 })
-                .test('TOTAL_SIZE', 'Total size of uploaded files must not exceed 10 MB', (files) => {
+                .test('TOTAL_SIZE', translations?.error?.totalSize, (files) => {
                     if (!files) return true;
                     const totalSize = files.reduce((acc, file) => acc + file.size, 0);
                     return totalSize <= 10 * 1024 * 1024;
@@ -107,14 +123,14 @@ const InsertMedicalRecord = () => {
         onSubmit: async (values) => {
             const resRecordType = await addRecordType(values);
             if (resRecordType.recordTypeError) {
-                showMessage('error', 'Error', resRecordType.recordTypeError)
+                showMessage('error', translations?.error?.title, resRecordType.recordTypeError)
             } else {
                 formik.setFieldValue("recordTypeId", resRecordType.recordTypeId);
                 setVisible(false);
             };
         },
         validationSchema: Yup.object({
-            category: Yup.string().required('Required').min(3, 'Minimum 3 characters')
+            category: Yup.string().required(translations?.required).min(3, translations?.login?.minChars?.replace(/{(\w+)}/g, '3'))
         })
     });
 
@@ -124,14 +140,14 @@ const InsertMedicalRecord = () => {
 
     useEffect(() => {
         if (clickableWarning.current) {
-            if (clickableWarning.current.textContent === 'Register new category') {
+            if (clickableWarning.current.textContent === translations?.insertMedicalRecord?.registerNewCategory) {
             clickableWarning.current.classList.add("register-category");
             } else { clickableWarning.current.classList.remove("register-category"); }
         };
     });
 
     const handleClick = (e) => {
-        if (e.target.textContent === 'Register new category') setVisible(true);
+        if (e.target.textContent === translations?.insertMedicalRecord?.registerNewCategory) setVisible(true);
     };
 
     if (user.userType === 'Doctor' && loadingUser) {
