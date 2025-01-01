@@ -22,21 +22,55 @@ def create_user(email: str, firstName: str, lastName: str, password: bytes, user
     return None if not confirmation else confirmation[0]
 
 
-def create_patient_or_doctor_user(userId: int, userType: str) -> (None | dict):
+def create_patient_or_doctor_user(userId: int, userType: str) -> None | dict:
+    """
+    Creates a new patient or doctor user in the database.
+
+    Parameters:
+    - userId (int): The unique identifier of the user.
+    - userType (str): The type of user to be created ('patient' or 'doctor').
+
+    Returns:
+    - None: If the user creation failed.
+    - dict: A dictionary containing user information if successful.
+    """
     args = [userId, userType]
     query = 'AddPatientOrDoctorUser'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 
 
-def update_user(email: str, firstName: str, lastName: str, userId: int) -> (None | dict):
+def update_user(email: str, firstName: str, lastName: str, userId: int) -> None | dict:
+    """
+    Update an existing user's information in the database.
+
+    Args:
+        email (str): The updated email address of the user.
+        firstName (str): The updated first name of the user.
+        lastName (str): The updated last name of the user.
+        userId (int): The unique identifier of the user to be updated.
+
+    Returns:
+        None | dict: None if the user update failed, or a dictionary containing the updated user information if successful.
+    """
     args = [email, firstName, lastName, userId]
     query = 'UpdateUser'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 
 
-def update_patient_user(dateOfBirth: str, gender: str, patientId: int) -> (None | dict):
+def update_patient_user(dateOfBirth: str, gender: str, patientId: int) -> None | dict:
+    """
+    Update an existing patient user's information in the database.
+
+    Args:
+        dateOfBirth (str): The updated date of birth of the patient.
+        gender (str): The updated gender of the patient.
+        patientId (int): The unique identifier of the patient to be updated.
+
+    Returns:
+        None | dict: None if the patient update failed, or a dictionary containing the updated patient information if successful.
+    """
     args = [dateOfBirth, gender, patientId]
     query = 'UpdatePatientUser'
     confirmation = mysql_client(query, type='procedure', args=args)
