@@ -14,16 +14,23 @@
         "confirm": "Confirm",
         "createUser": {
             "acceptTerms": "Accept Terms",
-            "acceptTermsValidation": "You must accept the terms and conditions",
             "firstName": "First Name",
-            "firstNameValidation": "First name must start with at least 2 word characters",
             "lastName": "Last Name",
-            "lastNameValidation": "Last name must start with at least 2 word characters",
             "userType": "User Type"
         },
         "doctor": "Healthcare professional",
         "error": {
             "title": "Error",
+            "acceptTermsValidation": "You must accept the terms and conditions",
+            "emailExists": "This e-mail already exists",
+            "firstNameValidation": "First name must start with at least 2 word characters",
+            "lastNameValidation": "Last name must start with at least 2 word characters",
+            "lowercaseValidation": "At least one lowercase",
+            "minChars": "Minimum {count} characters",
+            "noEmail": "Invalid e-mail",
+            "numericValidation": "At least one numeric",
+            "uppercaseValidation": "At least one uppercase",
+            "passwordValidation": "At least one lowercase, one uppercase and one numeric",
             "message": "Data not available. Try again later.",
             "missAuth": "Missing authentication",
             "missAuthorization": "Missing authorization",
@@ -32,19 +39,24 @@
             "notPatient": "User is not a Patient",
             "notDoctor": "User is not a Healthcare Professional",
             "notPatientOrDoctor": "User is neither a Patient nor a Healthcare Professional",
+            "userExists": "This user already exists",
+            "userNotExists": "User does not exist",
+            "userNotCreated": "User NOT created",
             "fileExists": "The file name already exists",
             "fileFormat": "Uploaded file has unsupported format",
             "fileNotSaved": "File not saved",
             "fileSize": "Uploaded file is too big (max 5 MB)",
             "maxFiles": "You can only upload a maximum of 10 files",
             "totalSize": "Total size of uploaded files must not exceed 10 MB",
+            "invalidLogin": "Invalid email or password",
             "healthDataNotCreated": "Health Data NOT created!"
         },
         "success": {
             "title": "Success",
             "fileSaved": "Saved file!",
             "filesSaved": "Saved files!",
-            "healthDataCreated": "Health Data Created!"
+            "healthDataCreated": "Health Data Created!",
+            "userCreated": "User created!"
         },
         "warn": {
             "title": "Warning",
@@ -123,16 +135,10 @@
         "lastRecord": "Last Record",
         "login": {
             "loggedIn": "Logged In",
-            "lowercaseValidation": "At least one lowercase",
-            "minChars": "Minimum {count} characters",
             "noAccount": "Don't have an account?",
-            "noEmail": "Invalid e-mail",
-            "numericValidation": "At least one numeric",
             "password": "Password",
             "pickPassword": "Pick a password",
             "rules": "Rules",
-            "uppercaseValidation": "At least one uppercase",
-            "validation": "At least one lowercase, one uppercase and one numeric",
             "welcome": "Welcome,"
         },
         "navbar": {

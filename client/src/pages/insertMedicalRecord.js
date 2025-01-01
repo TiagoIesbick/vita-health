@@ -92,7 +92,7 @@ const InsertMedicalRecord = () => {
         validationSchema: Yup.object({
             recordTypeId: Yup.string().required(translations?.required).matches(/\d+$/, translations?.insertMedicalRecord?.registerNewCategory),
             recordData: Yup.string().required(translations?.required)
-                .test('min-length-no-html', translations?.login?.minChars?.replace(/{(\w+)}/g, '3'), (value) => {
+                .test('min-length-no-html', translations?.error?.minChars?.replace(/{(\w+)}/g, '3'), (value) => {
                     const strippedText = stripHtmlTags(value);
                     return strippedText.length >= 3;
                 }),
@@ -130,7 +130,7 @@ const InsertMedicalRecord = () => {
             };
         },
         validationSchema: Yup.object({
-            category: Yup.string().required(translations?.required).min(3, translations?.login?.minChars?.replace(/{(\w+)}/g, '3'))
+            category: Yup.string().required(translations?.required).min(3, translations?.error?.minChars?.replace(/{(\w+)}/g, '3'))
         })
     });
 

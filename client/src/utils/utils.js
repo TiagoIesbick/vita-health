@@ -25,10 +25,10 @@ export const passwordFooter = (translations) => (
         <Divider />
         <p className="mt-2">{translations?.login?.rules}</p>
         <ul className="pl-2 ml-2 mt-0 line-height-3">
-            <li>{translations?.login?.lowercaseValidation}</li>
-            <li>{translations?.login?.uppercaseValidation}</li>
-            <li>{translations?.login?.numericValidation}</li>
-            <li>{translations?.login?.minChars?.replace(/{(\w+)}/g, '8')}</li>
+            <li>{translations?.error?.lowercaseValidation}</li>
+            <li>{translations?.error?.uppercaseValidation}</li>
+            <li>{translations?.error?.numericValidation}</li>
+            <li>{translations?.error?.minChars?.replace(/{(\w+)}/g, '8')}</li>
         </ul>
     </>
 );

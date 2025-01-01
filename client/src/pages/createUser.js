@@ -36,15 +36,15 @@ const CreateUser = () => {
         onSubmit: async (values, { resetForm }) => {
             const resUser = await addUser(values);
             if (resUser.userError) {
-                showMessage('error', translations?.error?.error, resUser.userError)
+                showMessage('error', translations?.error?.title, translations?.error?.[resUser.userError])
             } else {
                 const resPatientOrDoctor = await addPatientOrDoctor(resUser.user.userId, resUser.user.userType);
                 if (resPatientOrDoctor.userError) {
-                    showMessage('error', translations?.error?.error, resPatientOrDoctor.userError)
+                    showMessage('error', translations?.error?.title, translations?.error?.[resPatientOrDoctor.userError])
                 } else {
                     const login = await doLogin({ email: values.email, password: values.password});
                     if (login.error) {
-                        showMessage('error', translations?.error?.error, login.error);
+                        showMessage('error', translations?.error?.title, translations?.error?.[login.error]);
                         logout();
                         setUser(null);
                     } else if (login.token) {
@@ -59,15 +59,15 @@ const CreateUser = () => {
             };
         },
         validationSchema: Yup.object({
-            firstName: Yup.string().required(translations?.required).min(2, translations?.login?.minChars?.replace(/{(\w+)}/g, '2'))
-                .matches(/^\s*?\w{2,}.*/, translations?.createUser?.firstNameValidation),
-            lastName: Yup.string().required(translations?.required).min(2, translations?.login?.minChars?.replace(/{(\w+)}/g, '2'))
-                .matches(/^\s*?\w{2,}.*/, translations?.createUser?.lastNameValidation),
-            email: Yup.string().email(translations?.login?.noEmail).required(translations?.required),
-            password: Yup.string().required(translations?.required).min(8, translations?.login?.minChars?.replace(/{(\w+)}/g, '8'))
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.login?.validation),
+            firstName: Yup.string().required(translations?.required).min(2, translations?.error?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.error?.firstNameValidation),
+            lastName: Yup.string().required(translations?.required).min(2, translations?.error?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.error?.lastNameValidation),
+            email: Yup.string().email(translations?.error?.noEmail).required(translations?.required),
+            password: Yup.string().required(translations?.required).min(8, translations?.error?.minChars?.replace(/{(\w+)}/g, '8'))
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.error?.passwordValidation),
             userType: Yup.string().required(translations?.required),
-            acceptTerms: Yup.bool().oneOf([true], translations?.createUser?.acceptTermsValidation)
+            acceptTerms: Yup.bool().oneOf([true], translations?.error?.acceptTermsValidation)
         }),
     });
     const userType = [

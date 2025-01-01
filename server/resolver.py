@@ -369,7 +369,7 @@ def resolve_login(*_, email, password):
     if user:
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
         return { 'user': user, 'token': token }
-    return { 'error': 'Invalid email or password' }
+    return { 'error': 'invalidLogin' }
 
 
 @query.field("medicalRecords")

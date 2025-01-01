@@ -14,16 +14,23 @@
         "confirm": "Confirme",
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
-            "acceptTermsValidation": "Você deve aceitar os termos e condições",
             "firstName": "Nome",
-            "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
             "lastName": "Sobrenome",
-            "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
             "userType": "Tipo de Usuário"
         },
         "doctor": "Profissional de saúde",
         "error": {
             "title": "Erro",
+            "acceptTermsValidation": "Você deve aceitar os termos e condições",
+            "emailExists": "Esse e-mail já existe",
+            "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
+            "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
+            "lowercaseValidation": "Pelo menos uma minúscula",
+            "minChars": "Mínimo {count} caracteres",
+            "noEmail": "E-mail inválido",
+            "numericValidation": "Pelo menos um numérico",
+            "uppercaseValidation": "Pelo menos uma maiúscula",
+            "passwordValidation": "Pelo menos uma minúscula, uma maiúscula e um número",
             "message": "Dados não disponíveis. Tente novamente mais tarde.",
             "missAuth": "Autenticação ausente",
             "missAuthorization": "Autorização ausente",
@@ -32,19 +39,24 @@
             "notDoctor": "Usuário não é Profissional de Saúde",
             "notPatient": "Usuário não é Paciente",
             "notPatientOrDoctor": "Usuário não é Paciente nem Professional de Saúde",
+            "userExists": "Este usuário já existe",
+            "userNotExists": "Usuário não existe",
+            "userNotCreated": "Usuário NÃO criado",
             "fileExists": "O nome do arquivo já existe",
             "fileFormat": "O arquivo enviado tem formato incompatível",
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
             "totalSize": "O tamanho total dos arquivos enviados não deve exceder 10 MB",
+            "invalidLogin": "Email ou senha inválidos",
             "healthDataNotCreated": "Dados de saúde NÃO salvos!"
         },
         "success": {
             "title": "Sucesso",
             "fileSaved": "Arquivo salvo!",
             "filesSaved": "Arquivos salvos!",
-            "healthDataCreated": "Dados de saúde salvos!"
+            "healthDataCreated": "Dados de saúde salvos!",
+            "userCreated": "Usuário criado!"
         },
         "warn": {
             "title": "Aviso",
@@ -123,16 +135,10 @@
         "lastRecord": "Último Registro",
         "login": {
             "loggedIn": "Conectado",
-            "lowercaseValidation": "Pelo menos uma minúscula",
-            "minChars": "Mínimo {count} caracteres",
             "noAccount": "Não tem uma conta?",
-            "noEmail": "E-mail inválido",
-            "numericValidation": "Pelo menos um numérico",
             "password": "Senha",
             "pickPassword": "Escolha uma senha",
             "rules": "Regras",
-            "uppercaseValidation": "Pelo menos uma maiúscula",
-            "validation": "Pelo menos uma minúscula, uma maiúscula e um número",
             "welcome": "Olá,"
         },
         "navbar": {

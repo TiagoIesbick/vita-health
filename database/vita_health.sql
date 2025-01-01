@@ -304,19 +304,19 @@ SET @acceptTerms = ACTR;
 EXECUTE CountUsers USING @email ;
 IF  @countUsers > 0 THEN
   ROLLBACK ;
-	SET userError = 'This e-mail already exists' ;
+	SET userError = 'emailExists' ;
 ELSEIF @acceptTerms != 1 THEN
 	ROLLBACK ;
-  SET userError = 'You must accept the terms and conditions' ;
+  SET userError = 'acceptTermsValidation' ;
 ELSE
 	EXECUTE InsertIntoUsers USING @email, @firstName, @lastName, @password, @userType, @acceptTerms ;
   EXECUTE CountUsers USING @email ;
   IF @countUsers = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK ;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -348,29 +348,29 @@ EXECUTE CountPatients USING @userId ;
 EXECUTE CountDoctors USING @userId ;
 IF @countUsers != 1 THEN
 	ROLLBACK ;
-	SET userError = 'User does not exist' ;
+	SET userError = 'userNotExists' ;
 ELSEIF  @countPatients > 0 OR @countDoctors > 0 THEN
   ROLLBACK ;
-	SET userError = 'This user already exists' ;
+	SET userError = 'userExists' ;
 ELSEIF @userType = 'Patient' THEN
 	EXECUTE InsertIntoPatients USING @userId ;
   EXECUTE CountPatients USING @userId ;
   IF @countPatients = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 ELSEIF @userType = 'Doctor' THEN
 	EXECUTE InsertIntoDoctors USING @userId ;
   EXECUTE CountDoctors USING @userId ;
   IF @countDoctors = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
