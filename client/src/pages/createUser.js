@@ -53,7 +53,7 @@ const CreateUser = () => {
                         resetForm();
                         client.resetStore();
                         login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
-                        showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName}`)
+                        showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName} 👋`)
                     };
                 };
             };

@@ -77,42 +77,82 @@ def update_patient_user(dateOfBirth: str, gender: str, patientId: int) -> None |
     return None if not confirmation else confirmation[0]
 
 
-def update_doctor_user(specialty: str, licenseNumber: str, doctorId: int) -> (None | dict):
+def update_doctor_user(specialty: str, licenseNumber: str, doctorId: int) -> None | dict:
+    """
+    Updates an existing doctor user's information in the database.
+
+    Parameters:
+    - specialty (str): The updated specialty of the doctor.
+    - licenseNumber (str): The updated license number of the doctor.
+    - doctorId (int): The unique identifier of the doctor to be updated.
+
+    Returns:
+    - None: If the doctor update failed.
+    - dict: A dictionary containing the updated doctor information if successful.
+    """
     args = [specialty, licenseNumber, doctorId]
     query = 'UpdateDoctorUser'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 
 
-def reserve_token_id(patientId: int, expirationDate: str, token: str = 'reserve') -> (None | dict):
+def reserve_token_id(patientId: int, expirationDate: str, token: str = 'reserve') -> None | dict:
+    """
+    Reserves a token ID for a patient in the database.
+
+    This function creates a reservation for a token ID associated with a specific patient.
+    It can be used to pre-allocate a token before it's fully created or activated.
+
+    Args:
+        patientId (int): The unique identifier of the patient for whom the token is being reserved.
+        expirationDate (str): The date when the token reservation expires, typically in a format like 'YYYY-MM-DD'.
+        token (str, optional): The token string to be reserved. Defaults to 'reserve' if not provided.
+
+    Returns:
+        None | dict: None if the token ID reservation failed, or a dictionary containing
+                     information about the reserved token if successful.
+    """
     args = [token, patientId, expirationDate]
     query = 'ReserveTokenId'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 
 
-def create_token(tokenId: int, token: str) -> (None | dict):
+def create_token(tokenId: int, token: str) -> None | dict:
+    """
+    Creates a new token in the database.
+
+    This function adds a new token to the database using the provided token ID and token string.
+
+    Args:
+        tokenId (int): The unique identifier for the token.
+        token (str): The token string to be added.
+
+    Returns:
+        None | dict: None if the token creation failed, or a dictionary containing
+                     information about the created token if successful.
+    """
     args = [tokenId, token]
     query = 'AddToken'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 
 
-def create_token_access(tokenId: int, doctorId: int) -> (None | dict):
+def create_token_access(tokenId: int, doctorId: int) -> None | dict:
     args = [tokenId, doctorId]
     query = 'AddTokenAccess'
     confirmation = mysql_client(query, 'procedure', args)
     return None if not confirmation else confirmation[0]
 
 
-def create_record_type(recordName: str) -> (None | dict):
+def create_record_type(recordName: str) -> None | dict:
     args = [recordName]
     query = 'AddRecordType'
     confirmation = mysql_client(query, 'procedure', args)
     return None if not confirmation else confirmation[0]
 
 
-def create_medical_record(patientId: int, doctor_id: int | None, recordTypeId: int, recordData: str) -> (None | dict):
+def create_medical_record(patientId: int, doctor_id: int | None, recordTypeId: int, recordData: str) -> None | dict:
     args = [patientId, doctor_id, recordTypeId, recordData]
     query = 'AddMedicalRecord'
     confirmation = mysql_client(query, 'procedure', args)

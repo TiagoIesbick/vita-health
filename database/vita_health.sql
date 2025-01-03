@@ -627,16 +627,16 @@ SET @recordName = RCNM ;
 EXECUTE CountRecordName USING @recordName ;
 IF @countRecordName > 0 THEN
 	ROLLBACK ;
-  SET recordTypeError = 'This category already exists' ;
+  SET recordTypeError = 'categoryExists' ;
 ELSE
 	EXECUTE InsertRecordType USING @recordName ;
   EXECUTE CountRecordName USING @recordName ;
   IF @countRecordName = 1 THEN
     COMMIT ;
-    SET recordTypeConfirmation = 'Category created!' ;
+    SET recordTypeConfirmation = 'categoryCreated' ;
 	ELSE
 		ROLLBACK ;
-    SET recordTypeError = 'Category NOT created!' ;
+    SET recordTypeError = 'categoryNotCreated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(

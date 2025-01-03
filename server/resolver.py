@@ -7,6 +7,7 @@ import json
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
 from datetime import datetime
+from google.cloud import translate_v2 as translate
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
@@ -15,6 +16,10 @@ from db.openai import openai_chat_stream, extract_text_from_pdf, extract_text_wi
 from utils.decorators import *
 from pathlib import Path
 from utils.utils import *
+
+
+# Initialize the Google Cloud Translation client
+translate_client = translate.Client()
 
 
 query = QueryType()
@@ -592,6 +597,17 @@ def resolve_create_record_type(*_, recordName):
         - An error message if the creation failed.
         - The newly created record type information if successful.
     """
+    detection = translate_client.detect_language(recordName)
+    detected_language = detection.get("language")
+    if detected_language == "no":
+        return {'recordTypeError': 'langNotDetected'}
+    elif detected_language != "en":
+        translation = translate_client.translate(
+            recordName,
+            source_language=detected_language,
+            target_language="en"
+        )
+        recordName = translation.get("translatedText")
     recordName = ' '.join(nh3.clean(recordName).split()).title()
     return create_record_type(recordName)
 

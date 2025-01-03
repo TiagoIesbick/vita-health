@@ -22,8 +22,11 @@
         "error": {
             "title": "Error",
             "acceptTermsValidation": "You must accept the terms and conditions",
+            "categoryExists": "This category already exists",
+            "categoryNotCreated": "Category NOT created",
             "emailExists": "This e-mail already exists",
             "firstNameValidation": "First name must start with at least 2 word characters",
+            "langNotDetected": "Language not detected",
             "lastNameValidation": "Last name must start with at least 2 word characters",
             "lowercaseValidation": "At least one lowercase",
             "minChars": "Minimum {count} characters",
@@ -53,6 +56,7 @@
         },
         "success": {
             "title": "Success",
+            "categoryCreated": "Category created!",
             "fileSaved": "Saved file!",
             "filesSaved": "Saved files!",
             "healthDataCreated": "Health Data Created!",

@@ -123,8 +123,10 @@ const InsertMedicalRecord = () => {
         onSubmit: async (values) => {
             const resRecordType = await addRecordType(values);
             if (resRecordType.recordTypeError) {
-                showMessage('error', translations?.error?.title, resRecordType.recordTypeError)
+                showMessage('error', translations?.error?.title, translations?.error?.[resRecordType.recordTypeError])
             } else {
+                // translations.insertMedicalRecord.recordTypes[resRecordType.recordName] = 'Dentista';
+                // console.log('[translations]', translations);
                 formik.setFieldValue("recordTypeId", resRecordType.recordTypeId);
                 setVisible(false);
             };

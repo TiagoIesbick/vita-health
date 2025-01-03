@@ -39,7 +39,7 @@ const Login = () => {
                 setUser(login.user);
                 client.resetStore();
                 login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
-                showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName}`);
+                showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName} 👋`);
             };
         },
         validationSchema: Yup.object({
