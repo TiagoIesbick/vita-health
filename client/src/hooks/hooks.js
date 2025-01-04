@@ -308,8 +308,8 @@ export const useInactiveTokens = (limit, offset) => {
 };
 
 
-export const useRecordTypes = () => {
-    const { data, loading, error } = useQuery(recordTypesQuery);
+export const useRecordTypes = (lang) => {
+    const { data, loading, error } = useQuery(recordTypesQuery,{ variables: { lang }});
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
 };
 

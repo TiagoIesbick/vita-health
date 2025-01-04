@@ -25,11 +25,11 @@ import './insertMedicalRecord.css';
 
 const InsertMedicalRecord = () => {
     const navigate = useNavigate();
-    const { translations } = useLanguage();
+    const { language, translations } = useLanguage();
     const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId || 0);
-    const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
+    const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes(language);
     const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
     const { addMedicalRecord, loadingMedicalRecord, errorMedicalRecord } = useCreateMedicalRecord();
     const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
@@ -161,10 +161,10 @@ const InsertMedicalRecord = () => {
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
-    const translatedRecordTypes = recordTypes?.map(record => ({
-        ...record,
-        recordName: translations?.insertMedicalRecord?.recordTypes?.[record.recordName] || record.recordName
-    })).sort((a, b) => a.recordName.localeCompare(b.recordName));
+    // const translatedRecordTypes = recordTypes?.map(record => ({
+    //     ...record,
+    //     recordName: translations?.insertMedicalRecord?.recordTypes?.[record.recordName] || record.recordName
+    // })).sort((a, b) => a.recordName.localeCompare(b.recordName));
 
 
     return (
@@ -175,9 +175,12 @@ const InsertMedicalRecord = () => {
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...translatedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
+                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
-                        optionLabel="recordName"
+                        optionLabel={(record) => {
+                            if (record.translation) return record.translation.translatedName;
+                            else return record.recordName;
+                        }}
                         filter
                         className="w-full"
                         {...formik.getFieldProps("recordTypeId")}

@@ -227,6 +227,12 @@ def get_user_by_email_password(email:str, password:str) -> None | dict:
     return user[0]
 
 
+def get_record_type_translation(id: int, lang: str) -> None | dict:
+    query = rf"SELECT * FROM RecordTypeTranslations WHERE recordTypeId = {id} AND languageCode = '{lang}';"
+    translation = mysql_client(query)
+    return None if not translation else translation[0]
+
+
 def get_medical_records_by_pacient(id: int, limit: int, offset: int) -> None | list[dict]:
     """
     Retrieve medical records for a specific patient from the database.

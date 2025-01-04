@@ -7,7 +7,7 @@ type Query {
     activePatientTokens: [Tokens]
     activeDoctorTokens: [Tokens]
     inactiveTokens(limit: Int, offset: Int): TokensSubList
-    recordTypes: [RecordTypes]
+    recordTypes(lang: String!): [RecordTypes]
     aiConversation: [Conversation]
     searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [SearchFilesResult]
@@ -41,6 +41,13 @@ type SearchMedicalRecordsResult {
 type RecordTypes {
     recordTypeId: ID!
     recordName: String!
+    translation: RecordTypeTranslations
+}
+
+type RecordTypeTranslations {
+    translationId: ID!
+    languageCode: String!
+    translatedName: String!
 }
 
 type Files {

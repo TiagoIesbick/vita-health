@@ -80,6 +80,25 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `vita_health`.`RecordTypeTranslations`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vita_health`.`RecordTypeTranslations` (
+  `translationId` INT NOT NULL AUTO_INCREMENT,
+  `recordTypeId` INT NOT NULL,
+  `languageCode` VARCHAR(10) NOT NULL,
+  `translatedName` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`translationId`),
+  INDEX `recordTypeTranslationsRecordTypeId_idx` (`recordTypeId` ASC) INVISIBLE,
+  UNIQUE INDEX `recordTypeLanguage_UNIQUE` (`recordTypeId` ASC, `languageCode` ASC) VISIBLE,
+  CONSTRAINT `recordTypeTranslationsRecordTypeId`
+    FOREIGN KEY (`recordTypeId`)
+    REFERENCES `vita_health`.`RecordTypes` (`recordTypeId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `vita_health`.`MedicalRecords`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
@@ -244,6 +263,29 @@ VALUES
 ('Orthopedics'),
 ('Cardiology'),
 ('Obstetrics') ;
+
+
+-- -----------------------------------------------------
+-- Fill Table `vita_health`.`RecordTypeTranslations`
+-- -----------------------------------------------------
+INSERT INTO `vita_health`.`RecordTypeTranslations` (`recordTypeId`, `languageCode`, `translatedName`)
+VALUES
+(1, 'pt-br', 'Exame de Sangue'),
+(2, 'pt-br', 'Ressonância Magnética'),
+(3, 'pt-br', 'Raio-X'),
+(4, 'pt-br', 'Ultrasom'),
+(5, 'pt-br', 'Eletrocardiograma'),
+(6, 'pt-br', 'Neurologia'),
+(7, 'pt-br', 'Nutrição'),
+(8, 'pt-br', 'Fisioterapia'),
+(9, 'pt-br', 'Psicologia'),
+(10, 'pt-br', 'Traumatologia'),
+(11, 'pt-br', 'Psiquiatria'),
+(12, 'pt-br', 'Pediatria'),
+(13, 'pt-br', 'Dermatologia'),
+(14, 'pt-br', 'Ortopedia'),
+(15, 'pt-br', 'Cardiologia'),
+(16, 'pt-br', 'Obstetrícia') ;
 
 
 -- -----------------------------------------------------

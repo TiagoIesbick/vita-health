@@ -28,6 +28,7 @@ subscription = SubscriptionType()
 users = ObjectType("Users")
 patients = ObjectType("Patients")
 doctors = ObjectType("Doctors")
+record_types = ObjectType("RecordTypes")
 medical_records = ObjectType("MedicalRecords")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
@@ -563,7 +564,7 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
 
 
 @query.field("recordTypes")
-def resolve_record_types(*_):
+def resolve_record_types(_, info, lang):
     """
     Retrieve a list of available medical record types.
 
@@ -575,7 +576,14 @@ def resolve_record_types(*_):
     Returns:
     list: A list of strings representing the available medical record types.
     """
+    info.context['lang'] = lang
     return get_record_types()
+
+
+@record_types.field("translation")
+def resolver_record_types_translation(record_types, info):
+    language_code = info.context.get("lang")
+    return None if not record_types['recordTypeId'] or not language_code else get_record_type_translation(record_types['recordTypeId'], language_code)
 
 
 @mutation.field("createRecordType")

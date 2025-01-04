@@ -21,8 +21,8 @@ export const userQuery = gql`
 
 
 export const recordTypesQuery = gql`
-    query RecordTypes {
-        recordTypes {
+    query RecordTypes ($lang: String!) {
+        recordTypes (lang: $lang) {
             ...RecordTypeDetail
         }
     }

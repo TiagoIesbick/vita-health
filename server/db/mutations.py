@@ -139,6 +139,20 @@ def create_token(tokenId: int, token: str) -> None | dict:
 
 
 def create_token_access(tokenId: int, doctorId: int) -> None | dict:
+    """
+    Adds a new token access record to the database.
+
+    This function creates a new association between a token and a doctor in the database.
+    It is used to grant access to a specific doctor for a particular token.
+
+    Parameters:
+    - tokenId (int): The unique identifier of the token for which access is being granted.
+    - doctorId (int): The unique identifier of the doctor who will have access to the token.
+
+    Returns:
+    - None: If the token access creation failed.
+    - dict: A dictionary containing information about the created token access if successful.
+    """
     args = [tokenId, doctorId]
     query = 'AddTokenAccess'
     confirmation = mysql_client(query, 'procedure', args)
@@ -146,6 +160,18 @@ def create_token_access(tokenId: int, doctorId: int) -> None | dict:
 
 
 def create_record_type(recordName: str) -> None | dict:
+    """
+    Creates a new record type in the database.
+
+    This function adds a new record type to the database using the provided record name.
+
+    Args:
+        recordName (str): The name of the new record type to be created.
+
+    Returns:
+        None | dict: None if the record type creation failed, or a dictionary containing
+                     information about the created record type if successful.
+    """
     args = [recordName]
     query = 'AddRecordType'
     confirmation = mysql_client(query, 'procedure', args)
@@ -153,6 +179,22 @@ def create_record_type(recordName: str) -> None | dict:
 
 
 def create_medical_record(patientId: int, doctor_id: int | None, recordTypeId: int, recordData: str) -> None | dict:
+    """
+    Creates a new medical record in the database.
+
+    This function adds a new medical record to the database for a specific patient,
+    optionally associated with a doctor, and of a particular record type.
+
+    Args:
+        patientId (int): The unique identifier of the patient for whom the record is being created.
+        doctor_id (int | None): The unique identifier of the doctor creating the record, or None if not applicable.
+        recordTypeId (int): The identifier of the type of medical record being created.
+        recordData (str): The actual content or data of the medical record.
+
+    Returns:
+        None | dict: None if the medical record creation failed, or a dictionary containing
+                     information about the created medical record if successful.
+    """
     args = [patientId, doctor_id, recordTypeId, recordData]
     query = 'AddMedicalRecord'
     confirmation = mysql_client(query, 'procedure', args)

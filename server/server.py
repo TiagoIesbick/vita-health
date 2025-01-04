@@ -9,16 +9,16 @@ from starlette.routing import Route, WebSocketRoute
 from auth import BasicAuthBackend, get_context_value
 from routes import serve_file
 from db.redis import pubsub
-from resolver import query, users, patients, doctors, mutation, medical_records, \
-    tokens, token_access, subscription
+from resolver import query, users, patients, doctors, mutation, record_types, \
+    medical_records, tokens, token_access, subscription
 
 
 type_defs = load_schema_from_path("schema.graphql")
 
 
 schema = make_executable_schema(
-    type_defs, query, users, patients, doctors, mutation, medical_records,
-    tokens, token_access, upload_scalar, subscription
+    type_defs, query, users, patients, doctors, mutation, record_types,
+    medical_records, tokens, token_access, upload_scalar, subscription
 )
 
 
