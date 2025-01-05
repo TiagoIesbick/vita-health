@@ -12,16 +12,47 @@ fernet = Fernet(getenv('FERNET_KEY'))
 
 
 def encrypt(msg: str) -> bytes:
+    """
+    Encrypts a given message using the Fernet symmetric encryption algorithm.
+
+    Parameters:
+    msg (str): The message to be encrypted. It should be a string.
+
+    Returns:
+    bytes: The encrypted message as bytes.
+    """
     encrypted = fernet.encrypt(msg.encode())
     return encrypted
 
 
 def decrypt(encrypted: bytes) -> str:
+    """
+    Decrypts a given encrypted message using the Fernet symmetric encryption algorithm.
+
+    Parameters:
+    encrypted (bytes): The encrypted message as bytes.
+
+    Returns:
+    str: The decrypted message as a UTF-8 encoded string.
+    """
     decrypted = fernet.decrypt(encrypted).decode('utf-8')
     return decrypted
 
 
 def generate_token(exp: int, patient: dict) -> str:
+    """
+    Generate a JSON Web Token (JWT) for a patient.
+
+    This function creates a JWT by encoding the expiration time and patient information
+    using a secret key. The token is signed using the HS256 algorithm.
+
+    Parameters:
+    exp (int): The expiration time of the token in Unix timestamp format.
+    patient (dict): A dictionary containing the patient's information to be encoded in the token.
+
+    Returns:
+    str: A string representation of the generated JWT.
+    """
     token = jwt.encode({"exp": exp} | patient , getenv('SECRET'), algorithm="HS256")
     return token
 
