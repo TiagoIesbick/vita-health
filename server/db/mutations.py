@@ -202,6 +202,19 @@ def create_medical_record(patientId: int, doctor_id: int | None, recordTypeId: i
 
 
 def deactivate_token(tokenId: int) -> None | dict:
+    """
+    Deactivates a token in the database.
+
+    This function updates the expiration date of a token in the database to now.
+    Once a token is deactivated, it cannot be used for any further operations.
+
+    Parameters:
+    - tokenId (int): The unique identifier of the token to be deactivated.
+
+    Returns:
+    - None: If the token deactivation failed.
+    - dict: A dictionary containing information about the deactivated token if successful.
+    """
     args = [tokenId]
     query = 'DeactivateToken'
     confirmation = mysql_client(query, 'procedure', args)
@@ -209,6 +222,22 @@ def deactivate_token(tokenId: int) -> None | dict:
 
 
 def add_file_info(recordId: int, fileName: str, mimeType: str, url: str) -> None | dict:
+    """
+    Adds file information to the database for a specific medical record.
+
+    This function stores metadata about a file associated with a medical record,
+    including its name, MIME type, and URL.
+
+    Args:
+        recordId (int): The unique identifier of the medical record to which the file is attached.
+        fileName (str): The name of the file, including its extension.
+        mimeType (str): The MIME type of the file, indicating its format (e.g., 'image/jpeg', 'application/pdf').
+        url (str): The URL where the file is stored or can be accessed.
+
+    Returns:
+        None | dict: None if the file information addition failed, or a dictionary containing
+                     information about the added file if successful.
+    """
     args = [recordId, fileName, mimeType, url]
     query = 'AddFiles'
     confirmation = mysql_client(query, 'procedure', args)
@@ -216,6 +245,20 @@ def add_file_info(recordId: int, fileName: str, mimeType: str, url: str) -> None
 
 
 def update_file_text_content(fileId: int, textContent: str) -> None | dict:
+    """
+    Updates the text content of a file in the database.
+
+    This function modifies the text content associated with a specific file
+    identified by its file ID.
+
+    Args:
+        fileId (int): The unique identifier of the file to be updated.
+        textContent (str): The new text content to be associated with the file.
+
+    Returns:
+        None | dict: None if the update operation failed, or a dictionary
+                     containing information about the updated file if successful.
+    """
     args = [fileId, textContent]
     query = 'UpdateFileTextContent'
     confirmation = mysql_client(query, 'procedure', args)

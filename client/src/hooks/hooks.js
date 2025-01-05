@@ -6,6 +6,7 @@ import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery,
 import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
+import { useLanguage } from "../providers/languageContext";
 
 
 export const useBackgroundImageResize = () => {
@@ -74,9 +75,10 @@ export const useRealTimeCacheUpdate = (user) => {
 };
 
 
-export const useMedicalRecords = (limit, offset) => {
+export const useMedicalRecords = (limit, offset, lang) => {
     const { data, loading, error } = useQuery(medicalRecordsQuery, {
-        variables: {limit, offset}
+        variables: {limit, offset, lang},
+        fetchPolicy: 'cache-and-network'
     });
     return {medicalRecords: data?.medicalRecords, loading, error: Boolean(error)};
 };
@@ -309,7 +311,7 @@ export const useInactiveTokens = (limit, offset) => {
 
 
 export const useRecordTypes = (lang) => {
-    const { data, loading, error } = useQuery(recordTypesQuery,{ variables: { lang }});
+    const { data, loading, error } = useQuery(recordTypesQuery,{ variables: { lang }, fetchPolicy: 'network-only'});
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
 };
 
@@ -467,9 +469,12 @@ export const useMultipleUpload = () => {
 
 export const useInfiniteMedicalRecords = () => {
     const [offset, setOffset] = useState(0);
-    const { medicalRecords, loading, error } = useMedicalRecords(limit, offset);
+    const { language } = useLanguage();
+    const { medicalRecords, loading, error } = useMedicalRecords(limit, offset, language);
     const [allRecords, setAllRecords] = useState(medicalRecords?.items || []);
     const loader = useRef(null);
+
+    console.log('[medicalRecords]:', medicalRecords);
 
     useEffect(() => {
         if (medicalRecords?.items) {

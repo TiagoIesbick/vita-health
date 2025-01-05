@@ -161,11 +161,10 @@ const InsertMedicalRecord = () => {
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
-    // const translatedRecordTypes = recordTypes?.map(record => ({
-    //     ...record,
-    //     recordName: translations?.insertMedicalRecord?.recordTypes?.[record.recordName] || record.recordName
-    // })).sort((a, b) => a.recordName.localeCompare(b.recordName));
-
+    const sortedRecordTypes = recordTypes?.map(record => ({
+        ...record,
+        recordName: record.translation ? record.translation.translatedName : record.recordName
+    })).sort((a, b) => a.recordName.localeCompare(b.recordName));
 
     return (
         <Card title={translations?.insertMedicalRecord?.title} className="flex justify-content-center align-items-center card-min-height">
@@ -175,12 +174,9 @@ const InsertMedicalRecord = () => {
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...recordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
+                        options={!loadingRecordTypes ? [...sortedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
-                        optionLabel={(record) => {
-                            if (record.translation) return record.translation.translatedName;
-                            else return record.recordName;
-                        }}
+                        optionLabel="recordName"
                         filter
                         className="w-full"
                         {...formik.getFieldProps("recordTypeId")}

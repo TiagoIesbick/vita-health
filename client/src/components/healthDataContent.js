@@ -21,7 +21,7 @@ const HealthDataContent = ({item}) => {
 
     return (
         <Card
-            title={translations?.insertMedicalRecord?.recordTypes?.[item.recordType.recordName] || item.recordType.recordName}
+            title={item.recordType.translation ? item.recordType.translation.translatedName : item.recordType.recordName}
             subTitle={
                 <>
                     {`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}

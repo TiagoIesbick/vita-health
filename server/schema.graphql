@@ -1,7 +1,7 @@
 scalar Upload
 
 type Query {
-    medicalRecords(limit: Int, offset: Int): MedicalRecordsSubList
+    medicalRecords(limit: Int, offset: Int, lang: String!): MedicalRecordsSubList
     medicalRecord(recordId: ID!): MedicalRecords
     user(userId: ID!): Users
     activePatientTokens: [Tokens]

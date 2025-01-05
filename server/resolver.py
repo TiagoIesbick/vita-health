@@ -381,7 +381,7 @@ def resolve_login(*_, email, password):
 @query.field("medicalRecords")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
+def resolve_medical_records(_, info, limit, offset, lang, patient_id, doctor_id):
     """
     Resolves and returns a paginated list of medical records for a patient.
 
@@ -399,6 +399,7 @@ def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
     dict or None: A dictionary containing the total count of medical records and the paginated items.
                   Returns None if there are no medical records for the patient.
     """
+    info.context['lang'] = lang
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
     if not total_medical_records:

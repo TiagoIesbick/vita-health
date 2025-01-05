@@ -24,6 +24,8 @@ const MedicalRecords = () => {
         showMessage('error', 'Error', 'Data not available. Try again later.', true);
     };
 
+    console.log('[allRecords]:',allRecords);
+
     return (
         <>
             { allRecords.length > 0 && <AIChat allRecords={allRecords} user={user} /> }
