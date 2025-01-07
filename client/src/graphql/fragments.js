@@ -46,6 +46,7 @@ export const recordTypeFragment = gql`
         recordName
         translation {
             translationId
+            languageCode
             translatedName
         }
     }

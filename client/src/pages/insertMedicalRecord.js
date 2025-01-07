@@ -29,7 +29,7 @@ const InsertMedicalRecord = () => {
     const client = useApolloClient();
     const { user, patient, setPatient, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient?.userId || 0);
-    const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes(language);
+    const { recordTypes, loadingRecordTypes, errorRecordTypes } = useRecordTypes();
     const { addRecordType, loadingRecordType, errorRecordType } = useCreateRecordType();
     const { addMedicalRecord, loadingMedicalRecord, errorMedicalRecord } = useCreateMedicalRecord();
     const { addFiles, loadingFiles, errorFiles } = useMultipleUpload();
@@ -161,10 +161,15 @@ const InsertMedicalRecord = () => {
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
-    const sortedRecordTypes = recordTypes?.map(record => ({
-        ...record,
-        recordName: record.translation ? record.translation.translatedName : record.recordName
-    })).sort((a, b) => a.recordName.localeCompare(b.recordName));
+    const sortedRecordTypes = recordTypes?.map(record => {
+        const translation = record.translation?.find(
+            (t) => t.languageCode === language
+        );
+        return {
+            ...record,
+            recordName: translation ? translation.translatedName : record.recordName
+        };
+    }).sort((a, b) => a.recordName.localeCompare(b.recordName));
 
     return (
         <Card title={translations?.insertMedicalRecord?.title} className="flex justify-content-center align-items-center card-min-height">
@@ -174,7 +179,7 @@ const InsertMedicalRecord = () => {
                     <Dropdown
                         loading={loadingRecordTypes}
                         inputId="record-type"
-                        options={!loadingRecordTypes ? [...sortedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.recordTypes?.Other}...`}] : formik.initialValues.recordTypeId }
+                        options={!loadingRecordTypes ? [...sortedRecordTypes, {"recordTypeId": 'Other', "recordName": `${translations?.insertMedicalRecord?.other}...`}] : formik.initialValues.recordTypeId }
                         optionValue="recordTypeId"
                         optionLabel="recordName"
                         filter

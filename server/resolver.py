@@ -7,19 +7,15 @@ import json
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
 from datetime import datetime
-from google.cloud import translate_v2 as translate
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
 from db.elastic import es, search_with_highlights
 from db.openai import openai_chat_stream, extract_text_from_pdf, extract_text_with_ocr
 from utils.decorators import *
+from utils.utils import check_translate_word
 from pathlib import Path
 from utils.utils import *
-
-
-# Initialize the Google Cloud Translation client
-translate_client = translate.Client()
 
 
 query = QueryType()
@@ -381,7 +377,7 @@ def resolve_login(*_, email, password):
 @query.field("medicalRecords")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-def resolve_medical_records(_, info, limit, offset, lang, patient_id, doctor_id):
+def resolve_medical_records(*_, limit, offset, patient_id, doctor_id):
     """
     Resolves and returns a paginated list of medical records for a patient.
 
@@ -399,7 +395,6 @@ def resolve_medical_records(_, info, limit, offset, lang, patient_id, doctor_id)
     dict or None: A dictionary containing the total count of medical records and the paginated items.
                   Returns None if there are no medical records for the patient.
     """
-    info.context['lang'] = lang
     items = get_medical_records_by_pacient(patient_id, limit, offset)
     total_medical_records = count_medical_records(patient_id)
     if not total_medical_records:
@@ -565,7 +560,7 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
 
 
 @query.field("recordTypes")
-def resolve_record_types(_, info, lang):
+def resolve_record_types(*_):
     """
     Retrieve a list of available medical record types.
 
@@ -577,14 +572,12 @@ def resolve_record_types(_, info, lang):
     Returns:
     list: A list of strings representing the available medical record types.
     """
-    info.context['lang'] = lang
     return get_record_types()
 
 
 @record_types.field("translation")
-def resolver_record_types_translation(record_types, info):
-    language_code = info.context.get("lang")
-    return None if not record_types['recordTypeId'] or not language_code else get_record_type_translation(record_types['recordTypeId'], language_code)
+def resolver_record_types_translation(record_types, *_):
+    return None if not record_types['recordTypeId'] else get_record_type_translation(record_types['recordTypeId'])
 
 
 @mutation.field("createRecordType")
@@ -606,19 +599,19 @@ def resolve_create_record_type(*_, recordName):
         - An error message if the creation failed.
         - The newly created record type information if successful.
     """
-    detection = translate_client.detect_language(recordName)
-    detected_language = detection.get("language")
-    if detected_language == "no":
+    recordName = ' '.join(nh3.clean(recordName).split())
+    if not recordName:
         return {'recordTypeError': 'langNotDetected'}
-    elif detected_language != "en":
-        translation = translate_client.translate(
-            recordName,
-            source_language=detected_language,
-            target_language="en"
-        )
-        recordName = translation.get("translatedText")
-    recordName = ' '.join(nh3.clean(recordName).split()).title()
-    return create_record_type(recordName)
+
+    res = check_translate_word(recordName)
+
+    if res['error'] or res['confidence'] < 0.5:
+        return {'recordTypeError': 'langNotDetected'}
+    print(res)
+
+    return create_record_type(res['translations']['en'])
+
+    # return create_record_type(recordName)
 
 
 @query.field("activePatientTokens")

@@ -1,13 +1,13 @@
 scalar Upload
 
 type Query {
-    medicalRecords(limit: Int, offset: Int, lang: String!): MedicalRecordsSubList
+    medicalRecords(limit: Int, offset: Int): MedicalRecordsSubList
     medicalRecord(recordId: ID!): MedicalRecords
     user(userId: ID!): Users
     activePatientTokens: [Tokens]
     activeDoctorTokens: [Tokens]
     inactiveTokens(limit: Int, offset: Int): TokensSubList
-    recordTypes(lang: String!): [RecordTypes]
+    recordTypes: [RecordTypes]
     aiConversation: [Conversation]
     searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [SearchFilesResult]
@@ -41,7 +41,7 @@ type SearchMedicalRecordsResult {
 type RecordTypes {
     recordTypeId: ID!
     recordName: String!
-    translation: RecordTypeTranslations
+    translation: [RecordTypeTranslations]
 }
 
 type RecordTypeTranslations {

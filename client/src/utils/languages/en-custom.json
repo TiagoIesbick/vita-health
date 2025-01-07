@@ -112,25 +112,7 @@
             "newCategoryLabel": "Category",
             "notesPlaceholder": "Enter your notes here...",
             "title": "Add Health Data",
-            "recordTypes": {
-                "Blood Test": "Blood Test",
-                "Cardiology": "Cardiology",
-                "Dermatology": "Dermatology",
-                "ECG": "Eletrocardiogram",
-                "MRI Scan": "MRI Scan",
-                "Neurology": "Neurology",
-                "Nutrition": "Nutrition",
-                "Obstetrics": "Obstetrics",
-                "Orthopedics": "Orthopedics",
-                "Pediatrics": "Pediatrics",
-                "Physiotherapy": "Physiotherapy",
-                "Psychiatry": "Psychiatry",
-                "Psychology": "Psychology",
-                "Traumatology": "Traumatology",
-                "Ultrasound": "Ultrasound",
-                "X-Ray": "X-Ray",
-                "Other": "Other"
-            },
+            "other": "Other",
             "registerNewCategory": "Register new category"
         },
         "insertToken": {
