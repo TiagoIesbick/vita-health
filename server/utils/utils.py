@@ -116,11 +116,33 @@ def validate_name(name: str) -> bool:
 
 
 def validate_file_format(file_type: str) -> bool:
+    """
+    Validates if the given file type is supported.
+
+    This function checks if the provided file type is in the list of supported file formats.
+
+    Parameters:
+    file_type (str): The MIME type of the file to be validated.
+
+    Returns:
+    bool: True if the file type is supported, False otherwise.
+    """
     supported_file_formats = ["image/jpeg", "image/png", "image/svg+xml", "image/webp", "application/pdf"]
     return file_type in supported_file_formats
 
 
 def validate_file_size(file_size: int) -> bool:
+    """
+    Validates if the given file size is within the allowed limit.
+
+    This function checks if the provided file size is less than or equal to 5 MB (5,242,880 bytes).
+
+    Parameters:
+    file_size (int): The size of the file in bytes.
+
+    Returns:
+    bool: True if the file size is within the allowed limit (5 MB or less), False otherwise.
+    """
     return file_size <= 5 * 1024 * 1024
 
 
