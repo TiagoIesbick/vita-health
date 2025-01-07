@@ -309,7 +309,7 @@ export const useInactiveTokens = (limit, offset) => {
 
 
 export const useRecordTypes = () => {
-    const { data, loading, error } = useQuery(recordTypesQuery, { fetchPolicy: 'network-only' });
+    const { data, loading, error } = useQuery(recordTypesQuery, { fetchPolicy: 'cache-and-network' });
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
 };
 
@@ -329,16 +329,10 @@ export const useCreateRecordType = () => {
             update: (cache, { data: { createRecordType }}) => {
                 if (createRecordType.recordTypeError) return;
                 const existingCacheData = cache.readQuery({ query: recordTypesQuery });
-                const newRecordType = {
-                    __typename: 'RecordTypes',
-                    recordTypeId: createRecordType.recordTypeId,
-                    recordName: createRecordType.recordName,
-                };
                 const updatedRecordTypes = [
                     ...existingCacheData.recordTypes,
-                    newRecordType,
+                    createRecordType.recordType
                 ];
-                updatedRecordTypes.sort((a, b) => a.recordName.localeCompare(b.recordName));
                 cache.writeQuery({
                     query: recordTypesQuery,
                     data: { recordTypes: updatedRecordTypes }

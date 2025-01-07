@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment, recordTypeFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -151,10 +151,12 @@ export const mutationCreateRecordType = gql`
         createRecordType(recordName: $recordName) {
             recordTypeError
             recordTypeConfirmation
-            recordTypeId
-            recordName
+            recordType {
+                ...RecordTypeDetail
+            }
         }
     }
+    ${recordTypeFragment}
 `;
 
 

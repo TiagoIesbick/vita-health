@@ -6,7 +6,7 @@
                 "firstPDoctorUser": "Insira um token compartilhado pelo seu paciente",
                 "secondPDoctorUser": "Isso lhe concederá acesso temporário ao histórico médico dele e permitirá adicionar novos dados.",
                 "secondP1st": "Gere um token",
-                "secondP2nd": "para compartilhar com seu profissional de saúde.",
+                "secondP2nd": "para compartilhar com seus profissionais de saúde.",
                 "thirdP": "Isso concederá a eles acesso temporário ao seu histórico médico e permitirá que adicionem novos dados."
             },
             "title": "Tokens Ativos"
@@ -50,6 +50,7 @@
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
+            "translationExists": "Esta tradução já existe",
             "totalSize": "O tamanho total dos arquivos enviados não deve exceder 10 MB",
             "invalidLogin": "Email ou senha inválidos",
             "healthDataNotCreated": "Dados de saúde NÃO salvos!"

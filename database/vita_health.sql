@@ -657,35 +657,47 @@ DELIMITER ;
 -- Create Procedure to create record types
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddRecordType(IN RCNM VARCHAR(255))
+CREATE PROCEDURE AddRecordType(IN RCNM VARCHAR(255), IN PTBR VARCHAR(255))
 BEGIN
 DECLARE recordTypeConfirmation VARCHAR(45);
 DECLARE recordTypeError VARCHAR(45);
 PREPARE CountRecordName FROM 'SELECT COUNT(`recordTypeId`) INTO @countRecordName FROM `RecordTypes`
 	WHERE `recordName` = ?' ;
 PREPARE InsertRecordType FROM 'INSERT INTO `vita_health`.`RecordTypes` (`recordName`) VALUES (?)' ;
+PREPARE CountTranslation FROM 'SELECT COUNT(`translationId`) INTO @countTranslation FROM `RecordTypeTranslations`
+  WHERE `recordTypeId` = ? AND `languageCode` = ?' ;
+PREPARE InsertTranslation FROM 'INSERT INTO `vita_health`.`RecordTypeTranslations`
+  (`recordTypeId`, `languageCode`, `translatedName`) VALUES (?, ?, ?)' ;
 START TRANSACTION;
 SET @recordName = RCNM ;
+SET @ptTranslation = PTBR ;
+SET @languageCode = 'pt-br' ;
 EXECUTE CountRecordName USING @recordName ;
 IF @countRecordName > 0 THEN
-	ROLLBACK ;
+  ROLLBACK ;
   SET recordTypeError = 'categoryExists' ;
 ELSE
 	EXECUTE InsertRecordType USING @recordName ;
-  EXECUTE CountRecordName USING @recordName ;
-  IF @countRecordName = 1 THEN
-    COMMIT ;
-    SET recordTypeConfirmation = 'categoryCreated' ;
+	SET @newRecordTypeId = LAST_INSERT_ID();
+	EXECUTE CountTranslation USING @newRecordTypeId, @languageCode ;
+  IF @countTranslation > 0 THEN
+    ROLLBACK ;
+		SET recordTypeError = 'translationExists' ;
 	ELSE
-		ROLLBACK ;
-    SET recordTypeError = 'categoryNotCreated' ;
+		EXECUTE InsertTranslation USING @newRecordTypeId, @languageCode, @ptTranslation;
+		IF ROW_COUNT() = 1 THEN
+			COMMIT ;
+			SET recordTypeConfirmation = 'categoryCreated' ;
+		ELSE
+		  ROLLBACK ;
+		  SET recordTypeError = 'categoryNotCreated' ;
+		END IF ;
 	END IF ;
 END IF ;
 SELECT * FROM(
   (SELECT recordTypeConfirmation) recordTypeConfirmation,
   (SELECT recordTypeError) recordTypeError,
-  (SELECT LAST_INSERT_ID() AS recordTypeId) recordTypeID,
-  (SELECT @recordName AS recordName) recordName
+  (SELECT @newRecordTypeId AS recordTypeId) recordTypeID
 );
 END //
 DELIMITER ;

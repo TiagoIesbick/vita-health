@@ -603,15 +603,14 @@ def resolve_create_record_type(*_, recordName):
     if not recordName:
         return {'recordTypeError': 'langNotDetected'}
 
-    res = check_translate_word(recordName)
-
-    if res['error'] or res['confidence'] < 0.5:
+    translations = check_translate_word(recordName)
+    if translations['error'] or translations['confidence'] < 0.5:
         return {'recordTypeError': 'langNotDetected'}
-    print(res)
 
-    return create_record_type(res['translations']['en'])
-
-    # return create_record_type(recordName)
+    res = create_record_type(translations['translations']['en'], translations['translations']['pt'])
+    if res['recordTypeConfirmation']:
+        res['recordType'] = get_medical_records_type(res['recordTypeId'])
+    return res
 
 
 @query.field("activePatientTokens")

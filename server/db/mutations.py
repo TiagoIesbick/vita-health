@@ -159,7 +159,7 @@ def create_token_access(tokenId: int, doctorId: int) -> None | dict:
     return None if not confirmation else confirmation[0]
 
 
-def create_record_type(recordName: str) -> None | dict:
+def create_record_type(recordName: str, ptTranslation: str) -> None | dict:
     """
     Creates a new record type in the database.
 
@@ -172,7 +172,7 @@ def create_record_type(recordName: str) -> None | dict:
         None | dict: None if the record type creation failed, or a dictionary containing
                      information about the created record type if successful.
     """
-    args = [recordName]
+    args = [recordName, ptTranslation]
     query = 'AddRecordType'
     confirmation = mysql_client(query, 'procedure', args)
     return None if not confirmation else confirmation[0]
