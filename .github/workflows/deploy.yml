@@ -22,12 +22,6 @@ jobs:
       run: |
         scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.VM_USER }}@${{ secrets.VM_IP }}:./vita-health
 
-    - name: Copy Google Cloud credentials to VM
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_IP }} "mkdir -p ~/vita-health/server/config"
-        echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > ./google-credentials.json
-        scp -o StrictHostKeyChecking=no ./google-credentials.json ${{ secrets.VM_USER }}@${{ secrets.VM_IP }}:~/vita-health/server/config/google-credentials.json
-
     - name: Deploy on VM
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_IP }} << 'EOF'
@@ -48,7 +42,8 @@ jobs:
         echo "ELASTICSEARCH_HOST=${{ secrets.ELASTICSEARCH_HOST }}" >> .env
         echo "ELASTICSEARCH_PORT=${{ secrets.ELASTICSEARCH_PORT }}" >> .env
         echo "GOOGLE_APPLICATION_CREDENTIALS=/server/config/google-credentials.json" >> .env
-        mkdir -p server/uploads
+        echo "Generating google-credentials.json"
+        echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > google-credentials.json
         sudo docker compose -f docker-compose.prod.yml down
         sudo lsof -ti :80 | xargs sudo kill -9
         sudo docker volume rm vita-health_client-build
