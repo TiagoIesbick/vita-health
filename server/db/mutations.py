@@ -263,25 +263,3 @@ def update_file_text_content(fileId: int, textContent: str) -> None | dict:
     query = 'UpdateFileTextContent'
     confirmation = mysql_client(query, 'procedure', args)
     return None if not confirmation else confirmation[0]
-
-
-def insert_record_type():
-    query = ''' INSERT INTO `vita_health`.`RecordTypeTranslations` (`recordTypeId`, `languageCode`, `translatedName`)
-        VALUES
-        (1, 'pt-br', 'Exame de Sangue'),
-        (2, 'pt-br', 'Ressonância Magnética'),
-        (3, 'pt-br', 'Raio-X'),
-        (4, 'pt-br', 'Ultrasom'),
-        (5, 'pt-br', 'Eletrocardiograma'),
-        (6, 'pt-br', 'Nutrição'),
-        (7, 'pt-br', 'Neurologia'),
-        (8, 'pt-br', 'Fisioterapia'),
-        (9, 'pt-br', 'Psicologia'),
-        (10, 'pt-br', 'Traumatologia'),
-        (11, 'pt-br', 'Psiquiatria'),
-        (12, 'pt-br', 'Pediatria'),
-        (13, 'pt-br', 'Dermatologia'),
-        (14, 'pt-br', 'Ortopedia'),
-        (15, 'pt-br', 'Cardiologia'),
-        (16, 'pt-br', 'Obstetrícia') ;'''
-    return mysql_client(query)
