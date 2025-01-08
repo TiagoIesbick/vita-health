@@ -31,7 +31,7 @@ const Login = () => {
         onSubmit: async (values) => {
             const login = await doLogin(values);
             if (login.error) {
-                showMessage('error', translations?.error?.error, login.error, true);
+                showMessage('error', translations?.error?.title, translations?.error?.[login.error], true);
                 logout();
                 setUser(null);
             } else if (login.token) {
@@ -39,13 +39,13 @@ const Login = () => {
                 setUser(login.user);
                 client.resetStore();
                 login.user.userType === 'Patient' ? navigate('/medical-records') : navigate('/insert-token');
-                showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName}`);
+                showMessage('success', translations?.login?.loggedIn, `${translations?.login?.welcome} ${login.user.firstName} 👋`);
             };
         },
         validationSchema: Yup.object({
-            email: Yup.string().email(translations?.login?.noEmail).required(translations?.required),
-            password: Yup.string().required(translations?.required).min(8, translations?.login?.minChars?.replace(/{(\w+)}/g, '8'))
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.login?.validation)
+            email: Yup.string().email(translations?.error?.noEmail).required(translations?.required),
+            password: Yup.string().required(translations?.required).min(8, translations?.error?.minChars?.replace(/{(\w+)}/g, '8'))
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.error?.passwordValidation)
         }),
     });
     if (error) {

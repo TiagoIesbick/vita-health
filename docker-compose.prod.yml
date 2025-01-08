@@ -37,6 +37,7 @@ services:
       - '8000:8000'
     volumes:
       - uploads:/server/uploads
+      - ./google-credentials.json:/server/config/google-credentials.json:ro
     depends_on:
       - database
       - redis

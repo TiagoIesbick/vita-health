@@ -13,6 +13,7 @@ from db.redis import pubsub
 from db.elastic import es, search_with_highlights
 from db.openai import openai_chat_stream, extract_text_from_pdf, extract_text_with_ocr
 from utils.decorators import *
+from utils.utils import check_translate_word
 from pathlib import Path
 from utils.utils import *
 
@@ -23,6 +24,7 @@ subscription = SubscriptionType()
 users = ObjectType("Users")
 patients = ObjectType("Patients")
 doctors = ObjectType("Doctors")
+record_types = ObjectType("RecordTypes")
 medical_records = ObjectType("MedicalRecords")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
@@ -369,7 +371,7 @@ def resolve_login(*_, email, password):
     if user:
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
         return { 'user': user, 'token': token }
-    return { 'error': 'Invalid email or password' }
+    return { 'error': 'invalidLogin' }
 
 
 @query.field("medicalRecords")
@@ -573,6 +575,11 @@ def resolve_record_types(*_):
     return get_record_types()
 
 
+@record_types.field("translation")
+def resolver_record_types_translation(record_types, *_):
+    return None if not record_types['recordTypeId'] else get_record_type_translation(record_types['recordTypeId'])
+
+
 @mutation.field("createRecordType")
 @requires_authentication('recordTypeError')
 def resolve_create_record_type(*_, recordName):
@@ -592,8 +599,18 @@ def resolve_create_record_type(*_, recordName):
         - An error message if the creation failed.
         - The newly created record type information if successful.
     """
-    recordName = ' '.join(nh3.clean(recordName).split()).title()
-    return create_record_type(recordName)
+    recordName = ' '.join(nh3.clean(recordName).split())
+    if not recordName:
+        return {'recordTypeError': 'langNotDetected'}
+
+    translations = check_translate_word(recordName)
+    if translations['error'] or translations['confidence'] < 0.5:
+        return {'recordTypeError': 'langNotDetected'}
+
+    res = create_record_type(translations['translations']['en'], translations['translations']['pt'])
+    if res['recordTypeConfirmation']:
+        res['recordType'] = get_medical_records_type(res['recordTypeId'])
+    return res
 
 
 @query.field("activePatientTokens")
@@ -1066,9 +1083,9 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
                 }
     """
     if not validate_files_length(files):
-        return {'fileError': ['You can only upload a maximum of 10 files']}
+        return {'fileError': ["maxFiles"]}
     if not validate_files_size(files):
-        return {'fileError': ['Total size of uploaded files must not exceed 10 MB']}
+        return {'fileError': ["totalSize"]}
 
     file_infos = []
     file_errors = []
@@ -1076,10 +1093,10 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
     for file in files:
         content_type = file.content_type
         if not validate_file_format(content_type):
-            file_errors.append(rf"{file.filename}: Uploaded file has unsupported format")
+            file_errors.append(rf"{file.filename}: fileFormat")
             continue
         if not validate_file_size(file.size):
-            file_errors.append(rf"{file.filename}: Uploaded file is too big (max 5 MB)")
+            file_errors.append(rf"{file.filename}: maxFiles")
             continue
 
         filename = rf'{uuid.uuid4()}{Path(file.filename).suffix}'
@@ -1134,7 +1151,7 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
 
     if file_errors:
         return { 'fileError': file_errors, 'files': file_infos }
-    return { 'fileConfirmation': 'Saved files!', 'files': file_infos }
+    return { 'fileConfirmation': 'filesSaved', 'files': file_infos }
 
 
 @query.field("searchMedicalRecords")

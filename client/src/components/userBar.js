@@ -49,7 +49,7 @@ const UserBar = () => {
             icon: 'pi pi-sign-out',
             command: () => {
                 logout();
-                showMessage('info', translations?.userbar?.loggedOut, `${translations?.userbar?.bye} ${user.firstName}`);
+                showMessage('info', translations?.userbar?.loggedOut, `${translations?.userbar?.bye} ${user.firstName} 👋`);
                 setUser(null);
                 setPatient(null);
                 navigate("/");

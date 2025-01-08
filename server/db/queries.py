@@ -227,6 +227,12 @@ def get_user_by_email_password(email:str, password:str) -> None | dict:
     return user[0]
 
 
+def get_record_type_translation(id: int) -> None | list[dict]:
+    query = rf"SELECT * FROM RecordTypeTranslations WHERE recordTypeId = {id};"
+    translation = mysql_client(query)
+    return None if not translation else translation
+
+
 def get_medical_records_by_pacient(id: int, limit: int, offset: int) -> None | list[dict]:
     """
     Retrieve medical records for a specific patient from the database.
@@ -537,11 +543,45 @@ def get_doctor_patients(id: int) -> None | dict:
 
 
 def get_medical_records_files(id: int) -> list[dict]:
+    """
+    Retrieve all file records associated with a specific medical record from the database.
+
+    Parameters:
+    id (int): The unique identifier of the medical record.
+
+    Returns:
+    list[dict]: A list of dictionaries, where each dictionary represents a file record.
+                Each dictionary contains the following keys:
+                - 'fileId': The unique identifier of the file.
+                - 'recordId': The unique identifier of the medical record.
+                - 'fileName': The name of the file.
+                - 'mimeType': The type of the file.
+                - 'url': The URL where the file can be accessed.
+                - 'textContent': The text content of the file.
+    """
     query = rf'SELECT * FROM Files WHERE recordId = {id};'
     return mysql_client(query)
 
 
 def get_filename_by_user(fileName: str, userId: int) -> list[dict]:
+    """
+    Retrieve file information associated with a specific filename and user ID from the database.
+
+    This function queries the database to find files with a given filename that are associated
+    with a specific user. It joins the Files, MedicalRecords, Patients, and Users tables to
+    establish the relationship between files and users.
+
+    Args:
+        fileName (str): The name of the file to search for.
+        userId (int): The unique identifier of the user associated with the file.
+
+    Returns:
+        list[dict]: A list of dictionaries, where each dictionary contains information about
+                    a matching file. Each dictionary has two keys:
+                    - 'fileName': The name of the file (str)
+                    - 'userId': The ID of the user associated with the file (int)
+                    Returns an empty list if no matching files are found.
+    """
     query = rf'''
     SELECT f.fileName, u.userId FROM Files f
     INNER JOIN MedicalRecords mr ON f.recordId = mr.recordId

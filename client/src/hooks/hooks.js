@@ -309,7 +309,7 @@ export const useInactiveTokens = (limit, offset) => {
 
 
 export const useRecordTypes = () => {
-    const { data, loading, error } = useQuery(recordTypesQuery);
+    const { data, loading, error } = useQuery(recordTypesQuery, { fetchPolicy: 'cache-and-network' });
     return {recordTypes: data?.recordTypes, loadingRecordTypes: loading, errorRecordTypes: Boolean(error)};
 };
 
@@ -329,16 +329,10 @@ export const useCreateRecordType = () => {
             update: (cache, { data: { createRecordType }}) => {
                 if (createRecordType.recordTypeError) return;
                 const existingCacheData = cache.readQuery({ query: recordTypesQuery });
-                const newRecordType = {
-                    __typename: 'RecordTypes',
-                    recordTypeId: createRecordType.recordTypeId,
-                    recordName: createRecordType.recordName,
-                };
                 const updatedRecordTypes = [
                     ...existingCacheData.recordTypes,
-                    newRecordType,
+                    createRecordType.recordType
                 ];
-                updatedRecordTypes.sort((a, b) => a.recordName.localeCompare(b.recordName));
                 cache.writeQuery({
                     query: recordTypesQuery,
                     data: { recordTypes: updatedRecordTypes }
@@ -371,7 +365,7 @@ export const useCreateMedicalRecord = () => {
                 });
                 const existingCacheData = cache.readQuery({
                     query: medicalRecordsQuery,
-                    variables: { limit: 10, offset: 0}
+                    variables: { limit: 10, offset: 0 }
                 });
                 if (!existingCacheData) return;
                 const updatedMedicalRecords = {
@@ -480,7 +474,7 @@ export const useInfiniteMedicalRecords = () => {
                 return [...prevRecords, ...newRecords];
             });
         }
-    }, [medicalRecords]);
+    }, [medicalRecords, offset]);
 
     const observerCallback = useCallback(
         (entries) => {

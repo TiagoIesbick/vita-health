@@ -80,6 +80,25 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `vita_health`.`RecordTypeTranslations`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vita_health`.`RecordTypeTranslations` (
+  `translationId` INT NOT NULL AUTO_INCREMENT,
+  `recordTypeId` INT NOT NULL,
+  `languageCode` VARCHAR(10) NOT NULL,
+  `translatedName` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`translationId`),
+  INDEX `recordTypeTranslationsRecordTypeId_idx` (`recordTypeId` ASC) INVISIBLE,
+  UNIQUE INDEX `recordTypeLanguage_UNIQUE` (`recordTypeId` ASC, `languageCode` ASC) VISIBLE,
+  CONSTRAINT `recordTypeTranslationsRecordTypeId`
+    FOREIGN KEY (`recordTypeId`)
+    REFERENCES `vita_health`.`RecordTypes` (`recordTypeId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `vita_health`.`MedicalRecords`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `vita_health`.`MedicalRecords` (
@@ -247,6 +266,29 @@ VALUES
 
 
 -- -----------------------------------------------------
+-- Fill Table `vita_health`.`RecordTypeTranslations`
+-- -----------------------------------------------------
+INSERT INTO `vita_health`.`RecordTypeTranslations` (`recordTypeId`, `languageCode`, `translatedName`)
+VALUES
+(1, 'pt-br', 'Exame de Sangue'),
+(2, 'pt-br', 'Ressonância Magnética'),
+(3, 'pt-br', 'Raio-X'),
+(4, 'pt-br', 'Ultrasom'),
+(5, 'pt-br', 'Eletrocardiograma'),
+(6, 'pt-br', 'Neurologia'),
+(7, 'pt-br', 'Nutrição'),
+(8, 'pt-br', 'Fisioterapia'),
+(9, 'pt-br', 'Psicologia'),
+(10, 'pt-br', 'Traumatologia'),
+(11, 'pt-br', 'Psiquiatria'),
+(12, 'pt-br', 'Pediatria'),
+(13, 'pt-br', 'Dermatologia'),
+(14, 'pt-br', 'Ortopedia'),
+(15, 'pt-br', 'Cardiologia'),
+(16, 'pt-br', 'Obstetrícia') ;
+
+
+-- -----------------------------------------------------
 -- Fill Table `vita_health`.`MedicalRecords`
 -- -----------------------------------------------------
 INSERT INTO `vita_health`.`MedicalRecords` (`patientId`, `recordTypeId`, `recordData`)
@@ -304,19 +346,19 @@ SET @acceptTerms = ACTR;
 EXECUTE CountUsers USING @email ;
 IF  @countUsers > 0 THEN
   ROLLBACK ;
-	SET userError = 'This e-mail already exists' ;
+	SET userError = 'emailExists' ;
 ELSEIF @acceptTerms != 1 THEN
 	ROLLBACK ;
-  SET userError = 'You must accept the terms and conditions' ;
+  SET userError = 'acceptTermsValidation' ;
 ELSE
 	EXECUTE InsertIntoUsers USING @email, @firstName, @lastName, @password, @userType, @acceptTerms ;
   EXECUTE CountUsers USING @email ;
   IF @countUsers = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK ;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -348,29 +390,29 @@ EXECUTE CountPatients USING @userId ;
 EXECUTE CountDoctors USING @userId ;
 IF @countUsers != 1 THEN
 	ROLLBACK ;
-	SET userError = 'User does not exist' ;
+	SET userError = 'userNotExists' ;
 ELSEIF  @countPatients > 0 OR @countDoctors > 0 THEN
   ROLLBACK ;
-	SET userError = 'This user already exists' ;
+	SET userError = 'userExists' ;
 ELSEIF @userType = 'Patient' THEN
 	EXECUTE InsertIntoPatients USING @userId ;
   EXECUTE CountPatients USING @userId ;
   IF @countPatients = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 ELSEIF @userType = 'Doctor' THEN
 	EXECUTE InsertIntoDoctors USING @userId ;
   EXECUTE CountDoctors USING @userId ;
   IF @countDoctors = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User created!' ;
+		SET userConfirmation = 'userCreated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT created' ;
+		SET userError = 'userNotCreated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -615,35 +657,47 @@ DELIMITER ;
 -- Create Procedure to create record types
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddRecordType(IN RCNM VARCHAR(255))
+CREATE PROCEDURE AddRecordType(IN RCNM VARCHAR(255), IN PTBR VARCHAR(255))
 BEGIN
 DECLARE recordTypeConfirmation VARCHAR(45);
 DECLARE recordTypeError VARCHAR(45);
 PREPARE CountRecordName FROM 'SELECT COUNT(`recordTypeId`) INTO @countRecordName FROM `RecordTypes`
 	WHERE `recordName` = ?' ;
 PREPARE InsertRecordType FROM 'INSERT INTO `vita_health`.`RecordTypes` (`recordName`) VALUES (?)' ;
+PREPARE CountTranslation FROM 'SELECT COUNT(`translationId`) INTO @countTranslation FROM `RecordTypeTranslations`
+  WHERE `recordTypeId` = ? AND `languageCode` = ?' ;
+PREPARE InsertTranslation FROM 'INSERT INTO `vita_health`.`RecordTypeTranslations`
+  (`recordTypeId`, `languageCode`, `translatedName`) VALUES (?, ?, ?)' ;
 START TRANSACTION;
 SET @recordName = RCNM ;
+SET @ptTranslation = PTBR ;
+SET @languageCode = 'pt-br' ;
 EXECUTE CountRecordName USING @recordName ;
 IF @countRecordName > 0 THEN
-	ROLLBACK ;
-  SET recordTypeError = 'This category already exists' ;
+  ROLLBACK ;
+  SET recordTypeError = 'categoryExists' ;
 ELSE
 	EXECUTE InsertRecordType USING @recordName ;
-  EXECUTE CountRecordName USING @recordName ;
-  IF @countRecordName = 1 THEN
-    COMMIT ;
-    SET recordTypeConfirmation = 'Category created!' ;
+	SET @newRecordTypeId = LAST_INSERT_ID();
+	EXECUTE CountTranslation USING @newRecordTypeId, @languageCode ;
+  IF @countTranslation > 0 THEN
+    ROLLBACK ;
+		SET recordTypeError = 'translationExists' ;
 	ELSE
-		ROLLBACK ;
-    SET recordTypeError = 'Category NOT created!' ;
+		EXECUTE InsertTranslation USING @newRecordTypeId, @languageCode, @ptTranslation;
+		IF ROW_COUNT() = 1 THEN
+			COMMIT ;
+			SET recordTypeConfirmation = 'categoryCreated' ;
+		ELSE
+		  ROLLBACK ;
+		  SET recordTypeError = 'categoryNotCreated' ;
+		END IF ;
 	END IF ;
 END IF ;
 SELECT * FROM(
   (SELECT recordTypeConfirmation) recordTypeConfirmation,
   (SELECT recordTypeError) recordTypeError,
-  (SELECT LAST_INSERT_ID() AS recordTypeId) recordTypeID,
-  (SELECT @recordName AS recordName) recordName
+  (SELECT @newRecordTypeId AS recordTypeId) recordTypeID
 );
 END //
 DELIMITER ;
@@ -689,10 +743,10 @@ BEGIN
     EXECUTE CountMedicalRecord USING @patientId;
     IF @countMedicalRecord - @countPreviousMedicalRecord = 1 THEN
         COMMIT;
-        SET medicalRecordConfirmation = 'Health Data Created!';
+        SET medicalRecordConfirmation = "healthDataCreated";
     ELSE
         ROLLBACK;
-        SET medicalRecordError = 'Health Data NOT created!';
+        SET medicalRecordError = "healthDataNotCreated";
     END IF;
 
     SELECT * FROM (
@@ -760,16 +814,16 @@ SET @url = URL ;
 EXECUTE CountFileName USING @fileName ;
 IF @countFileName > 0 THEN
 	ROLLBACK ;
-    SET fileError = 'The file name already exists' ;
+    SET fileError = 'fileExists' ;
 ELSE
 	EXECUTE InsertFile USING @recordId, @fileName, @mimeType, @url ;
     EXECUTE CountFileName USING @fileName ;
     IF @countFileName = 1 THEN
 		COMMIT ;
-		SET fileConfirmation = 'Saved file!' ;
+		SET fileConfirmation = 'fileSaved' ;
 	ELSE
 		ROLLBACK ;
-        SET fileError = 'File not saved' ;
+        SET fileError = 'fileNotSaved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(

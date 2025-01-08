@@ -33,7 +33,7 @@ def requires_authentication(error_field: Optional[str] = None, return_none: bool
             info = args[1]  # info is the second argument passed to a resolver
             if not info.context.get('authenticated'):
                 return None if return_none else (
-                    {error_field: 'Missing authentication'} if not return_list else {error_field: ['Missing authentication']}
+                    {error_field: "missAuth"} if not return_list else {error_field: ["missAuth"]}
                 )
             return resolver_function(*args, **kwargs)
         return wrapper
@@ -65,10 +65,10 @@ def requires_patient(error_field: Optional[str] = None, return_none: bool = Fals
             info = args[1]
             user_type = info.context['user_detail'].get('userType')
             if user_type != 'Patient':
-                return None if return_none else {error_field: 'User is not a Patient'}
+                return None if return_none else {error_field: "notPatient"}
             patient = get_users_patient(info.context['user_detail']['userId'])
             if not patient:
-                return None if return_none else {error_field: 'Missing patient credential'}
+                return None if return_none else {error_field: "missPatientCredential"}
             return resolver_function(*args, patient=patient, **kwargs)
         return wrapper
     return decorator
@@ -99,10 +99,10 @@ def requires_doctor(error_field: Optional[str] = None, return_none: bool = False
             info = args[1]
             user_type = info.context['user_detail'].get('userType')
             if user_type != 'Doctor':
-                return None if return_none else {error_field: 'User is not a Doctor'}
+                return None if return_none else {error_field: "notDoctor"}
             doctor = get_users_doctor(info.context['user_detail']['userId'])
             if not doctor:
-                return None if return_none else {error_field: 'Missing doctor credential'}
+                return None if return_none else {error_field: "missDoctorCredential"}
             return resolver_function(*args, doctor=doctor, **kwargs)
         return wrapper
     return decorator
@@ -139,25 +139,25 @@ def requires_patient_or_doctor_access(error_field: Optional[str] = None, return_
                 patient = get_users_patient(user_detail['userId'])
                 if not patient:
                     return None if return_none else (
-                        {error_field: 'Missing patient credential'} if not return_list else {error_field: ['Missing patient credential']}
+                        {error_field: "missPatientCredential"} if not return_list else {error_field: ["missPatientCredential"]}
                     )
                 patient_id = patient['patientId']
             elif user_type == 'Doctor':
                 medical_access = info.context.get('medical_access')
                 if not medical_access:
                     return None if return_none else (
-                        {error_field: 'Missing authorization'} if not return_list else {error_field: ['Missing authorization']}
+                        {error_field: "missAuthorization"} if not return_list else {error_field: ["missAuthorization"]}
                     )
                 patient_id = medical_access['patientId']
                 doctor = get_users_doctor(user_detail['userId'])
                 if not doctor:
                     return None if return_none else (
-                        {error_field: 'Missing doctor credential'} if not return_list else {error_field: ['Missing doctor credential']}
+                        {error_field: "missDoctorCredential"} if not return_list else {error_field: ["missDoctorCredential"]}
                     )
                 doctor_id = doctor['doctorId']
             else:
                 return None if return_none else (
-                    {error_field: 'User is neither a Patient nor a Doctor'} if not return_list else {error_field: ['User is neither a Patient nor a Doctor']}
+                    {error_field: "notPatientOrDoctor"} if not return_list else {error_field: ["notPatientOrDoctor"]}
                 )
             return resolver_function(*args, patient_id=patient_id, doctor_id=doctor_id, **kwargs)
         return wrapper

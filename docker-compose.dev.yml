@@ -37,6 +37,7 @@ services:
       - '8000:8000'
     volumes:
       - ./server:/server
+      - ./vita-health-432601-d5ccd599a1ab.json:/server/config/vita-health-432601-d5ccd599a1ab.json:ro
     depends_on:
       - database
       - redis

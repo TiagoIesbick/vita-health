@@ -21,6 +21,7 @@ broadcaster = "*"
 websockets = "*"
 elasticsearch = "*"
 beautifulsoup4 = "*"
+google-cloud-translate = "*"
 
 [dev-packages]
 

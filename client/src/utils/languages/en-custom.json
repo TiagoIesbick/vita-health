@@ -14,17 +14,58 @@
         "confirm": "Confirm",
         "createUser": {
             "acceptTerms": "Accept Terms",
-            "acceptTermsValidation": "You must accept the terms and conditions",
             "firstName": "First Name",
-            "firstNameValidation": "First name must start with at least 2 word characters",
             "lastName": "Last Name",
-            "lastNameValidation": "Last name must start with at least 2 word characters",
             "userType": "User Type"
         },
         "doctor": "Healthcare professional",
         "error": {
             "title": "Error",
-            "message": "Data not available. Try again later."
+            "acceptTermsValidation": "You must accept the terms and conditions",
+            "categoryExists": "This category already exists",
+            "categoryNotCreated": "Category NOT created",
+            "emailExists": "This e-mail already exists",
+            "firstNameValidation": "First name must start with at least 2 word characters",
+            "langNotDetected": "Language not detected",
+            "lastNameValidation": "Last name must start with at least 2 word characters",
+            "lowercaseValidation": "At least one lowercase",
+            "minChars": "Minimum {count} characters",
+            "noEmail": "Invalid e-mail",
+            "numericValidation": "At least one numeric",
+            "uppercaseValidation": "At least one uppercase",
+            "passwordValidation": "At least one lowercase, one uppercase and one numeric",
+            "message": "Data not available. Try again later.",
+            "missAuth": "Missing authentication",
+            "missAuthorization": "Missing authorization",
+            "missDoctorCredential": "Missing healthcare professional credential",
+            "missPatientCredential": "Missing patient credential",
+            "notPatient": "User is not a Patient",
+            "notDoctor": "User is not a Healthcare Professional",
+            "notPatientOrDoctor": "User is neither a Patient nor a Healthcare Professional",
+            "userExists": "This user already exists",
+            "userNotExists": "User does not exist",
+            "userNotCreated": "User NOT created",
+            "fileExists": "The file name already exists",
+            "fileFormat": "Uploaded file has unsupported format",
+            "fileNotSaved": "File not saved",
+            "fileSize": "Uploaded file is too big (max 5 MB)",
+            "maxFiles": "You can only upload a maximum of 10 files",
+            "translationExists": "This translation already exists",
+            "totalSize": "Total size of uploaded files must not exceed 10 MB",
+            "invalidLogin": "Invalid email or password",
+            "healthDataNotCreated": "Health Data NOT created!"
+        },
+        "success": {
+            "title": "Success",
+            "categoryCreated": "Category created!",
+            "fileSaved": "Saved file!",
+            "filesSaved": "Saved files!",
+            "healthDataCreated": "Health Data Created!",
+            "userCreated": "User created!"
+        },
+        "warn": {
+            "title": "Warning",
+            "message": "Health data was created, but some files had errors"
         },
         "generateToken": {
             "dateFormat": "yy-mm-dd",
@@ -72,25 +113,8 @@
             "newCategoryLabel": "Category",
             "notesPlaceholder": "Enter your notes here...",
             "title": "Add Health Data",
-            "recordTypes": {
-                "Blood Test": "Blood Test",
-                "Cardiology": "Cardiology",
-                "Dermatology": "Dermatology",
-                "ECG": "Eletrocardiogram",
-                "MRI Scan": "MRI Scan",
-                "Neurology": "Neurology",
-                "Nutrition": "Nutrition",
-                "Obstetrics": "Obstetrics",
-                "Orthopedics": "Orthopedics",
-                "Pediatrics": "Pediatrics",
-                "Physiotherapy": "Physiotherapy",
-                "Psychiatry": "Psychiatry",
-                "Psychology": "Psychology",
-                "Traumatology": "Traumatology",
-                "Ultrasound": "Ultrasound",
-                "X-Ray": "X-Ray",
-                "Other": "Other"
-            }
+            "other": "Other",
+            "registerNewCategory": "Register new category"
         },
         "insertToken": {
             "title": "Insert an Access Token"
@@ -98,16 +122,10 @@
         "lastRecord": "Last Record",
         "login": {
             "loggedIn": "Logged In",
-            "lowercaseValidation": "At least one lowercase",
-            "minChars": "Minimum {count} characters",
             "noAccount": "Don't have an account?",
-            "noEmail": "Invalid e-mail",
-            "numericValidation": "At least one numeric",
             "password": "Password",
             "pickPassword": "Pick a password",
             "rules": "Rules",
-            "uppercaseValidation": "At least one uppercase",
-            "validation": "At least one lowercase, one uppercase and one numeric",
             "welcome": "Welcome,"
         },
         "navbar": {

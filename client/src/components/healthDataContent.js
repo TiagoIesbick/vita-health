@@ -12,16 +12,20 @@ import FileGallery from "./fileGallery";
 
 
 const HealthDataContent = ({item}) => {
-    const { translations } = useLanguage();
+    const { language, translations } = useLanguage();
     const [show, setShow] = useState(false);
     let date = localDateTime(item.dateCreated, 'minus');
     const filesLength = item.files.length;
     const cleanText = stripHtmlTags(item.recordData);
     const textSlice = cleanText.length > 100 ? cleanText.slice(0, 100) + ' ...' : cleanText;
 
+    const translation = item.recordType.translation?.find(
+        (t) => t.languageCode === language
+    );
+
     return (
         <Card
-            title={translations?.insertMedicalRecord?.recordTypes?.[item.recordType.recordName] || item.recordType.recordName}
+            title={translation ? translation.translatedName : item.recordType.recordName}
             subTitle={
                 <>
                     {`${date.toLocaleDateString()} ${date.toLocaleTimeString(undefined, {timeStyle:'short'})}`}

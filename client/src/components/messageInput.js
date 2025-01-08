@@ -47,7 +47,7 @@ const MessageInput = ({ formik, loading, loadingConversation, translations }) =>
                 rounded
                 tooltip={
                     (formik.touched.content && formik.errors.content) || !formik.values.content
-                        ? "Minimum 3 characters" : undefined
+                        ? translations?.error?.minChars?.replace(/{(\w+)}/g, '3') : undefined
                 }
                 tooltipOptions={{
                     position: 'left', showOnDisabled: true, showDelay: 300, hideDelay: 300

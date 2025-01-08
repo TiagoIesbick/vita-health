@@ -30,7 +30,7 @@ const AIChat = ({ user, allRecords }) => {
         },
         validationSchema: Yup.object({
             content: Yup.string().required(translations?.required)
-                .min(3, translations?.login?.minChars?.replace(/{(\w+)}/g, '3'))
+                .min(3, translations?.error?.minChars?.replace(/{(\w+)}/g, '3'))
         }),
     })
 

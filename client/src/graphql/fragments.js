@@ -44,6 +44,11 @@ export const recordTypeFragment = gql`
     fragment RecordTypeDetail on RecordTypes {
         recordTypeId
         recordName
+        translation {
+            translationId
+            languageCode
+            translatedName
+        }
     }
 `;
 

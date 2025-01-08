@@ -2,6 +2,9 @@
 id_rsa_gcp.pub
 id_rsa_gcp.pub.pub
 
+# service key
+vita-health-432601-d5ccd599a1ab.json
+
 # dependencies
 node_modules/
 /.pnp

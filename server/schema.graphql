@@ -41,6 +41,13 @@ type SearchMedicalRecordsResult {
 type RecordTypes {
     recordTypeId: ID!
     recordName: String!
+    translation: [RecordTypeTranslations]
+}
+
+type RecordTypeTranslations {
+    translationId: ID!
+    languageCode: String!
+    translatedName: String!
 }
 
 type Files {
@@ -193,8 +200,7 @@ type TokenAccessResult {
 type RecordTypeResult {
     recordTypeConfirmation: String
     recordTypeError: String
-    recordTypeId: ID
-    recordName: String
+    recordType: RecordTypes
 }
 
 type MedicalRecordResult {

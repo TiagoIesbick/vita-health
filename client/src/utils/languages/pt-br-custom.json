@@ -6,7 +6,7 @@
                 "firstPDoctorUser": "Insira um token compartilhado pelo seu paciente",
                 "secondPDoctorUser": "Isso lhe concederá acesso temporário ao histórico médico dele e permitirá adicionar novos dados.",
                 "secondP1st": "Gere um token",
-                "secondP2nd": "para compartilhar com seu profissional de saúde.",
+                "secondP2nd": "para compartilhar com seus profissionais de saúde.",
                 "thirdP": "Isso concederá a eles acesso temporário ao seu histórico médico e permitirá que adicionem novos dados."
             },
             "title": "Tokens Ativos"
@@ -14,17 +14,58 @@
         "confirm": "Confirme",
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
-            "acceptTermsValidation": "Você deve aceitar os termos e condições",
             "firstName": "Nome",
-            "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
             "lastName": "Sobrenome",
-            "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
             "userType": "Tipo de Usuário"
         },
         "doctor": "Profissional de saúde",
         "error": {
             "title": "Erro",
-            "message": "Dados não disponíveis. Tente novamente mais tarde."
+            "acceptTermsValidation": "Você deve aceitar os termos e condições",
+            "categoryExists": "Essa categoria já existe",
+            "categoryNotCreated": "Categoria NÃO criada",
+            "emailExists": "Esse e-mail já existe",
+            "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
+            "langNotDetected": "Idioma não detectado",
+            "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
+            "lowercaseValidation": "Pelo menos uma minúscula",
+            "minChars": "Mínimo {count} caracteres",
+            "noEmail": "E-mail inválido",
+            "numericValidation": "Pelo menos um numérico",
+            "uppercaseValidation": "Pelo menos uma maiúscula",
+            "passwordValidation": "Pelo menos uma minúscula, uma maiúscula e um número",
+            "message": "Dados não disponíveis. Tente novamente mais tarde.",
+            "missAuth": "Autenticação ausente",
+            "missAuthorization": "Autorização ausente",
+            "missDoctorCredential": "Ausência de credencial de profissional de saúde",
+            "missPatientCredential": "Credencial de paciente ausente",
+            "notDoctor": "Usuário não é Profissional de Saúde",
+            "notPatient": "Usuário não é Paciente",
+            "notPatientOrDoctor": "Usuário não é Paciente nem Professional de Saúde",
+            "userExists": "Este usuário já existe",
+            "userNotExists": "Usuário não existe",
+            "userNotCreated": "Usuário NÃO criado",
+            "fileExists": "O nome do arquivo já existe",
+            "fileFormat": "O arquivo enviado tem formato incompatível",
+            "fileNotSaved": "Arquivo não salvo",
+            "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
+            "maxFiles": "Você só pode enviar no máximo 10 arquivos",
+            "translationExists": "Esta tradução já existe",
+            "totalSize": "O tamanho total dos arquivos enviados não deve exceder 10 MB",
+            "invalidLogin": "Email ou senha inválidos",
+            "healthDataNotCreated": "Dados de saúde NÃO salvos!"
+        },
+        "success": {
+            "title": "Sucesso",
+            "categoryCreated": "Categoria criada!",
+            "fileSaved": "Arquivo salvo!",
+            "filesSaved": "Arquivos salvos!",
+            "healthDataCreated": "Dados de saúde salvos!",
+            "userCreated": "Usuário criado!"
+        },
+        "warn": {
+            "title": "Aviso",
+            "message": "Os dados de saúde foram salvos, mas alguns arquivos apresentaram erros"
         },
         "generateToken": {
             "dateFormat": "dd/mm/yy",
@@ -72,25 +113,8 @@
             "newCategoryLabel": "Categoria",
             "notesPlaceholder": "Digite suas anotações aqui...",
             "title": "Adicionar Dados de Saúde",
-            "recordTypes": {
-                "Blood Test": "Exame de Sangue",
-                "Cardiology": "Cardiologia",
-                "Dermatology": "Dermatologia",
-                "ECG": "Eletrocardiograma",
-                "MRI Scan": "Ressonância Magnética",
-                "Neurology": "Neurologia",
-                "Nutrition": "Nutrição",
-                "Obstetrics": "Obstetrícia",
-                "Orthopedics": "Ortopedia",
-                "Pediatrics": "Pediatria",
-                "Physiotherapy": "Fisioterapia",
-                "Psychiatry": "Psiquiatria",
-                "Psychology": "Psicologia",
-                "Traumatology": "Traumatologia",
-                "Ultrasound": "Ultrasom",
-                "X-Ray": "Raio-X",
-                "Other": "Outro"
-            }
+            "other": "Outro",
+            "registerNewCategory": "Registre uma nova categoria"
         },
         "insertToken": {
             "title": "Insira um  Token de Acesso"
@@ -98,16 +122,10 @@
         "lastRecord": "Último Registro",
         "login": {
             "loggedIn": "Conectado",
-            "lowercaseValidation": "Pelo menos uma minúscula",
-            "minChars": "Mínimo {count} caracteres",
             "noAccount": "Não tem uma conta?",
-            "noEmail": "E-mail inválido",
-            "numericValidation": "Pelo menos um numérico",
             "password": "Senha",
             "pickPassword": "Escolha uma senha",
             "rules": "Regras",
-            "uppercaseValidation": "Pelo menos uma maiúscula",
-            "validation": "Pelo menos uma minúscula, uma maiúscula e um número",
             "welcome": "Olá,"
         },
         "navbar": {
