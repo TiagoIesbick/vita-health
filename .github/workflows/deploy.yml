@@ -27,7 +27,6 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_IP }} "mkdir -p ~/vita-health/server/config"
         echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > ./google-credentials.json
         scp -o StrictHostKeyChecking=no ./google-credentials.json ${{ secrets.VM_USER }}@${{ secrets.VM_IP }}:~/vita-health/server/config/google-credentials.json
-        rm ./google-credentials.json
 
     - name: Deploy on VM
       run: |
