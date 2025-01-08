@@ -599,18 +599,20 @@ def resolve_create_record_type(*_, recordName):
         - An error message if the creation failed.
         - The newly created record type information if successful.
     """
-    recordName = ' '.join(nh3.clean(recordName).split())
-    if not recordName:
-        return {'recordTypeError': 'langNotDetected'}
+    insert_record_type()
+    return
+    # recordName = ' '.join(nh3.clean(recordName).split())
+    # if not recordName:
+    #     return {'recordTypeError': 'langNotDetected'}
 
-    translations = check_translate_word(recordName)
-    if translations['error'] or translations['confidence'] < 0.5:
-        return {'recordTypeError': 'langNotDetected'}
+    # translations = check_translate_word(recordName)
+    # if translations['error'] or translations['confidence'] < 0.5:
+    #     return {'recordTypeError': 'langNotDetected'}
 
-    res = create_record_type(translations['translations']['en'], translations['translations']['pt'])
-    if res['recordTypeConfirmation']:
-        res['recordType'] = get_medical_records_type(res['recordTypeId'])
-    return res
+    # res = create_record_type(translations['translations']['en'], translations['translations']['pt'])
+    # if res['recordTypeConfirmation']:
+    #     res['recordType'] = get_medical_records_type(res['recordTypeId'])
+    # return res
 
 
 @query.field("activePatientTokens")
