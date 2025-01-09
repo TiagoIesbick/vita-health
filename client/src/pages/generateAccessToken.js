@@ -38,8 +38,8 @@ const GenerateAccessToken = () => {
         },
         validationSchema: Yup.object({
             tokenExpirationDateTime: Yup.date().required(translations?.required)
-                .min(toDay, translations?.generateToken?.expTimeFirstValidation)
-                .max(toDayPlus90, translations?.generateToken?.expTimeSecondValidation)
+                .min(toDay, translations?.error?.expTimeMinDateValidation)
+                .max(toDayPlus90, translations?.error?.expTimeMaxDateValidation)
         }),
     });
 

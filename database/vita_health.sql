@@ -445,16 +445,16 @@ SET @userId = USID ;
 EXECUTE CountUsers USING @email, @userId ;
 IF  @countUsers > 0 THEN
 	ROLLBACK ;
-	SET userError = 'This e-mail already exists' ;
+	SET userError = 'emailExists' ;
 ELSE
 	EXECUTE UpdateUsers USING @email, @firstName, @lastName, @userId ;
   EXECUTE CountUpdatedUser USING @email, @firstName, @lastName ;
   IF @countUpdatedUser = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User updated!' ;
+		SET userConfirmation = 'profileUpdated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT updated' ;
+		SET userError = 'profileNotUpdated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -483,16 +483,16 @@ SET @gender = GEDR ;
 SET @patientId = PTID ;
 IF  @dateOfBirth > NOW() THEN
 	ROLLBACK ;
-	SET userError = 'Date of birth cannot be in the future' ;
+	SET userError = 'dobValidation' ;
 ELSE
 	EXECUTE UpdatePatientUsers USING @dateOfBirth, @gender, @patientId ;
     EXECUTE CountUpdatedPatientUser USING @dateOfBirth, @gender, @patientId ;
     IF @CountUpdatedPatientUser = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User updated!' ;
+		SET userConfirmation = 'profileUpdated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT updated' ;
+		SET userError = 'profileNotUpdated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -523,10 +523,10 @@ EXECUTE UpdateDoctorUsers USING @specialty, @licenceNumber, @doctorId ;
 EXECUTE CountUpdatedDoctorUser USING @specialty, @licenceNumber, @doctorId ;
 IF @countUpdatedDoctorUser = 1 THEN
 COMMIT ;
-	SET userConfirmation = 'User updated!' ;
+	SET userConfirmation = 'profileUpdated' ;
 ELSE
 	ROLLBACK;
-	SET userError = 'User NOT updated' ;
+	SET userError = 'profileNotUpdated' ;
 END IF ;
 SELECT * FROM(
   (SELECT userConfirmation) userConfirmation,

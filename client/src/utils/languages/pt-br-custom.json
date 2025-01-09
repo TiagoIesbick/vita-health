@@ -1,5 +1,6 @@
 {
     "pt-br": {
+        "accessTime": "Horário do Acesso",
         "activeTokens": {
             "noData": {
                 "firstP": "Você não tem tokens ativos.",
@@ -11,6 +12,14 @@
             },
             "title": "Tokens Ativos"
         },
+        "inactiveTokens": {
+            "noData": {
+                "firstP": "Você não tem tokens inativos.",
+                "secondP1st": "Para desativar um token, visite a página de tokens ativos",
+                "secondP2nd": "e escolha um token para desativar ou aguarde que ele expire."
+            },
+            "title": "Tokens Inativos"
+        },
         "confirm": "Confirme",
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
@@ -19,13 +28,27 @@
             "userType": "Tipo de Usuário"
         },
         "doctor": "Profissional de saúde",
+        "editProfile": {
+            "title": "Editar Perfil",
+            "dob": "Data de Nascimento",
+            "female": "Feminino",
+            "licenseNumber": "Número de Registro",
+            "male": "Masculino",
+            "specialty": "Especialidade"
+        },
         "error": {
             "title": "Erro",
             "acceptTermsValidation": "Você deve aceitar os termos e condições",
+            "accessExpired": "A permissão de acesso expirou.",
             "categoryExists": "Essa categoria já existe",
             "categoryNotCreated": "Categoria NÃO criada",
+            "dobValidation": "A data não pode estar no futuro",
             "emailExists": "Esse e-mail já existe",
+            "expired": "Expirado",
+            "expTimeMinDateValidation": "A data não pode ser no passado",
+            "expTimeMaxDateValidation": "Máximo 90 dias",
             "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
+            "invalidPassword": "Senha inválida",
             "langNotDetected": "Idioma não detectado",
             "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
             "lowercaseValidation": "Pelo menos uma minúscula",
@@ -34,6 +57,7 @@
             "numericValidation": "Pelo menos um numérico",
             "uppercaseValidation": "Pelo menos uma maiúscula",
             "passwordValidation": "Pelo menos uma minúscula, uma maiúscula e um número",
+            "profileNotUpdated": "Perfil NÃO atualizado",
             "message": "Dados não disponíveis. Tente novamente mais tarde.",
             "missAuth": "Autenticação ausente",
             "missAuthorization": "Autorização ausente",
@@ -61,6 +85,8 @@
             "fileSaved": "Arquivo salvo!",
             "filesSaved": "Arquivos salvos!",
             "healthDataCreated": "Dados de saúde salvos!",
+            "permissionGranted": "Permissão Concedida",
+            "profileUpdated": "Perfil atualizado!",
             "userCreated": "Usuário criado!"
         },
         "warn": {
@@ -70,8 +96,6 @@
         "generateToken": {
             "dateFormat": "dd/mm/yy",
             "expTime": "Tempo de Expiração",
-            "expTimeFirstValidation": "A data não pode ser no passado",
-            "expTimeSecondValidation": "Máximo 90 dias",
             "title": "Gere um Token de Acesso"
         },
         "healthAssistant": {
@@ -88,6 +112,15 @@
             "title": "Assistente de Saúde"
         },
         "healthHistory": {
+            "countdown": {
+                "patientName": "Nome do paciente",
+                "expirationTimer": "Tempo de expiração"
+            },
+            "emptyMessage": {
+                "firstP2nd": "ainda não tem histórico de saúde.",
+                "secondP1st": "Adicione novos dados de saúde",
+                "secondP2nd": "para iniciar a construção dos registros médicos do paciente."
+            },
             "noData": {
                 "firstP": "Você ainda não tem dados de saúde salvos.",
                 "secondP1st": "Adicione seus dados de saúde",
@@ -128,6 +161,7 @@
             "rules": "Regras",
             "welcome": "Olá,"
         },
+        "name": "Nome",
         "navbar": {
             "history": "Histórico",
             "login": "Entre",
@@ -142,8 +176,6 @@
         },
         "userbar": {
             "bye": "Até logo,",
-            "editProfile": "Editar Perfil",
-            "inactiveTokens": "Tokens Inativos",
             "loggedOut": "Desconectado",
             "logout": "Sair"
         }

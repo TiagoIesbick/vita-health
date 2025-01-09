@@ -3,6 +3,7 @@ import { useUser } from "../providers/userContext";
 import { useInfiniteMedicalRecords } from "../hooks/hooks";
 import { useNavigate } from "react-router-dom";
 import { useUserQuery } from '../hooks/hooks';
+import { useLanguage } from "../providers/languageContext";
 import CountDown from "../components/countdown";
 import LoadingSkeleton from "../components/skeleton";
 import MedicalRecordsCard from "../components/medicalRecordsCard";
@@ -11,6 +12,7 @@ import AIChat from "../components/aiChat";
 
 const MedicalRecordsAccess = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { user, patient, setPatient, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(patient.userId);
     const { allRecords, medicalRecords, loading, error, loader } = useInfiniteMedicalRecords();
@@ -21,22 +23,22 @@ const MedicalRecordsAccess = () => {
 
     if (error || errorUser) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (
         <>
             { allRecords.length > 0 && !loadingUser && <AIChat allRecords={allRecords} user={user} /> }
             <MedicalRecordsCard
-                title="Health History"
+                title={translations?.healthHistory?.title}
                 allRecords={allRecords}
                 medicalRecords={medicalRecords}
                 loading={loading}
                 loader={loader}
                 emptyMessage={
                     <>
-                        <p><span className="font-bold">{userDetail?.firstName + ' ' + userDetail?.lastName}</span> has no health history yet.</p>
-                        <p>Start by adding new health data <Link to="/insert-medical-record">here</Link> to begin building the patient’s medical records.</p>
+                        <p><span className="font-bold">{userDetail?.firstName + ' ' + userDetail?.lastName}</span> {translations?.healthHistory?.emptyMessage?.firstP2nd}</p>
+                        <p>{translations?.healthHistory?.emptyMessage?.secondP1st} <Link to="/insert-medical-record">{translations?.here}</Link> {translations?.healthHistory?.emptyMessage?.secondP2nd}</p>
                     </>
                 }
             >

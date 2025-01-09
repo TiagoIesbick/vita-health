@@ -7,12 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHospitalUser, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
 import { Button } from "primereact/button";
 import { Tooltip } from 'primereact/tooltip';
+import { useLanguage } from "../providers/languageContext";
 import './countdown.css';
 
 
 const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { translations } = useLanguage();
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const clock = useRef(null);
     const addButton = useRef(null);
@@ -32,7 +34,7 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
             setPatient(null);
             deleteCookie(ACCESS_MEDICAL_TOKEN_KEY);
             navigate('/');
-            showMessage('error', 'Expired', 'Access permission has expired.', true);
+            showMessage('error', translations?.error?.expired, translations?.error?.accessExpired, true);
         };
     }, 1000);
 
@@ -48,7 +50,7 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
         <div className='flex flex-wrap gap-2 mb-4 text-xl font-semibold text-primary-900 align-items-center'>
             <Tooltip target=".patient-tooltip" />
             <span className='flex sm:flex-1 gap-1 min-w-max patient-tooltip'
-                data-pr-tooltip='Patient name'
+                data-pr-tooltip={translations?.healthHistory?.countdown?.patientName}
                 data-pr-position='top'
                 data-pr-at="left+60 top"
             >
@@ -58,14 +60,14 @@ const CountDown = ({ patient, setPatient, showMessage, patientDetail }) => {
             <Tooltip target=".expiration-tooltip" />
             <span className='flex sm:flex-1 gap-1 countdown-width expiration-tooltip'
                 ref={clock}
-                data-pr-tooltip='Expiration timer'
+                data-pr-tooltip={translations?.healthHistory?.countdown?.expirationTimer}
                 data-pr-position='top'
                 data-pr-at="left+60 top"
             >
                 <i className="pi pi-clock text-xl font-semibold"></i>
                 {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
             </span>
-            <Button ref={addButton} onClick={() => navigate("/insert-medical-record")}><FontAwesomeIcon className="pr-1" icon={faNotesMedical} /> Add Health Data</Button>
+            <Button ref={addButton} onClick={() => navigate("/insert-medical-record")}><FontAwesomeIcon className="pr-1" icon={faNotesMedical} /> {translations?.insertMedicalRecord?.title}</Button>
         </div>
     );
 };

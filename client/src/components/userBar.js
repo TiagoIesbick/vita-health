@@ -32,12 +32,12 @@ const UserBar = () => {
             command: () => navigate("/patients")
         }] : []),
         ...(user.userType === 'Patient' ? [{
-            label: translations?.userbar?.inactiveTokens,
+            label: translations?.inactiveTokens?.title,
             icon: 'pi pi-eye-slash',
             command: () => navigate("/inactive-tokens")
         }] : []),
         {
-            label: translations?.userbar?.editProfile,
+            label: translations?.editProfile?.title,
             icon: 'pi pi-user-edit',
             command: () => navigate("/edit-profile")
         },
