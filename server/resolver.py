@@ -924,7 +924,7 @@ def resolve_save_token_access(_, info, doctor, token):
     try:
         jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
     except jwt.exceptions.PyJWTError as exc:
-        return {'accessError': str(exc)}
+        return {'accessError': 'invalidExpiredToken'}
     if not info.context['medical_access']:
         return {'accessError': 'missAuthorization'}
     res = create_token_access(info.context['medical_access']['tokenId'], doctor['doctorId'])

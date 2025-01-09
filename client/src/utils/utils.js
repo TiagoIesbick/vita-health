@@ -95,7 +95,7 @@ export const handleTokenAccess = async (token, client, addTokenAccess, setPatien
     const resTokenAccess = await addTokenAccess(token);
 
     if (resTokenAccess.accessError) {
-        showMessage('error', translations?.error?.title, resTokenAccess.accessError);
+        showMessage('error', translations?.error?.title, translations?.error?.[resTokenAccess.accessError]);
         if (resTokenAccess.accessError === "missAuthorization") {
             const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
             if (cachedData) {

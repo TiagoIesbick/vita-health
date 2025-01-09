@@ -631,17 +631,17 @@ SET @doctorId = DTID;
 EXECUTE Expiration USING @tokenId ;
 IF @expirationToken < NOW() THEN
 	ROLLBACK ;
-  SET accessError = 'Access permission has expired.' ;
+  SET accessError = 'expiredAccess' ;
 ELSE
 	EXECUTE CountPreviousTokenAccess USING @tokenId ;
 	EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
 	EXECUTE CountTokenAccess USING @tokenId ;
 	IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
 		COMMIT;
-		SET accessConfirmation = 'Saved access' ;
+		SET accessConfirmation = 'accessSaved' ;
 	ELSE
 		ROLLBACK ;
-		SET accessError = 'Access NOT saved' ;
+		SET accessError = 'accessNotSaved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
