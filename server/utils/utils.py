@@ -199,6 +199,24 @@ def strip_html_tags(html):
 
 
 def check_translate_word(word: str) -> dict:
+    """
+    Detects the language of a given word and translates it to specified target languages.
+
+    This function uses Google Cloud Translation API to detect the language of the input word
+    and translate it to English and Portuguese. It returns a dictionary containing the detected
+    language, confidence score, translations, and any errors encountered during the process.
+
+    Parameters:
+    word (str): The word to be detected and translated.
+
+    Returns:
+    dict: A dictionary containing the following keys:
+        - 'detected_language': The detected language code of the input word.
+        - 'confidence': The confidence score of the language detection.
+        - 'translations': A dictionary of translations, where keys are target language codes
+                          ('en' for English, 'pt' for Portuguese) and values are the translated words.
+        - 'error': A list of error messages, if any occurred during the translation process.
+    """
     translate_client = translate.Client()
     detection = translate_client.detect_language(word)
     detected_language = detection.get("language")
