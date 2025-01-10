@@ -163,14 +163,16 @@ def create_record_type(recordName: str, ptTranslation: str) -> None | dict:
     """
     Creates a new record type in the database.
 
-    This function adds a new record type to the database using the provided record name.
+    This function adds a new record type with its name and Portuguese translation
+    to the database.
 
     Args:
-        recordName (str): The name of the new record type to be created.
+        recordName (str): The name of the record type in English.
+        ptTranslation (str): The Portuguese translation of the record type name.
 
     Returns:
-        None | dict: None if the record type creation failed, or a dictionary containing
-                     information about the created record type if successful.
+        None | dict: None if the record type creation failed, or a dictionary
+                     containing information about the created record type if successful.
     """
     args = [recordName, ptTranslation]
     query = 'AddRecordType'

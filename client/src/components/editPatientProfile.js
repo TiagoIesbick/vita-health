@@ -5,6 +5,7 @@ import { RadioButton } from 'primereact/radiobutton';
 import { Calendar } from "primereact/calendar";
 import { localDateTime, toDay } from "../utils/utils";
 import { Button } from 'primereact/button';
+import { useLanguage } from "../providers/languageContext";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useUpdatePatientUser, useUpdateUser } from "../hooks/hooks";
@@ -14,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { editUser, loadingUpdateUser, errorUpdateUser } = useUpdateUser();
     const { editPatientUser, loadingUpdatePatientUser, errorUpdatePatientUser } = useUpdatePatientUser();
 
@@ -29,37 +31,37 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
             const { dateOfBirth: _, gender: __, ...userValues} = values;
             const resUser = await editUser(userValues);
             if (resUser.userError) {
-                showMessage('error', 'Error', resUser.userError);
+                showMessage('error', translations?.error?.title, translations?.error?.[resUser.userError]);
             } else if (resUser.token) {
                 storeToken(ACCESS_TOKEN_KEY, resUser.token);
                 const resPatientUser = await editPatientUser({ dateOfBirth: values.dateOfBirth, gender: values.gender});
                 if (resPatientUser.userError) {
-                    showMessage('error', 'Error', resPatientUser.userError);
+                    showMessage('error', translations?.error?.title, translations?.error?.[resPatientUser.userError]);
                 } else {
                     setUser(resUser.user);
-                    showMessage('success', 'SUCCESS', resPatientUser.userConfirmation);
+                    showMessage('success', translations?.success?.title, translations?.success?.[resPatientUser.userConfirmation]);
                 };
             };
         },
         validationSchema: Yup.object({
-            firstName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
-                .matches(/^\s*?\w{2,}.*/, 'First name must start with at least 2 word characters'),
-            lastName: Yup.string().required('Required').min(2, 'Minimum 2 characters')
-                .matches(/^\s*?\w{2,}.*/, 'Last name must start with at least 2 word characters'),
-            email: Yup.string().email('Invalid e-mail').required('Required'),
-            dateOfBirth: Yup.date().required('Required').max(toDay, 'The date cannot be in the future'),
-            gender: Yup.string().required('Required')
+            firstName: Yup.string().required(translations?.required).min(2, translations?.error?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.error?.firstNameValidation),
+            lastName: Yup.string().required(translations?.required).min(2, translations?.error?.minChars?.replace(/{(\w+)}/g, '2'))
+                .matches(/^\s*?\w{2,}.*/, translations?.error?.lastNameValidation),
+            email: Yup.string().email(translations?.error?.noEmail).required(translations?.required),
+            dateOfBirth: Yup.date().required(translations?.required).max(toDay, translations?.error?.dobValidation),
+            gender: Yup.string().required(translations?.required)
         }),
     });
 
     if (errorUpdateUser || errorUpdatePatientUser) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (
         <Card
-            title="Edit Profile"
+            title={translations?.editProfile?.title}
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
@@ -70,7 +72,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                         className="w-full"
                         {...formik.getFieldProps("firstName")}
                     />
-                    <label htmlFor="firstName">First Name</label>
+                    <label htmlFor="firstName">{translations?.createUser?.firstName}</label>
                     {formik.touched.firstName && formik.errors.firstName &&<div className="text-red-500 text-xs">{formik.errors.firstName}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -80,7 +82,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                         className="w-full"
                         {...formik.getFieldProps("lastName")}
                     />
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="lastName">{translations?.createUser?.lastName}</label>
                     {formik.touched.lastName && formik.errors.lastName &&<div className="text-red-500 text-xs">{formik.errors.lastName}</div>}
                 </FloatLabel>
                 <FloatLabel>
@@ -97,12 +99,12 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                     <Calendar
                         className="w-full"
                         inputId="date-of-birth"
-                        dateFormat="yy-mm-dd"
+                        dateFormat={translations?.generateToken?.dateFormat}
                         maxDate={toDay}
                         showIcon
                         {...formik.getFieldProps("dateOfBirth")}
                     />
-                    <label htmlFor="date-of-birth">Date of Birth</label>
+                    <label htmlFor="date-of-birth">{translations?.editProfile?.dob}</label>
                     {formik.touched.dateOfBirth && formik.errors.dateOfBirth &&<div className="text-red-500 text-xs">{formik.errors.dateOfBirth}</div>}
                 </FloatLabel>
                 <div className="flex flex-wrap gap-3">
@@ -117,7 +119,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                             }}
                             checked={formik.values.gender === 'male'}
                         />
-                        <label htmlFor="male" className="ml-2">Male</label>
+                        <label htmlFor="male" className="ml-2">{translations?.editProfile?.male}</label>
                     </div>
                     <div className="flex align-items-center">
                         <RadioButton
@@ -130,7 +132,7 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                             }}
                             checked={formik.values.gender === 'female'}
                         />
-                        <label htmlFor="female" className="ml-2">Female</label>
+                        <label htmlFor="female" className="ml-2">{translations?.editProfile?.female}</label>
                     </div>
                     <div className="flex align-items-center">
                         <RadioButton
@@ -143,11 +145,11 @@ const EditPatientProfile = ({ user, setUser, patient, showMessage }) => {
                             }}
                             checked={formik.values.gender === 'other'}
                         />
-                        <label htmlFor="other" className="ml-2">Other</label>
+                        <label htmlFor="other" className="ml-2">{translations?.insertMedicalRecord?.other}</label>
                     </div>
                     {formik.touched.gender && formik.errors.gender &&<div className="text-red-500 text-xs">{formik.errors.gender}</div>}
                 </div>
-                <Button type="submit" label="Confirm" disabled={!formik.isValid || loadingUpdateUser || loadingUpdatePatientUser} loading={loadingUpdateUser || loadingUpdatePatientUser} />
+                <Button type="submit" label={translations?.confirm} disabled={!formik.isValid || loadingUpdateUser || loadingUpdatePatientUser} loading={loadingUpdateUser || loadingUpdatePatientUser} />
             </form>
         </Card>
     );

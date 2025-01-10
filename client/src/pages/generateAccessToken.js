@@ -29,7 +29,7 @@ const GenerateAccessToken = () => {
         onSubmit: async (values, { resetForm }) => {
             const resToken = await addToken(values.tokenExpirationDateTime);
             if (resToken.tokenError){
-                showMessage('error', translations?.error?.title, resToken.tokenError);
+                showMessage('error', translations?.error?.title, translations?.error?.[resToken.tokenError]);
             } else {
                 resetForm();
                 setToken(resToken.token.token);
@@ -38,8 +38,8 @@ const GenerateAccessToken = () => {
         },
         validationSchema: Yup.object({
             tokenExpirationDateTime: Yup.date().required(translations?.required)
-                .min(toDay, translations?.generateToken?.expTimeFirstValidation)
-                .max(toDayPlus90, translations?.generateToken?.expTimeSecondValidation)
+                .min(toDay, translations?.error?.expTimeMinDateValidation)
+                .max(toDayPlus90, translations?.error?.expTimeMaxDateValidation)
         }),
     });
 

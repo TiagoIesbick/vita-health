@@ -188,19 +188,19 @@ def resolve_create_user(*_, input):
         - If creation fails: The result from the create_user function.
     """
     email, firstName, lastName, password, userType, acceptTerms = \
-        input['email'], input['firstName'].strip().capitalize(), input['lastName'].strip().capitalize(), input['password'], input['userType'], input['acceptTerms']
+        input['email'], nh3.clean(input['firstName'].strip().capitalize()), nh3.clean(input['lastName'].strip().capitalize()), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
-        return { 'userError': 'Invalid e-mail'}
+        return { 'userError': 'noEmail'}
     if not validate_name(firstName):
-        return { 'userError': 'First name must start with at least 2 word characters' }
+        return { 'userError': 'firstNameValidation' }
     if not validate_name(lastName):
-        return { 'userError': 'Last name must start with at least 2 word characters' }
+        return { 'userError': 'lastNameValidation' }
     if not validate_password(password):
-        return { 'userError': 'Invalid password' }
+        return { 'userError': 'invalidPassword' }
     res = create_user(
         email,
-        nh3.clean(firstName),
-        nh3.clean(lastName),
+        firstName,
+        lastName,
         encrypt(password),
         userType,
         acceptTerms
@@ -269,15 +269,15 @@ def resolve_update_user(_, info, input):
             }
     """
     email, firstName, lastName, userId = \
-        input['email'], input['firstName'].strip().capitalize(), \
-        input['lastName'].strip().capitalize(), info.context['user_detail']['userId']
+        input['email'], nh3.clean(input['firstName'].strip().capitalize()), \
+        nh3.clean(input['lastName'].strip().capitalize()), info.context['user_detail']['userId']
     if not validate_email(email):
-        return { 'userError': 'Invalid e-mail'}
+        return { 'userError': 'noEmail'}
     if not validate_name(firstName):
-        return { 'userError': 'First name must start with at least 2 word characters' }
+        return { 'userError': 'firstNameValidation' }
     if not validate_name(lastName):
-        return { 'userError': 'Last name must start with at least 2 word characters' }
-    res = update_user(email, nh3.clean(firstName), nh3.clean(lastName), userId)
+        return { 'userError': 'lastNameValidation' }
+    res = update_user(email, firstName, lastName, userId)
     if res['userConfirmation']:
         res['user'] = get_user(userId)
         res['token'] = jwt.encode(res['user'], getenv('SECRET'), algorithm="HS256")
@@ -924,9 +924,9 @@ def resolve_save_token_access(_, info, doctor, token):
     try:
         jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
     except jwt.exceptions.PyJWTError as exc:
-        return {'accessError': str(exc)}
+        return {'accessError': 'invalidExpiredToken'}
     if not info.context['medical_access']:
-        return {'accessError': 'Missing authorization'}
+        return {'accessError': 'missAuthorization'}
     res = create_token_access(info.context['medical_access']['tokenId'], doctor['doctorId'])
     if res['accessConfirmation']:
         res['tokenAccess'] = get_token_access(res['tokenAccessId'])
@@ -1045,7 +1045,7 @@ def resolve_deactivate_token(*_, patient, tokenId):
     tokens = get_active_tokens_by_patient(patient['patientId'])
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:
-        return {'deactivateTokenError': 'Token not found'}
+        return {'deactivateTokenError': 'tokenNotFound'}
     res = deactivate_token(tokenId)
     if res['deactivateTokenConfirmation']:
         res['token'] = get_token(tokenId)

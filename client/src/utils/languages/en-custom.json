@@ -1,5 +1,6 @@
 {
     "en": {
+        "accessTime": "Access Time",
         "activeTokens": {
             "noData": {
                 "firstP": "You have no active tokens.",
@@ -11,7 +12,20 @@
             },
             "title": "Active Tokens"
         },
+        "inactiveTokens": {
+            "noData": {
+                "firstP": "You have no inactive tokens.",
+                "secondP1st": "To deactivate a token, visit the active tokens page",
+                "secondP2nd": "and choose a token to deactivate, or wait for it to expire."
+            },
+            "title": "Inactive Tokens"
+        },
         "confirm": "Confirm",
+        "confirmDeactivate": {
+            "title": "Deactivation Confirmation",
+            "deactivate": "Deactivate",
+            "question": "Do you want to deactivate this token?"
+        },
         "createUser": {
             "acceptTerms": "Accept Terms",
             "firstName": "First Name",
@@ -19,13 +33,30 @@
             "userType": "User Type"
         },
         "doctor": "Healthcare professional",
+        "editProfile": {
+            "title": "Edit Profile",
+            "dob": "Date of Birth",
+            "female": "Female",
+            "licenseNumber": "License Number",
+            "male": "Male",
+            "specialty": "Specialty"
+        },
         "error": {
             "title": "Error",
             "acceptTermsValidation": "You must accept the terms and conditions",
+            "accessExpired": "Access permission has expired.",
+            "accessNotSaved": "Access NOT saved",
             "categoryExists": "This category already exists",
             "categoryNotCreated": "Category NOT created",
+            "dobValidation": "The date cannot be in the future",
             "emailExists": "This e-mail already exists",
+            "expired": "Expired",
+            "expiredAccess": "Access permission has expired.",
+            "expTimeMinDateValidation": "The date and time cannot be in the past",
+            "expTimeMaxDateValidation": "Maximum 90 days",
             "firstNameValidation": "First name must start with at least 2 word characters",
+            "invalidExpiredToken": "Invalid and/or expired token",
+            "invalidPassword": "Invalid password",
             "langNotDetected": "Language not detected",
             "lastNameValidation": "Last name must start with at least 2 word characters",
             "lowercaseValidation": "At least one lowercase",
@@ -34,6 +65,7 @@
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
             "passwordValidation": "At least one lowercase, one uppercase and one numeric",
+            "profileNotUpdated": "Profile NOT updated",
             "message": "Data not available. Try again later.",
             "missAuth": "Missing authentication",
             "missAuthorization": "Missing authorization",
@@ -51,16 +83,27 @@
             "fileSize": "Uploaded file is too big (max 5 MB)",
             "maxFiles": "You can only upload a maximum of 10 files",
             "translationExists": "This translation already exists",
+            "tokenAlreadyDeactivated": "Token already deactivated",
+            "tokenNotDeactivated": "Token not deactivated",
+            "tokenNotFound": "Token not found",
+            "tokenNotRegistered": "Token NOT registerd",
+            "tokenNotReserved": "Token NOT reserved",
             "totalSize": "Total size of uploaded files must not exceed 10 MB",
             "invalidLogin": "Invalid email or password",
             "healthDataNotCreated": "Health Data NOT created!"
         },
         "success": {
             "title": "Success",
+            "accessSaved": "Saved access",
             "categoryCreated": "Category created!",
             "fileSaved": "Saved file!",
             "filesSaved": "Saved files!",
             "healthDataCreated": "Health Data Created!",
+            "permissionGranted": "Permission Granted",
+            "profileUpdated": "Profile updated!",
+            "tokenDeactivated": "Token deactivated",
+            "tokenRegistered": "Registered token",
+            "tokenReserved": "Reserved Token",
             "userCreated": "User created!"
         },
         "warn": {
@@ -70,8 +113,6 @@
         "generateToken": {
             "dateFormat": "yy-mm-dd",
             "expTime": "Expiration Time",
-            "expTimeFirstValidation": "The date cannot be in the past",
-            "expTimeSecondValidation": "Maximum 90 days",
             "title": "Generate an Access Token"
         },
         "healthAssistant": {
@@ -88,6 +129,15 @@
             "title": "Health Assistant"
         },
         "healthHistory": {
+            "countdown": {
+                "patientName": "Patient name",
+                "expirationTimer": "Expiration timer"
+            },
+            "emptyMessage": {
+                "firstP2nd": "has no health history yet.",
+                "secondP1st": "Start by adding new health data",
+                "secondP2nd": "to begin building the patient’s medical records"
+            },
             "noData": {
                 "firstP": "You have no health history yet.",
                 "secondP1st": "Start by adding your health data",
@@ -128,6 +178,7 @@
             "rules": "Rules",
             "welcome": "Welcome,"
         },
+        "name": "Name",
         "navbar": {
             "history": "History",
             "login": "Login",
@@ -142,8 +193,6 @@
         },
         "userbar": {
             "bye": "Bye,",
-            "editProfile": "Edit Profile",
-            "inactiveTokens": "Inactive Tokens",
             "loggedOut": "Logged Out",
             "logout": "Logout"
         }

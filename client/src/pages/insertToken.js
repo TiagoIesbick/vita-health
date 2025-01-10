@@ -23,7 +23,7 @@ const InsertToken = () => {
             token: ''
         },
         onSubmit: (values, { resetForm }) => {
-            handleTokenAccess(values.token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm);
+            handleTokenAccess(values.token, client, addTokenAccess, setPatient, showMessage, navigate, translations, resetForm);
         },
         validationSchema: Yup.object({
             token: Yup.string().required(translations?.required).min(83, translations?.error?.minChars?.replace(/{(\w+)}/g, '83'))

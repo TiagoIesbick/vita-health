@@ -15,7 +15,7 @@ const Footer = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 />
             </Link>
-            <small>Copyright &copy; 2024</small>
+            <small>Copyright &copy; 2025</small>
         </footer>
     );
 };

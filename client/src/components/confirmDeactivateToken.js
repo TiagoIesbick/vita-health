@@ -2,12 +2,14 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useDeactivateToken } from '../hooks/hooks';
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useNavigate } from "react-router-dom";
 import { useTokenContext } from '../providers/tokenContext';
 
 
 const ConfirmDeactivateToken = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { visible, setVisible, tokenId } = useTokenContext();
     const { showMessage } = useUser();
     const { inactivateToken, loadingDeactivateToken, errorDeactivateToken } = useDeactivateToken();
@@ -15,16 +17,16 @@ const ConfirmDeactivateToken = () => {
     const handleDeactivate = async () => {
         const res = await inactivateToken(tokenId);
         if (res.deactivateTokenError) {
-            showMessage('error', 'Error', res.deactivateTokenError);
+            showMessage('error', translations?.error?.title, translations?.error?.[res.deactivateTokenError]);
         } else {
-            showMessage('success', 'Success', res.deactivateTokenConfirmation);
+            showMessage('success', translations?.success?.title, translations?.success?.[res.deactivateTokenConfirmation]);
             setVisible(false);
         };
     };
 
     if (errorDeactivateToken) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (
@@ -37,14 +39,14 @@ const ConfirmDeactivateToken = () => {
                             <i className="pi pi-question text-5xl"></i>
                         </div>
                         <span className="font-bold text-2xl block mb-2 mt-4" >
-                            Deactivation Confirmation
+                            {translations?.confirmDeactivate?.title}
                         </span>
                         <p className="mb-0" >
-                            Do you want to deactivate this token?
+                            {translations?.confirmDeactivate?.question}
                         </p>
                         <div className="flex align-items-center gap-2 mt-4" >
                             <Button
-                                label="Deactivate"
+                                label={translations?.confirmDeactivate?.deactivate}
                                 onClick={handleDeactivate}
                                 severity={'danger'}
                                 className="w-8rem"
@@ -52,7 +54,7 @@ const ConfirmDeactivateToken = () => {
                                 disabled={loadingDeactivateToken}
                             ></Button>
                             <Button
-                                label="Cancel"
+                                label={translations?.cancel}
                                 outlined
                                 onClick={(event) => {
                                     hide(event);

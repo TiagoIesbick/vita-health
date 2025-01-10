@@ -147,19 +147,76 @@ def validate_file_size(file_size: int) -> bool:
 
 
 def validate_files_length(files: list) -> bool:
+    """
+    Validates if the number of files in the given list is within the allowed limit.
+
+    This function checks if the provided list of files contains a number of elements
+    that is less than or equal to 10.
+
+    Parameters:
+    files (list): A list of file objects. Each file object can be of any type.
+
+    Returns:
+    bool: True if the number of files in the list is within the allowed limit (10 or less),
+          False otherwise.
+    """
     return len(files) <= 10
 
 
 def validate_files_size(files: list) -> bool:
+    """
+    Validates if the total size of all files in the given list is within the allowed limit.
+
+    This function checks if the sum of sizes of all files in the provided list
+    is less than or equal to 10 MB (10,485,760 bytes).
+
+    Parameters:
+    files (list): A list of file objects. Each file object is expected to have a 'size' attribute
+                  representing the size of the file in bytes.
+
+    Returns:
+    bool: True if the total size of all files is within the allowed limit (10 MB or less),
+          False otherwise.
+    """
     return sum(file.size for file in files) <= 10 * 1024 * 1024
 
 
 def strip_html_tags(html):
+    """
+    Remove HTML tags from a given HTML string and return the plain text content.
+
+    This function uses BeautifulSoup to parse the HTML and extract the text content
+    without any HTML tags or formatting.
+
+    Parameters:
+    html (str): A string containing HTML content to be stripped of tags.
+
+    Returns:
+    str: The plain text content of the HTML, with all tags removed.
+    """
     soup = BeautifulSoup(html, "html.parser")
     return soup.get_text()
 
 
 def check_translate_word(word: str) -> dict:
+    """
+    Detects the language of a given word and translates it to specified target languages.
+
+    This function uses Google Cloud Translation API to detect the language of the input word
+    and translate it to English and Portuguese. It returns a dictionary containing the detected
+    language, confidence score, translations, and any errors encountered during the process.
+
+    Parameters:
+    word (str): The word to be detected and translated.
+
+    Returns:
+    dict: A dictionary containing the following keys:
+        - 'detected_language': The detected language code of the input word.
+        - 'confidence': The confidence score of the language detection.
+        - 'translations': A dictionary of translations, where keys are target language codes
+                          ('en' for English, 'pt' for Portuguese) and values are the translated words.
+        - 'error': A list of error messages, if any occurred during the translation process.
+    """
     translate_client = translate.Client()
     detection = translate_client.detect_language(word)
     detected_language = detection.get("language")

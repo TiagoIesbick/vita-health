@@ -445,16 +445,16 @@ SET @userId = USID ;
 EXECUTE CountUsers USING @email, @userId ;
 IF  @countUsers > 0 THEN
 	ROLLBACK ;
-	SET userError = 'This e-mail already exists' ;
+	SET userError = 'emailExists' ;
 ELSE
 	EXECUTE UpdateUsers USING @email, @firstName, @lastName, @userId ;
   EXECUTE CountUpdatedUser USING @email, @firstName, @lastName ;
   IF @countUpdatedUser = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User updated!' ;
+		SET userConfirmation = 'profileUpdated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT updated' ;
+		SET userError = 'profileNotUpdated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -483,16 +483,16 @@ SET @gender = GEDR ;
 SET @patientId = PTID ;
 IF  @dateOfBirth > NOW() THEN
 	ROLLBACK ;
-	SET userError = 'Date of birth cannot be in the future' ;
+	SET userError = 'dobValidation' ;
 ELSE
 	EXECUTE UpdatePatientUsers USING @dateOfBirth, @gender, @patientId ;
     EXECUTE CountUpdatedPatientUser USING @dateOfBirth, @gender, @patientId ;
     IF @CountUpdatedPatientUser = 1 THEN
     COMMIT ;
-		SET userConfirmation = 'User updated!' ;
+		SET userConfirmation = 'profileUpdated' ;
 	ELSE
 		ROLLBACK;
-		SET userError = 'User NOT updated' ;
+		SET userError = 'profileNotUpdated' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -523,10 +523,10 @@ EXECUTE UpdateDoctorUsers USING @specialty, @licenceNumber, @doctorId ;
 EXECUTE CountUpdatedDoctorUser USING @specialty, @licenceNumber, @doctorId ;
 IF @countUpdatedDoctorUser = 1 THEN
 COMMIT ;
-	SET userConfirmation = 'User updated!' ;
+	SET userConfirmation = 'profileUpdated' ;
 ELSE
 	ROLLBACK;
-	SET userError = 'User NOT updated' ;
+	SET userError = 'profileNotUpdated' ;
 END IF ;
 SELECT * FROM(
   (SELECT userConfirmation) userConfirmation,
@@ -556,17 +556,17 @@ SET @patientId = PTID;
 SET @expirationDate = EXP;
 IF @expirationDate < NOW() THEN
 	ROLLBACK ;
-	SET tokenError = 'Expired date' ;
+	SET tokenError = 'expTimeMinDateValidation' ;
 ELSE
 	EXECUTE CountPreviousToken USING @issuedToken, @patientId, @expirationDate ;
 	EXECUTE InsertIntoTokens USING @issuedToken, @patientId, @expirationDate ;
   EXECUTE CountToken USING @issuedToken, @patientId, @expirationDate ;
   IF @countToken - @countPreviousToken = 1 THEN
     COMMIT ;
-    SET tokenConfirmation = 'Reserved TokenId' ;
+    SET tokenConfirmation = 'tokenReserved' ;
 	ELSE
 		ROLLBACK ;
-    SET tokenError = 'TokenId NOT reserved' ;
+    SET tokenError = 'tokenNotReserved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -596,10 +596,10 @@ EXECUTE UpdateToken USING @issuedToken, @reservedTokenId ;
 EXECUTE CountTokenId USING @issuedToken, @reservedTokenId ;
 IF @countTokenId != 1 THEN
 	ROLLBACK ;
-  SET tokenError = 'Token NOT registered' ;
+  SET tokenError = 'tokenNotRegistered' ;
 ELSE
   COMMIT;
-	SET tokenConfirmation = 'Registered Token' ;
+	SET tokenConfirmation = 'tokenRegistered' ;
 END IF ;
 SELECT * FROM(
   (SELECT tokenConfirmation) tokenConfirmation,
@@ -631,17 +631,17 @@ SET @doctorId = DTID;
 EXECUTE Expiration USING @tokenId ;
 IF @expirationToken < NOW() THEN
 	ROLLBACK ;
-  SET accessError = 'Access permission has expired.' ;
+  SET accessError = 'expiredAccess' ;
 ELSE
 	EXECUTE CountPreviousTokenAccess USING @tokenId ;
 	EXECUTE InsertIntoTokenAccess USING @tokenId, @doctorId ;
 	EXECUTE CountTokenAccess USING @tokenId ;
 	IF @countTokenAccess - @countPreviousTokenAccess = 1 THEN
 		COMMIT;
-		SET accessConfirmation = 'Saved access' ;
+		SET accessConfirmation = 'accessSaved' ;
 	ELSE
 		ROLLBACK ;
-		SET accessError = 'Access NOT saved' ;
+		SET accessError = 'accessNotSaved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -771,19 +771,19 @@ SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WH
 START TRANSACTION;
 IF @countTokenId = 0 THEN
 	ROLLBACK ;
-  SET deactivateTokenError = 'Token not found' ;
+  SET deactivateTokenError = 'tokenNotFound' ;
 ELSEIF @expirationTokenDate < NOW() THEN
 	ROLLBACK ;
-  SET deactivateTokenError = 'Token already deactivated ' ;
+  SET deactivateTokenError = 'tokenAlreadyDeactivated' ;
 ELSE
 	UPDATE `vita_health`.`Tokens` SET `expirationDate` = NOW() WHERE `tokenId` = TKID ;
   SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
   IF @expirationTokenDate > NOW() THEN
     ROLLBACK ;
-    SET deactivateTokenError = 'Token not deactivated' ;
+    SET deactivateTokenError = 'tokenNotDeactivated' ;
   ELSE
     COMMIT ;
-    SET deactivateTokenConfirmation = 'Token deactivated' ;
+    SET deactivateTokenConfirmation = 'tokenDeactivated' ;
   END IF ;
 END IF ;
 SELECT * FROM(

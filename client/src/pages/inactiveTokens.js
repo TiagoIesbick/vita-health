@@ -5,6 +5,7 @@ import { useInactiveTokens } from "../hooks/hooks";
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router';
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { Link } from "react-router-dom";
 import LoadingSkeleton from "../components/skeleton";
 import TokenTemplate from "../components/tokenTemplate";
@@ -16,6 +17,7 @@ import './inactiveTokens.css';
 const InactiveTokens = () => {
     const navigate = useNavigate();
     const { user, showMessage } = useUser();
+    const { translations } = useLanguage();
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(10);
     const { inactiveTokens, loadingInactiveTokens, errorInactiveTokens } = useInactiveTokens(rows, first);
@@ -58,18 +60,18 @@ const InactiveTokens = () => {
     if (!inactiveTokens.items || inactiveTokens.items.length === 0) {
         return (
             <Card
-                title="Inactive Tokens"
+                title={translations?.inactiveTokens?.title}
                 className="flex justify-content-center align-items-center card-min-height"
             >
-                <p>You have no inactive tokens yet.</p>
-                <p>To deactivate a token, visit the active tokens page <Link to="/active-tokens" >here</Link> and choose a token to deactivate, or wait for it to expire.</p>
+                <p>{translations?.inactiveTokens?.noData?.firstP}</p>
+                <p>{translations?.inactiveTokens?.noData?.secondP1st} <Link to="/active-tokens" >{translations?.here}</Link> {translations?.inactiveTokens?.noData?.secondP2nd}</p>
             </Card>
         );
     };
 
     return (
         <TokenProvider>
-            <Card className="card-min-height card-pb-0" title="Inative Tokens">
+            <Card className="card-min-height card-pb-0" title={translations?.inactiveTokens?.title}>
                 <DataView
                     value={inactiveTokens.items}
                     listTemplate={listTemplate}

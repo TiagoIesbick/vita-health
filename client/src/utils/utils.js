@@ -90,13 +90,13 @@ export const customizedMarker = (item) => {
 };
 
 
-export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, resetForm) => {
+export const handleTokenAccess = async (token, client, addTokenAccess, setPatient, showMessage, navigate, translations, resetForm) => {
     storeToken(ACCESS_MEDICAL_TOKEN_KEY, token);
     const resTokenAccess = await addTokenAccess(token);
 
     if (resTokenAccess.accessError) {
-        showMessage('error', 'Error', resTokenAccess.accessError);
-        if (resTokenAccess.accessError === 'Missing authorization') {
+        showMessage('error', translations?.error?.title, translations?.error?.[resTokenAccess.accessError]);
+        if (resTokenAccess.accessError === "missAuthorization") {
             const cachedData = client.cache.readQuery({ query: activeDoctorTokensQuery });
             if (cachedData) {
                 client.refetchQueries({ include: ["ActiveDoctorTokens"] });
@@ -110,7 +110,7 @@ export const handleTokenAccess = async (token, client, addTokenAccess, setPatien
         client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'medicalRecords' });
         client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'aiConversation' });
         client.cache.gc();
-        showMessage('success', 'Success', 'Permission Granted');
+        showMessage('success', translations?.success?.title, translations?.success?.permissionGranted);
         navigate("/medical-records-access");
         if (resetForm) resetForm();
     }

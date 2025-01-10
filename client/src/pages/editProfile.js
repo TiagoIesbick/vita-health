@@ -3,11 +3,13 @@ import EditDoctorProfile from "../components/editDoctorProfile";
 import { useUser } from "../providers/userContext";
 import { useUserQuery } from "../hooks/hooks";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../providers/languageContext";
 import LoadingSkeleton from "../components/skeleton";
 
 
 const EditProfile = () => {
     const navigate = useNavigate();
+    const { translations } = useLanguage();
     const { user, setUser, showMessage } = useUser();
     const { userDetail, loadingUser, errorUser } = useUserQuery(user.userId);
     if (loadingUser) {
@@ -15,7 +17,7 @@ const EditProfile = () => {
     };
     if (errorUser) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
     return (
         <>
