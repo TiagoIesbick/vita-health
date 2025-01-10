@@ -29,7 +29,7 @@ const GenerateAccessToken = () => {
         onSubmit: async (values, { resetForm }) => {
             const resToken = await addToken(values.tokenExpirationDateTime);
             if (resToken.tokenError){
-                showMessage('error', translations?.error?.title, resToken.tokenError);
+                showMessage('error', translations?.error?.title, translations?.error?.[resToken.tokenError]);
             } else {
                 resetForm();
                 setToken(resToken.token.token);

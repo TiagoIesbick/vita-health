@@ -21,6 +21,11 @@
             "title": "Tokens Inativos"
         },
         "confirm": "Confirme",
+        "confirmDeactivate": {
+            "title": "Confirmação de Desativação",
+            "deactivate": "Desativar",
+            "question": "Deseja desativar este token?"
+        },
         "createUser": {
             "acceptTerms": "Aceitar os Termos",
             "firstName": "Nome",
@@ -47,7 +52,7 @@
             "emailExists": "Esse e-mail já existe",
             "expired": "Expirado",
             "expiredAccess": "A permissão de acesso expirou.",
-            "expTimeMinDateValidation": "A data não pode ser no passado",
+            "expTimeMinDateValidation": "A data e a hora não podem estar no passado",
             "expTimeMaxDateValidation": "Máximo 90 dias",
             "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
             "invalidExpiredToken": "Token inválido e/ou expirado",
@@ -78,6 +83,11 @@
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
             "translationExists": "Esta tradução já existe",
+            "tokenAlreadyDeactivated": "Token já desativado",
+            "tokenNotDeactivated": "Token não desativado",
+            "tokenNotFound": "Token não encontrado",
+            "tokenNotRegistered": "Token NÃO registrado",
+            "tokenNotReserved": "Token não reservado",
             "totalSize": "O tamanho total dos arquivos enviados não deve exceder 10 MB",
             "invalidLogin": "Email ou senha inválidos",
             "healthDataNotCreated": "Dados de saúde NÃO salvos!"
@@ -91,6 +101,9 @@
             "healthDataCreated": "Dados de saúde salvos!",
             "permissionGranted": "Permissão Concedida",
             "profileUpdated": "Perfil atualizado!",
+            "tokenDeactivated": "Token desativado",
+            "tokenRegistered": "Token registrado",
+            "tokenReserved": "Token reservado",
             "userCreated": "Usuário criado!"
         },
         "warn": {

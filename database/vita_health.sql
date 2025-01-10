@@ -556,17 +556,17 @@ SET @patientId = PTID;
 SET @expirationDate = EXP;
 IF @expirationDate < NOW() THEN
 	ROLLBACK ;
-	SET tokenError = 'Expired date' ;
+	SET tokenError = 'expTimeMinDateValidation' ;
 ELSE
 	EXECUTE CountPreviousToken USING @issuedToken, @patientId, @expirationDate ;
 	EXECUTE InsertIntoTokens USING @issuedToken, @patientId, @expirationDate ;
   EXECUTE CountToken USING @issuedToken, @patientId, @expirationDate ;
   IF @countToken - @countPreviousToken = 1 THEN
     COMMIT ;
-    SET tokenConfirmation = 'Reserved TokenId' ;
+    SET tokenConfirmation = 'tokenReserved' ;
 	ELSE
 		ROLLBACK ;
-    SET tokenError = 'TokenId NOT reserved' ;
+    SET tokenError = 'tokenNotReserved' ;
 	END IF ;
 END IF ;
 SELECT * FROM(
@@ -596,10 +596,10 @@ EXECUTE UpdateToken USING @issuedToken, @reservedTokenId ;
 EXECUTE CountTokenId USING @issuedToken, @reservedTokenId ;
 IF @countTokenId != 1 THEN
 	ROLLBACK ;
-  SET tokenError = 'Token NOT registered' ;
+  SET tokenError = 'tokenNotRegistered' ;
 ELSE
   COMMIT;
-	SET tokenConfirmation = 'Registered Token' ;
+	SET tokenConfirmation = 'tokenRegistered' ;
 END IF ;
 SELECT * FROM(
   (SELECT tokenConfirmation) tokenConfirmation,
@@ -771,19 +771,19 @@ SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WH
 START TRANSACTION;
 IF @countTokenId = 0 THEN
 	ROLLBACK ;
-  SET deactivateTokenError = 'Token not found' ;
+  SET deactivateTokenError = 'tokenNotFound' ;
 ELSEIF @expirationTokenDate < NOW() THEN
 	ROLLBACK ;
-  SET deactivateTokenError = 'Token already deactivated ' ;
+  SET deactivateTokenError = 'tokenAlreadyDeactivated' ;
 ELSE
 	UPDATE `vita_health`.`Tokens` SET `expirationDate` = NOW() WHERE `tokenId` = TKID ;
   SELECT `expirationDate` INTO @expirationTokenDate FROM `vita_health`.`Tokens` WHERE `tokenId` = TKID ;
   IF @expirationTokenDate > NOW() THEN
     ROLLBACK ;
-    SET deactivateTokenError = 'Token not deactivated' ;
+    SET deactivateTokenError = 'tokenNotDeactivated' ;
   ELSE
     COMMIT ;
-    SET deactivateTokenConfirmation = 'Token deactivated' ;
+    SET deactivateTokenConfirmation = 'tokenDeactivated' ;
   END IF ;
 END IF ;
 SELECT * FROM(

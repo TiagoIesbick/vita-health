@@ -1045,7 +1045,7 @@ def resolve_deactivate_token(*_, patient, tokenId):
     tokens = get_active_tokens_by_patient(patient['patientId'])
     token_exists = any(token['tokenId'] == int(tokenId) for token in tokens)
     if not token_exists:
-        return {'deactivateTokenError': 'Token not found'}
+        return {'deactivateTokenError': 'tokenNotFound'}
     res = deactivate_token(tokenId)
     if res['deactivateTokenConfirmation']:
         res['token'] = get_token(tokenId)
