@@ -79,6 +79,8 @@
             "userNotCreated": "Usuário NÃO criado",
             "fileExists": "O nome do arquivo já existe",
             "fileFormat": "O arquivo enviado tem formato incompatível",
+            "fileNotRendered": "Seu navegador não suporta a visualização deste arquivo.",
+            "fileNotRenderedDownload": "Baixe o arquivo aqui",
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",

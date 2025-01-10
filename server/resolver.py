@@ -584,9 +584,9 @@ def resolver_record_types_translation(record_types, *_):
 @requires_authentication('recordTypeError')
 def resolve_create_record_type(*_, recordName):
     """
-    Create a new record type with the given name.
+    Create a new medical record type with translations.
 
-    This function creates a new record type after sanitizing and formatting the provided name.
+    This function creates a new medical record type by cleaning and translating the provided record name.
     It requires authentication to perform this operation.
 
     Parameters:
@@ -594,10 +594,16 @@ def resolve_create_record_type(*_, recordName):
     recordName (str): The name of the record type to be created.
 
     Returns:
-    dict: The result of the create_record_type function, which typically includes:
-        - A confirmation message if the record type was successfully created.
-        - An error message if the creation failed.
-        - The newly created record type information if successful.
+    dict: A dictionary containing the result of the operation.
+        If the record name is invalid or translation fails:
+            {'recordTypeError': 'langNotDetected'}
+        If the record type is successfully created:
+            {
+                'recordTypeConfirmation': 'categoryCreated',
+                'recordType': <created_record_type_object>
+            }
+        Otherwise:
+            The result returned by the create_record_type function.
     """
     recordName = ' '.join(nh3.clean(recordName).split())
     if not recordName:
