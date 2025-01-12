@@ -102,6 +102,22 @@ class BasicAuthBackend(AuthenticationBackend):
 
 
 async def get_context_value(request: Request) -> dict:
+    """
+    Asynchronously retrieves context values related to the user's authentication status and details.
+
+    This function takes a Starlette Request object as input and returns a dictionary containing
+    context values such as the original request, authentication status, user details, and medical access.
+
+    Parameters:
+    request (starlette.requests.Request): The Starlette Request object containing user information.
+
+    Returns:
+    dict: A dictionary containing the following keys:
+        - 'request': The original Starlette Request object.
+        - 'authenticated': A boolean indicating whether the user is authenticated.
+        - 'user_detail': A dictionary containing user details if authenticated, or None otherwise.
+        - 'medical_access': A dictionary containing medical access details if authenticated, or None otherwise.
+    """
     return {
         "request": request,
         "authenticated": request.user.is_authenticated,

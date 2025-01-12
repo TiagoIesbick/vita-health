@@ -535,7 +535,7 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
     Returns:
     dict: A dictionary containing the result of the operation.
         If successful, includes:
-            - 'medicalRecordConfirmation': True
+            - 'medicalRecordConfirmation': A confirmation message
             - 'medicalRecord': The created medical record object
         If unsuccessful, includes:
             - 'medicalRecordError': An error message describing the failure
