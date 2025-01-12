@@ -57,6 +57,11 @@ export const dateTemplate = (date) => {
 };
 
 
+export const getRecordTypeTranslation = (recordType, language) => {
+    return recordType?.translation?.find((t) => t.languageCode === language);
+};
+
+
 export const customizedMarker = (item) => {
     const recordStyle = {
         'Blood Test': {icon: <FontAwesomeIcon icon={faVials}/>, color: '--red-300'},

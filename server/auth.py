@@ -10,7 +10,23 @@ from utils.utils import decrypt
 
 
 class UserDetail(SimpleUser):
-    def __init__(self, user: dict, medical_access: (None | dict) = None) -> None:
+    def __init__(self, user: dict, medical_access: None | dict = None) -> None:
+        """
+        Initialize a UserDetail instance with user information and optional medical access data.
+
+        This constructor sets up a UserDetail object with the user's basic information and,
+        if provided, their medical access details.
+
+        Parameters:
+        user (dict): A dictionary containing the user's information. It must include
+                     at least a 'firstName' key.
+        medical_access (None | dict, optional): A dictionary containing the user's medical
+                                                access information, or None if not applicable.
+                                                Defaults to None.
+
+        Returns:
+        None
+        """
         self.username = user['firstName']
         self.user_detail = user
         self.medical_access = medical_access
@@ -18,6 +34,23 @@ class UserDetail(SimpleUser):
 
 class BasicAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn: starlette.requests.HTTPConnection) -> (None | starlette.authentication.AuthCredentials):
+        """
+        Authenticate a user based on access tokens in cookies or Authorization headers.
+
+        This method attempts to authenticate a user using either an access token from cookies
+        or an Authorization header. It also handles medical access tokens if present.
+
+        Parameters:
+        conn (starlette.requests.HTTPConnection): The HTTP connection object containing
+                                                  request information including headers and cookies.
+
+        Returns:
+        tuple | None: A tuple containing AuthCredentials and UserDetail objects if authentication
+                      is successful, or None if authentication fails.
+
+        Raises:
+        AuthenticationError: If the provided authentication credentials are invalid.
+        """
         cookies = conn.cookies
         access_token = cookies.get('accessToken')
         medical_access_token = cookies.get('accessMedicalToken')

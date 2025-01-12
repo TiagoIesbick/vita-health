@@ -61,6 +61,7 @@
             "lastNameValidation": "Last name must start with at least 2 word characters",
             "lowercaseValidation": "At least one lowercase",
             "minChars": "Minimum {count} characters",
+            "noDataAvailable": "No Data Available",
             "noEmail": "Invalid e-mail",
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
@@ -179,6 +180,10 @@
             "pickPassword": "Pick a password",
             "rules": "Rules",
             "welcome": "Welcome,"
+        },
+        "medicalRecord": {
+            "providerName": "Provider name",
+            "filesGallery": "Files Gallery"
         },
         "name": "Name",
         "navbar": {

@@ -61,6 +61,7 @@
             "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
             "lowercaseValidation": "Pelo menos uma minúscula",
             "minChars": "Mínimo {count} caracteres",
+            "noDataAvailable": "Nenhum dado disponível",
             "noEmail": "E-mail inválido",
             "numericValidation": "Pelo menos um numérico",
             "uppercaseValidation": "Pelo menos uma maiúscula",
@@ -179,6 +180,10 @@
             "pickPassword": "Escolha uma senha",
             "rules": "Regras",
             "welcome": "Olá,"
+        },
+        "medicalRecord": {
+            "providerName": "Nome do profissional",
+            "filesGallery": "Galeria de Arquivos"
         },
         "name": "Nome",
         "navbar": {

@@ -577,6 +577,21 @@ def resolve_record_types(*_):
 
 @record_types.field("translation")
 def resolver_record_types_translation(record_types, *_):
+    """
+    Resolves the 'translation' field for the 'record_types' GraphQL object.
+
+    This function retrieves the translation associated with a specific medical record type.
+    It requires the record type ID to perform this operation.
+
+    Parameters:
+    record_types (dict): A dictionary containing medical record type information,
+                           including 'recordTypeId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the translation information if the recordTypeId
+                  exists and the translation is found, otherwise None.
+    """
     return None if not record_types['recordTypeId'] else get_record_type_translation(record_types['recordTypeId'])
 
 
