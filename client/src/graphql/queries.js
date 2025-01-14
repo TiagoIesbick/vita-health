@@ -131,14 +131,21 @@ export const messageSubscription = gql`
 
 
 export const searchMedicalRecordsQuery = gql`
-    query SearchMedicalRecords ($term: String!) {
-        searchMedicalRecords (term: $term) {
+    query SearchMedicalRecords ($term: String!, $languageCode: String) {
+        searchMedicalRecords (term: $term, languageCode: $languageCode) {
             recordId
             recordData
             dateCreated
             doctorFullName
+            patientFullName
             recordTypeName
+            recordTypeTranslations {
+                languageCode
+                translatedName
+                highlight
+            }
             patientId
+            doctorId
         }
     }
 `;

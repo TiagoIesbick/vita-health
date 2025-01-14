@@ -26,6 +26,7 @@ patients = ObjectType("Patients")
 doctors = ObjectType("Doctors")
 record_types = ObjectType("RecordTypes")
 medical_records = ObjectType("MedicalRecords")
+search_medical_records_results = ObjectType("SearchMedicalRecordsResult")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
 
@@ -1178,7 +1179,7 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
 @query.field("searchMedicalRecords")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
+async def resolve_search_medical_records(*_, term, languageCode, patient_id, doctor_id):
     """
     Search for medical records based on a given term.
 
@@ -1197,13 +1198,32 @@ async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
           If no term is provided or no matches are found, returns an empty list.
     """
     if term:
+        search_fields = ["recordData", "doctorFullName", "recordTypeName"]
+        if languageCode != "en-us":
+            search_fields.pop()
         return await search_with_highlights(
             index="medical_records",
             term=term,
-            search_fields=["recordData", "doctorFullName", "recordTypeName"],
-            patient_id=patient_id
+            search_fields=search_fields,
+            patient_id=patient_id,
+            language_code=languageCode
         )
     return []
+
+
+@search_medical_records_results.field("recordTypeTranslations")
+async def resolve_record_type_translations(result, *_):
+    if "recordTypeTranslations" in result and result["recordTypeTranslations"]:
+        return [
+            {
+                "languageCode": translation["_source"]["languageCode"],
+                "translatedName": translation["_source"]["translatedName"],
+                "highlight": translation.get("highlight", {}).get("recordTypeTranslations.translatedName", [])
+            }
+            for translation in result["recordTypeTranslations"]
+        ]
+    document = es.get(index='medical_records', id=result['recordId'])
+    return document.get("_source", {}).get('recordTypeTranslations', [])
 
 
 @query.field("searchFiles")

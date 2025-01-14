@@ -5,7 +5,7 @@ import { customizedMarker, stripHtmlTags } from '../utils/utils';
 import { useNavigate } from 'react-router';
 
 
-const SearchList = ({ searchResults, resultsType='health-data', setTerm=()=>{}, setFile=()=>{}, setVisible=()=>{} }) => {
+const SearchList = ({ searchResults, resultsType='health-data', setTerm=()=>{}, setFile=()=>{}, setVisible=()=>{}, language=null }) => {
     const navigate = useNavigate();
 
     if (!searchResults) return;
@@ -37,7 +37,13 @@ const SearchList = ({ searchResults, resultsType='health-data', setTerm=()=>{}, 
                                 )}
                                 <span
                                     className='text-overflow-ellipsis white-space-nowrap overflow-hidden'
-                                    dangerouslySetInnerHTML={{ __html: result.recordTypeName }}
+                                    dangerouslySetInnerHTML={
+                                        language === 'pt-br'
+                                        ? result.recordTypeTranslations?.[0]?.highlight?.[0]
+                                        ? { __html: result.recordTypeTranslations?.[0]?.highlight?.[0]}
+                                        : { __html: result.recordTypeTranslations?.[0]?.translatedName}
+                                        : { __html: result.recordTypeName }
+                                    }
                                 ></span>
                             </span>
                             {result.doctorFullName &&

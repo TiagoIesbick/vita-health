@@ -9,7 +9,7 @@ type Query {
     inactiveTokens(limit: Int, offset: Int): TokensSubList
     recordTypes: [RecordTypes]
     aiConversation: [Conversation]
-    searchMedicalRecords(term: String!): [SearchMedicalRecordsResult]
+    searchMedicalRecords(term: String!, languageCode: String): [SearchMedicalRecordsResult]
     searchFiles(term: String!): [SearchFilesResult]
     doctorPatients: [DoctorPatients]
     patientRecordsbyDoctor(limit: Int, offset: Int, patientId: ID!): MedicalRecordsSubList
@@ -34,8 +34,11 @@ type SearchMedicalRecordsResult {
     recordData: String!
     dateCreated: String!
     doctorFullName: String
+    patientFullName: String!
     recordTypeName: String
+    recordTypeTranslations: [SearchRecordTypeTranslations]
     patientId: ID!
+    doctorId: ID
 }
 
 type RecordTypes {
@@ -48,6 +51,12 @@ type RecordTypeTranslations {
     translationId: ID!
     languageCode: String!
     translatedName: String!
+}
+
+type SearchRecordTypeTranslations {
+    languageCode: String
+    translatedName: String
+    highlight: [String]
 }
 
 type Files {

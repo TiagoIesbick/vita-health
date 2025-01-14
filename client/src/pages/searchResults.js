@@ -4,6 +4,7 @@ import { useSearchFiles, useSearchMedicalRecords } from '../hooks/hooks';
 import { useNavigate } from 'react-router';
 import { useUser } from "../providers/userContext";
 import { useFileContext } from '../providers/fileContext';
+import { useLanguage } from "../providers/languageContext";
 import LoadingSkeleton from "../components/skeleton";
 import SearchList from '../components/searchList';
 import './searchResults.css';
@@ -13,9 +14,10 @@ const SearchResults = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search).get('query');
+    const { language, translations } = useLanguage();
     const { showMessage } = useUser();
     const { setFile, setFileVisible } = useFileContext();
-    const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(query);
+    const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(query, language);
     const { searchFiles, loadingFiles, errorFiles } = useSearchFiles(query);
 
     if (loading || loadingFiles) {
@@ -24,7 +26,7 @@ const SearchResults = () => {
 
     if (error || errorFiles) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (
@@ -34,13 +36,13 @@ const SearchResults = () => {
         >
             {searchMedicalRecords?.length ? (
                 <>
-                    <h4>Health Data</h4>
+                    <h4>{translations?.search?.healthData}</h4>
                     <SearchList searchResults={searchMedicalRecords} />
                 </>
             ) : null}
             {searchFiles?.length ? (
                 <>
-                    <h4>Files</h4>
+                    <h4>{translations?.search?.files}</h4>
                     <SearchList searchResults={searchFiles} resultsType={'files'} setFile={setFile} setVisible={setFileVisible}/>
                 </>
             ) : null}

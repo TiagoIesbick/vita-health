@@ -15,13 +15,13 @@ import './search.css';
 
 const Search = ({ expanded, setExpanded, screenWidth }) => {
     const navigate = useNavigate();
-    const { translations } = useLanguage();
+    const { language, translations } = useLanguage();
     const overlayRef = useRef(null);
     const searchInput = useRef(null);
     const [term, setTerm] =  useState('');
     const [debouncedTerm, setDebouncedTerm] = useState('');
     const { setFile, setFileVisible } = useFileContext();
-    const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(debouncedTerm);
+    const { searchMedicalRecords, loading, error } = useSearchMedicalRecords(debouncedTerm, language);
     const { searchFiles, loadingFiles, errorFiles } = useSearchFiles(debouncedTerm);
 
     const handleButtonClick = () => setExpanded(!expanded);
@@ -149,7 +149,7 @@ const Search = ({ expanded, setExpanded, screenWidth }) => {
                     {searchMedicalRecords?.length ? (
                         <>
                             <h4>{translations?.search?.healthData}</h4>
-                            <SearchList searchResults={searchMedicalRecords} setTerm={setTerm} />
+                            <SearchList searchResults={searchMedicalRecords} setTerm={setTerm} language={language} />
                         </>
                     ) : null}
                     {searchFiles?.length ? (
