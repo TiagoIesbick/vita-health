@@ -196,7 +196,9 @@
         "search": {
             "files": "Files",
             "healthData": "Health Data",
-            "search": "Search"
+            "noData": "No data found for",
+            "search": "Search",
+            "searchResults": "Search Results for"
         },
         "userbar": {
             "bye": "Bye,",

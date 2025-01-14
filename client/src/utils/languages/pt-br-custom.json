@@ -196,7 +196,9 @@
         "search": {
             "files": "Arquivos",
             "healthData": "Dados de Saúde",
-            "search": "Pesquisar"
+            "noData": "Nenhum dado encontrado para",
+            "search": "Pesquisar",
+            "searchResults": "Resultados da Pesquisa para"
         },
         "userbar": {
             "bye": "Até logo,",

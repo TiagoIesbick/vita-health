@@ -31,13 +31,13 @@ const SearchResults = () => {
 
     return (
         <Card
-            title={`Search Results for "${query}"`}
+            title={`${translations?.search?.searchResults} "${query}"`}
             className="flex justify-content-center align-items-center card-min-height search-results"
         >
             {searchMedicalRecords?.length ? (
                 <>
                     <h4>{translations?.search?.healthData}</h4>
-                    <SearchList searchResults={searchMedicalRecords} />
+                    <SearchList searchResults={searchMedicalRecords} language={language} />
                 </>
             ) : null}
             {searchFiles?.length ? (
@@ -47,7 +47,7 @@ const SearchResults = () => {
                 </>
             ) : null}
             {!searchMedicalRecords?.length && !searchFiles?.length &&
-                <p>No data found for "{query}"</p>
+                <p>{translations?.search?.noData} "{query}"</p>
             }
         </Card>
     );
