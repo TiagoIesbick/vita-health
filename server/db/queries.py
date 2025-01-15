@@ -159,6 +159,27 @@ def get_doctor_full_name(id: int) -> None | str:
     return None if not doctor_full_name else doctor_full_name[0]['fullName']
 
 
+def get_patient_full_name(id: int) -> None | str:
+    """
+    Retrieve the full name of a patient from the database based on the patient ID.
+
+    This function queries the Patients and Users tables in the database to fetch
+    the concatenated first name and last name of the patient associated with the
+    specified patient ID.
+
+    Args:
+        id (int): The unique identifier of the patient whose full name is to be retrieved.
+
+    Returns:
+        None | str: A string containing the patient's full name if found,
+                    or None if no patient matches the given ID.
+    """
+    query = rf'''SELECT CONCAT(u.firstName, ' ', u.lastName) AS fullName
+        FROM Patients p JOIN Users u ON p.userId = u.userId WHERE p.patientId = {id};'''
+    patient_full_name = mysql_client(query)
+    return None if not patient_full_name else patient_full_name[0]['fullName']
+
+
 def get_users_doctor(id: int) -> None | dict:
     """
     Retrieve doctor information associated with a specific user ID from the database.
@@ -228,7 +249,39 @@ def get_user_by_email_password(email:str, password:str) -> None | dict:
 
 
 def get_record_type_translation(id: int) -> None | list[dict]:
+    """
+    Retrieve record type translations for a specific record type ID from the database.
+
+    Parameters:
+    id (int): The unique identifier of the record type.
+
+    Returns:
+    None | list[dict]: A list of dictionaries, where each dictionary represents a record type translation.
+                      If no translations are found for the given record type ID, the function returns None.
+    """
     query = rf"SELECT * FROM RecordTypeTranslations WHERE recordTypeId = {id};"
+    translation = mysql_client(query)
+    return None if not translation else translation
+
+
+def get_search_record_type_translation(id: int) -> None | list[dict]:
+    """
+    Retrieve language-specific translations for a specific record type.
+
+    This function queries the RecordTypeTranslations table to fetch the language code
+    and translated name for a given record type ID.
+
+    Args:
+        id (int): The unique identifier of the record type.
+
+    Returns:
+        None | list[dict]: A list of dictionaries containing the translations if found,
+                           or None if no translations are available for the given record type ID.
+                           Each dictionary in the list contains:
+                           - 'languageCode': The code of the language for the translation.
+                           - 'translatedName': The name of the record type in the specified language.
+    """
+    query = rf"SELECT languageCode, translatedName FROM RecordTypeTranslations WHERE recordTypeId = {id};"
     translation = mysql_client(query)
     return None if not translation else translation
 
