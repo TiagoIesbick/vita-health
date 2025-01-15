@@ -552,8 +552,11 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
                 "recordData": strip_html_tags(medical_record['recordData'] or ''),
                 "dateCreated": medical_record['dateCreated'],
                 "doctorFullName": None if not doctor_id else get_doctor_full_name(doctor_id),
+                "patientFullName": None if not patient_id else get_patient_full_name(patient_id),
                 "recordTypeName": get_record_type_name(medical_record['recordTypeId']),
-                "patientId": patient_id
+                "recordTypeTranslations": get_search_record_type_translation(medical_record['recordTypeId']),
+                "patientId": patient_id,
+                "doctorId": doctor_id
             }
         )
         res['medicalRecord'] = medical_record
