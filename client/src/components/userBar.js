@@ -27,7 +27,7 @@ const UserBar = () => {
             command: () => navigate("/active-tokens")
         },
         ...(user.userType === 'Doctor' ? [{
-            label: `${translations?.patient}s`,
+            label: translations?.patients?.title,
             icon: <FontAwesomeIcon icon={faUsers} className='mr-2 text-color-secondary pi w-1rem'/>,
             command: () => navigate("/patients")
         }] : []),

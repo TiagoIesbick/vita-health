@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { useDoctorPatients } from "../hooks/hooks";
 import { useUser } from "../providers/userContext";
+import { useLanguage } from "../providers/languageContext";
 import { useNavigate } from 'react-router';
 import { useState } from "react";
 import { FilterMatchMode, FilterOperator, FilterService } from 'primereact/api';
@@ -16,6 +17,7 @@ import { dateTemplate } from '../utils/utils';
 const Patients = () => {
     const navigate = useNavigate();
     const { showMessage } = useUser();
+    const { translations } = useLanguage();
     const {doctorPatients, loadingDoctorPatients, errorDoctorPatients} = useDoctorPatients();
     const [expandedRows, setExpandedRows] = useState(null);
 
@@ -51,8 +53,8 @@ const Patients = () => {
 
     const header = (
         <div className="flex flex-wrap justify-content-end gap-2">
-            <Button icon="pi pi-plus" label="Expand All" onClick={expandAll} text />
-            <Button icon="pi pi-minus" label="Collapse All" onClick={collapseAll} text />
+            <Button icon="pi pi-plus" label={translations?.patients?.expandAll} onClick={expandAll} text />
+            <Button icon="pi pi-minus" label={translations?.patients?.collapseAll} onClick={collapseAll} text />
         </div>
     );
 
@@ -60,20 +62,20 @@ const Patients = () => {
 
     if (errorDoctorPatients) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
     console.log(doctorPatients);
 
     return (
-        <Card className="card-min-height" title="Patients">
+        <Card className="card-min-height" title={translations?.patients?.title}>
             <DataTable value={doctorPatients} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
                 onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={(data) => <PatientsRecordsExpansion data={data} />}
                 dataKey="patientId" header={header} tableStyle={{ minWidth: '100%' }} sortField="patientFullName" sortOrder={1}
-                filterDisplay="row" emptyMessage="No patients found." filters={filters}
+                filterDisplay="row" emptyMessage={translations?.patients?.emptyMessage} filters={filters}
             >
                 <Column expander style={{ width: '5rem' }} />
-                <Column field="patientFullName" header="Name" filter sortable />
-                <Column field="lastRecordCreated" header="Last Record" dataType="date" filter sortable body={(rowData) => dateTemplate(rowData.lastRecordCreated)} filterElement={dateFilterTemplate} />
+                <Column field="patientFullName" header={translations?.name} filter sortable />
+                <Column field="lastRecordCreated" header={translations?.lastRecord} dataType="date" filter sortable body={(rowData) => dateTemplate(rowData.lastRecordCreated)} filterElement={dateFilterTemplate} />
             </DataTable>
         </Card>
     );

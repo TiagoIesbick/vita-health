@@ -192,6 +192,15 @@
             "signUp": "Cadastre-se"
         },
         "patient": "Paciente",
+        "patients": {
+            "title": "Pacientes",
+            "collapseAll": "Recolher Tudo",
+            "date": "Data",
+            "emptyMessage": "Nenhum paciente encontrado.",
+            "expandAll": "Expandir Tudo",
+            "notes": "Anotações",
+            "recordsFor": "Registros para"
+        },
         "required": "Obrigatório",
         "search": {
             "files": "Arquivos",

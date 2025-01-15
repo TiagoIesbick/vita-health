@@ -192,6 +192,15 @@
             "signUp": "Sign Up"
         },
         "patient": "Patient",
+        "patients": {
+            "title": "Patients",
+            "collapseAll": "Collapse All",
+            "date": "Date",
+            "emptyMessage": "No patients found.",
+            "expandAll": "Expand All",
+            "notes": "Notes",
+            "recordsFor": "Records for"
+        },
         "required": "Required",
         "search": {
             "files": "Files",
