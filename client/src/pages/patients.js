@@ -64,7 +64,6 @@ const Patients = () => {
         navigate('/');
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
-    console.log(doctorPatients);
 
     return (
         <Card className="card-min-height" title={translations?.patients?.title}>

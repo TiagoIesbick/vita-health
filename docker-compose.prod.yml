@@ -16,7 +16,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=false
     volumes:
       - es_data:/usr/share/elasticsearch/data
