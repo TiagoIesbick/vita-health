@@ -26,6 +26,7 @@ patients = ObjectType("Patients")
 doctors = ObjectType("Doctors")
 record_types = ObjectType("RecordTypes")
 medical_records = ObjectType("MedicalRecords")
+search_medical_records_results = ObjectType("SearchMedicalRecordsResult")
 tokens = ObjectType("Tokens")
 token_access = ObjectType("TokenAccess")
 
@@ -535,7 +536,7 @@ def resolve_create_medical_record(*_, recordTypeId, recordData, patient_id, doct
     Returns:
     dict: A dictionary containing the result of the operation.
         If successful, includes:
-            - 'medicalRecordConfirmation': True
+            - 'medicalRecordConfirmation': A confirmation message
             - 'medicalRecord': The created medical record object
         If unsuccessful, includes:
             - 'medicalRecordError': An error message describing the failure
@@ -577,6 +578,21 @@ def resolve_record_types(*_):
 
 @record_types.field("translation")
 def resolver_record_types_translation(record_types, *_):
+    """
+    Resolves the 'translation' field for the 'record_types' GraphQL object.
+
+    This function retrieves the translation associated with a specific medical record type.
+    It requires the record type ID to perform this operation.
+
+    Parameters:
+    record_types (dict): A dictionary containing medical record type information,
+                           including 'recordTypeId'.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    dict or None: A dictionary containing the translation information if the recordTypeId
+                  exists and the translation is found, otherwise None.
+    """
     return None if not record_types['recordTypeId'] else get_record_type_translation(record_types['recordTypeId'])
 
 
@@ -584,9 +600,9 @@ def resolver_record_types_translation(record_types, *_):
 @requires_authentication('recordTypeError')
 def resolve_create_record_type(*_, recordName):
     """
-    Create a new record type with the given name.
+    Create a new medical record type with translations.
 
-    This function creates a new record type after sanitizing and formatting the provided name.
+    This function creates a new medical record type by cleaning and translating the provided record name.
     It requires authentication to perform this operation.
 
     Parameters:
@@ -594,10 +610,16 @@ def resolve_create_record_type(*_, recordName):
     recordName (str): The name of the record type to be created.
 
     Returns:
-    dict: The result of the create_record_type function, which typically includes:
-        - A confirmation message if the record type was successfully created.
-        - An error message if the creation failed.
-        - The newly created record type information if successful.
+    dict: A dictionary containing the result of the operation.
+        If the record name is invalid or translation fails:
+            {'recordTypeError': 'langNotDetected'}
+        If the record type is successfully created:
+            {
+                'recordTypeConfirmation': 'categoryCreated',
+                'recordType': <created_record_type_object>
+            }
+        Otherwise:
+            The result returned by the create_record_type function.
     """
     recordName = ' '.join(nh3.clean(recordName).split())
     if not recordName:
@@ -1157,7 +1179,7 @@ async def resolve_multiple_upload(*_, recordId, files, patient_id, doctor_id):
 @query.field("searchMedicalRecords")
 @requires_authentication(return_none=True)
 @requires_patient_or_doctor_access(return_none=True)
-async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
+async def resolve_search_medical_records(*_, term, languageCode, patient_id, doctor_id):
     """
     Search for medical records based on a given term.
 
@@ -1176,13 +1198,32 @@ async def resolve_search_medical_records(*_, term, patient_id, doctor_id):
           If no term is provided or no matches are found, returns an empty list.
     """
     if term:
+        search_fields = ["recordData", "doctorFullName", "recordTypeName"]
+        if languageCode != "en-us":
+            search_fields.pop()
         return await search_with_highlights(
             index="medical_records",
             term=term,
-            search_fields=["recordData", "doctorFullName", "recordTypeName"],
-            patient_id=patient_id
+            search_fields=search_fields,
+            patient_id=patient_id,
+            language_code=languageCode
         )
     return []
+
+
+@search_medical_records_results.field("recordTypeTranslations")
+async def resolve_record_type_translations(result, *_):
+    if "recordTypeTranslations" in result and result["recordTypeTranslations"]:
+        return [
+            {
+                "languageCode": translation["_source"]["languageCode"],
+                "translatedName": translation["_source"]["translatedName"],
+                "highlight": translation.get("highlight", {}).get("recordTypeTranslations.translatedName", [])
+            }
+            for translation in result["recordTypeTranslations"]
+        ]
+    document = es.get(index='medical_records', id=result['recordId'])
+    return document.get("_source", {}).get('recordTypeTranslations', [])
 
 
 @query.field("searchFiles")

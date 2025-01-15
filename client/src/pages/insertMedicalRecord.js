@@ -16,7 +16,7 @@ import { useLanguage } from "../providers/languageContext";
 import { useApolloClient } from "@apollo/client";
 import { ACCESS_MEDICAL_TOKEN_KEY, deleteCookie } from "../graphql/auth";
 import { delTokenFromActiveDoctorTokensCache } from "../graphql/cache";
-import { TINYMCE_API_KEY, stripHtmlTags, supportedFileFormats } from "../utils/utils";
+import { TINYMCE_API_KEY, getRecordTypeTranslation, stripHtmlTags, supportedFileFormats } from "../utils/utils";
 import CountDown from "../components/countdown";
 import LoadingSkeleton from "../components/skeleton";
 import MultipleUpload from "../components/multipleUpload";
@@ -160,9 +160,7 @@ const InsertMedicalRecord = () => {
     };
 
     const sortedRecordTypes = recordTypes?.map(record => {
-        const translation = record.translation?.find(
-            (t) => t.languageCode === language
-        );
+        const translation = getRecordTypeTranslation(record, language);
         return {
             ...record,
             recordName: translation ? translation.translatedName : record.recordName

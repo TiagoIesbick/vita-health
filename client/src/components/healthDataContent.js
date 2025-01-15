@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { localDateTime, stripHtmlTags } from "../utils/utils";
+import { getRecordTypeTranslation, localDateTime, stripHtmlTags } from "../utils/utils";
 import { Button } from 'primereact/button';
 import { Badge } from 'primereact/badge';
 import { Link } from "react-router-dom";
@@ -19,9 +19,7 @@ const HealthDataContent = ({item}) => {
     const cleanText = stripHtmlTags(item.recordData);
     const textSlice = cleanText.length > 100 ? cleanText.slice(0, 100) + ' ...' : cleanText;
 
-    const translation = item.recordType.translation?.find(
-        (t) => t.languageCode === language
-    );
+    const translation = getRecordTypeTranslation(item.recordType, language);
 
     return (
         <Card

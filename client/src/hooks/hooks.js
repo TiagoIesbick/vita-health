@@ -558,9 +558,9 @@ export const useCreateConversation = () => {
 };
 
 
-export const useSearchMedicalRecords = (term) => {
+export const useSearchMedicalRecords = (term, languageCode) => {
     const { data, loading, error } = useQuery(searchMedicalRecordsQuery, {
-        variables: { term },
+        variables: { term, languageCode },
         fetchPolicy: 'network-only'
     });
     return {searchMedicalRecords: data?.searchMedicalRecords, loading, error: Boolean(error)};

@@ -61,6 +61,7 @@
             "lastNameValidation": "Last name must start with at least 2 word characters",
             "lowercaseValidation": "At least one lowercase",
             "minChars": "Minimum {count} characters",
+            "noDataAvailable": "No Data Available",
             "noEmail": "Invalid e-mail",
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
@@ -79,6 +80,8 @@
             "userNotCreated": "User NOT created",
             "fileExists": "The file name already exists",
             "fileFormat": "Uploaded file has unsupported format",
+            "fileNotRendered": "Your browser does not support viewing this file.",
+            "fileNotRenderedDownload": "Download the file here",
             "fileNotSaved": "File not saved",
             "fileSize": "Uploaded file is too big (max 5 MB)",
             "maxFiles": "You can only upload a maximum of 10 files",
@@ -178,6 +181,10 @@
             "rules": "Rules",
             "welcome": "Welcome,"
         },
+        "medicalRecord": {
+            "providerName": "Provider name",
+            "filesGallery": "Files Gallery"
+        },
         "name": "Name",
         "navbar": {
             "history": "History",
@@ -185,11 +192,22 @@
             "signUp": "Sign Up"
         },
         "patient": "Patient",
+        "patients": {
+            "title": "Patients",
+            "collapseAll": "Collapse All",
+            "date": "Date",
+            "emptyMessage": "No patients found.",
+            "expandAll": "Expand All",
+            "notes": "Notes",
+            "recordsFor": "Records for"
+        },
         "required": "Required",
         "search": {
             "files": "Files",
             "healthData": "Health Data",
-            "search": "Search"
+            "noData": "No data found for",
+            "search": "Search",
+            "searchResults": "Search Results for"
         },
         "userbar": {
             "bye": "Bye,",

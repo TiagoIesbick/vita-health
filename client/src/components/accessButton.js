@@ -20,7 +20,7 @@ const AccessButton = ({ token }) => {
 
     if (errorTokenAccess) {
         navigate('/');
-        showMessage('error', 'Error', 'Data not available. Try again later.', true);
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
     };
 
     return (

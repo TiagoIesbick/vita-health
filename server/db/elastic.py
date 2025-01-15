@@ -49,7 +49,15 @@ medical_records_mapping = {
             "dateCreated": {"type": "date", "format": "strict_date_optional_time||epoch_millis"},
             "doctorFullName": field_settings,
             "recordTypeName": field_settings,
-            "patientId": {"type": "integer"}
+            "recordTypeTranslations": {
+                "type": "nested",
+                "properties": {
+                    "languageCode": {"type": "keyword"},
+                    "translatedName": field_settings
+                }
+            },
+            "patientId": {"type": "integer"},
+            "doctorId": {"type": "integer"}
         }
     }
 }
@@ -113,35 +121,49 @@ def migrate_medical_records():
             r.dateCreated,
             r.patientId,
             r.doctorId,
-            d.userId,
+            d.userId AS doctorUserId,
+            p.userId AS patientUserId,
             rt.recordName AS recordTypeName,
-            CONCAT(u.firstName, ' ', u.lastName) AS doctorFullName
+            CONCAT(u.firstName, ' ', u.lastName) AS doctorFullName,
+            CONCAT(up.firstName, ' ', up.lastName) AS patientFullName,
+            rtt.languageCode,
+            rtt.translatedName
         FROM MedicalRecords r
         JOIN RecordTypes rt ON r.recordTypeId = rt.recordTypeId
         LEFT JOIN Doctors d ON r.doctorId = d.doctorId
         LEFT JOIN Users u ON d.userId = u.userId
+        LEFT JOIN Patients p ON r.patientId = p.patientId
+        LEFT JOIN Users up ON p.userId = up.userId
+        LEFT JOIN RecordTypeTranslations rtt ON rt.recordTypeId = rtt.recordTypeId;
     """
 
     records = mysql_client(query)
 
+    records_by_id = {}
     for record in records:
-        document = {
-            "recordId": record["recordId"],
-            "recordData": strip_html_tags(record["recordData"]),
-            "dateCreated": record["dateCreated"],
-            "doctorFullName": record.get("doctorFullName", None),
-            "recordTypeName": record["recordTypeName"],
-            "patientId": record["patientId"]
-        }
+        record_id = record["recordId"]
+        if record_id not in records_by_id:
+            records_by_id[record_id] = {
+                "recordId": record_id,
+                "recordData": strip_html_tags(record["recordData"]),
+                "dateCreated": record["dateCreated"],
+                "doctorFullName": record.get("doctorFullName", None),
+                "patientFullName": record.get("patientFullName", None),
+                "recordTypeName": record["recordTypeName"],
+                "recordTypeTranslations": [],
+                "patientId": record["patientId"],
+                "doctorId": record["doctorId"]
+            }
+        if record["languageCode"]:
+            records_by_id[record_id]["recordTypeTranslations"].append({
+                "languageCode": record["languageCode"],
+                "translatedName": record["translatedName"]
+            })
 
-        es.index(
-            index="medical_records",
-            id=record["recordId"],
-            document=document
-        )
+    for record in records_by_id.values():
+        es.index(index="medical_records", id=record["recordId"], document=record)
 
-    print(f"{len(records)} medical records migrated.")
-
+    print(f"{len(records_by_id)} medical records migrated.")
 
 
 def migrate_files():
@@ -218,10 +240,10 @@ def extract_highlighted_field(hit: dict, field_name: str) -> str:
         str: The highlighted field value if available, otherwise the original field value.
               Returns the first element if the result is a list.
     """
-    return hit["highlight"].get(field_name, [hit["_source"].get(field_name)])[0]
+    return hit.get("highlight", {}).get(field_name, [hit["_source"].get(field_name)])[0]
 
 
-async def search_with_highlights(index: str, term: str, search_fields: list[str], patient_id: int) -> list[dict]:
+async def search_with_highlights(index: str, term: str, search_fields: list[str], patient_id: int, language_code: str = None) -> list[dict]:
     """
     This function performs a search operation on the specified Elasticsearch index with highlighting.
 
@@ -238,7 +260,7 @@ async def search_with_highlights(index: str, term: str, search_fields: list[str]
     query_body = {
         "query": {
             "bool": {
-                "must": [
+                "should": [
                     {
                         "multi_match": {
                             "query": term,
@@ -252,15 +274,39 @@ async def search_with_highlights(index: str, term: str, search_fields: list[str]
         },
         "highlight": {
             "fields": {field: field_highlight for field in search_fields}
-        }
+        },
+        "min_score": 1.0
     }
+
+    if language_code not in ["en-us", None]:
+        query_body["query"]["bool"]["should"].append({
+            "nested": {
+                "path": "recordTypeTranslations",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"term": {"recordTypeTranslations.languageCode": language_code}},
+                            {"match": {"recordTypeTranslations.translatedName": term}}
+                        ]
+                    }
+                },
+                "inner_hits": {
+                    "highlight": {
+                        "fields": {
+                            "recordTypeTranslations.translatedName": field_highlight
+                        }
+                    }
+                }
+            }
+        })
 
     res = es.search(index=index, body=query_body)
 
     return [
         {
             **hit["_source"],
-            **{field: extract_highlighted_field(hit, field) for field in search_fields}
+            **{field: extract_highlighted_field(hit, field) for field in search_fields},
+            "recordTypeTranslations": hit.get("inner_hits", {}).get("recordTypeTranslations", {}).get("hits", {}).get("hits", [])
         }
         for hit in res["hits"]["hits"]
     ]

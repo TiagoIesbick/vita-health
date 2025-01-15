@@ -1,10 +1,13 @@
 import { Card } from "primereact/card";
 import { BASE_URL_SERVER } from "../graphql/apolloConfig";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../providers/languageContext";
 import FileRenderer from "./fileRenderer";
 
 
 const FileItem = ({ file, fileHeight, fileWidth }) => {
+    const { translations } = useLanguage();
+
     return (
         <FileRenderer
             file={file}
@@ -18,8 +21,8 @@ const FileItem = ({ file, fileHeight, fileWidth }) => {
             fallback={
                 <div className='flex align-items-center h-full justify-content-center mx-4'>
                     <Card className='text-center text-white' style={{background: 'linear-gradient(45deg, darkblue, darkorchid)'}}>
-                        <p className='mt-0'>Your browser does not support viewing this file.</p>
-                        <Link to={BASE_URL_SERVER + file.url} target="_blank" className='text-white underline'>Download the file here</Link>
+                        <p className='mt-0'>{translations?.error?.fileNotRendered}</p>
+                        <Link to={BASE_URL_SERVER + file.url} target="_blank" className='text-white underline'>{translations?.error?.fileNotRenderedDownload}</Link>
                     </Card>
                 </div>
             }

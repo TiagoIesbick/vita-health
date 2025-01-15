@@ -61,6 +61,7 @@
             "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
             "lowercaseValidation": "Pelo menos uma minúscula",
             "minChars": "Mínimo {count} caracteres",
+            "noDataAvailable": "Nenhum dado disponível",
             "noEmail": "E-mail inválido",
             "numericValidation": "Pelo menos um numérico",
             "uppercaseValidation": "Pelo menos uma maiúscula",
@@ -79,6 +80,8 @@
             "userNotCreated": "Usuário NÃO criado",
             "fileExists": "O nome do arquivo já existe",
             "fileFormat": "O arquivo enviado tem formato incompatível",
+            "fileNotRendered": "Seu navegador não suporta a visualização deste arquivo.",
+            "fileNotRenderedDownload": "Baixe o arquivo aqui",
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
@@ -178,6 +181,10 @@
             "rules": "Regras",
             "welcome": "Olá,"
         },
+        "medicalRecord": {
+            "providerName": "Nome do profissional",
+            "filesGallery": "Galeria de Arquivos"
+        },
         "name": "Nome",
         "navbar": {
             "history": "Histórico",
@@ -185,11 +192,22 @@
             "signUp": "Cadastre-se"
         },
         "patient": "Paciente",
+        "patients": {
+            "title": "Pacientes",
+            "collapseAll": "Recolher Tudo",
+            "date": "Data",
+            "emptyMessage": "Nenhum paciente encontrado.",
+            "expandAll": "Expandir Tudo",
+            "notes": "Anotações",
+            "recordsFor": "Registros para"
+        },
         "required": "Obrigatório",
         "search": {
             "files": "Arquivos",
             "healthData": "Dados de Saúde",
-            "search": "Pesquisar"
+            "noData": "Nenhum dado encontrado para",
+            "search": "Pesquisar",
+            "searchResults": "Resultados da Pesquisa para"
         },
         "userbar": {
             "bye": "Até logo,",
