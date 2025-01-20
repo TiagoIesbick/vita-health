@@ -1216,6 +1216,28 @@ async def resolve_search_medical_records(*_, term, languageCode, patient_id, doc
 
 @search_medical_records_results.field("recordTypeTranslations")
 async def resolve_record_type_translations(result, *_):
+    """
+    Resolves the recordTypeTranslations field for the searchMedicalRecordsResults query.
+
+    This function processes the result of a search on medical records and extracts the
+    translations for record types. It checks if the 'recordTypeTranslations' field is present
+    in the result and if it contains any translations. If the conditions are met, it returns
+    a list of dictionaries, each representing a translation. Each dictionary contains the
+    language code, translated name, and any highlighted search terms. If the conditions are not
+    met, it retrieves the 'recordTypeTranslations' field from the Elasticsearch document
+    associated with the result's 'recordId' and returns it.
+
+    Parameters:
+    result (dict): The result of a search on medical records. It should contain the
+                   'recordTypeTranslations' field.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    list: A list of dictionaries representing the translations for record types. Each
+          dictionary contains the language code, translated name, and any highlighted
+          search terms. If no translations are found, it returns the 'recordTypeTranslations'
+          field from the Elasticsearch document associated with the result's 'recordId'.
+    """
     if "recordTypeTranslations" in result and result["recordTypeTranslations"]:
         return [
             {
