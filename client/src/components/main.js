@@ -28,8 +28,8 @@ const Main = () => {
             <Toast ref={toast} position="top-center" />
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/sign-up" element={<CreateUser />} />
+                <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
+                <Route path="/sign-up" element={!user ? <CreateUser />: <Navigate to="/" replace />} />
                 <Route path="/edit-profile" element={user ? <EditProfile /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records" element={user && user.userType === 'Patient' ? <MedicalRecords /> : <Navigate to="/" replace />} />
                 <Route path="/generate-access-token" element={user && user.userType === 'Patient' ? <GenerateAccessToken /> : <Navigate to="/" replace />} />

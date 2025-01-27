@@ -59,7 +59,7 @@ const Login = () => {
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
-            <FloatLabel>
+                <FloatLabel>
                     <InputText
                         id="email"
                         autoComplete="email"
