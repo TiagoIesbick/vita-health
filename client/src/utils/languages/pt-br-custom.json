@@ -174,6 +174,7 @@
         },
         "lastRecord": "Último Registro",
         "login": {
+            "forgotPassword": "Esqueceu a senha?",
             "loggedIn": "Conectado",
             "noAccount": "Não tem uma conta?",
             "password": "Senha",

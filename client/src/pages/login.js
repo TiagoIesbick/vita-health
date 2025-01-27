@@ -84,6 +84,7 @@ const Login = () => {
                 </FloatLabel>
                 <Button type="submit" label={translations?.navbar?.login} disabled={loading || !formik.isValid} loading={loading}  />
             </form>
+            <Link className='flex mt-2 w-full text-sm justify-content-center' to="/password-reset">{translations?.login?.forgotPassword}</Link>
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">
                 {translations?.login?.noAccount}
