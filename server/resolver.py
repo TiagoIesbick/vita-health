@@ -6,7 +6,7 @@ import os
 import json
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
@@ -373,6 +373,19 @@ def resolve_login(*_, email, password):
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
         return { 'user': user, 'token': token }
     return { 'error': 'invalidLogin' }
+
+
+@mutation.field("requestPasswordReset")
+def resolve_request_password_reset(*_, email):
+    if not validate_email(email):
+        return { 'requestResetError': 'noEmail'}
+    user = get_user_by_email(email)
+    if not user:
+        return { 'requestResetError': 'emailNotExists'}
+    expiry = datetime.now(timezone.utc) + timedelta(minutes=30)
+    payload = { "email": email, "exp": expiry}
+    token = jwt.encode(payload, getenv('SECRET'), algorithm="HS256")
+    return {'requestResetConfirmation': token}
 
 
 @query.field("medicalRecords")

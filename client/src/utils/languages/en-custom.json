@@ -50,6 +50,7 @@
             "categoryNotCreated": "Category NOT created",
             "dobValidation": "The date cannot be in the future",
             "emailExists": "This e-mail already exists",
+            "emailNotExists": "This e-mail does not exist in our database. Please sign up instead.",
             "expired": "Expired",
             "expiredAccess": "Access permission has expired.",
             "expTimeMinDateValidation": "The date and time cannot be in the past",

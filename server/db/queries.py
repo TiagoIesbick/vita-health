@@ -248,6 +248,25 @@ def get_user_by_email_password(email:str, password:str) -> None | dict:
     return user[0]
 
 
+def get_user_by_email(email:str) -> None | dict:
+    """
+    Retrieve user ID from the database based on email.
+
+    This function queries the Users table in the database to fetch user ID
+    associated with the provided email.
+
+    Args:
+        email (str): The email address of the user to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the user's ID if found,
+                     or None if no user matches the given email.
+    """
+    query = rf"SELECT userId FROM Users WHERE email = '{email}';"
+    user = mysql_client(query)
+    return None if not user else user[0]
+
+
 def get_record_type_translation(id: int) -> None | list[dict]:
     """
     Retrieve record type translations for a specific record type ID from the database.
