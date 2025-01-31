@@ -1,0 +1,12 @@
+{
+    "en-us": {
+        "greeting": "Hello, {{name}}!",
+        "message": "Thank you for using our service. Please let us know if you need any help.",
+        "signature": "Best regards,"
+    },
+    "pt-br": {
+        "greeting": "Hola, {{name}}!",
+        "message": "Gracias por usar nuestro servicio. Por favor, avísenos si necesita ayuda.",
+        "signature": "Saludos cordiales,"
+    }
+}

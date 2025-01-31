@@ -16,6 +16,7 @@ from utils.decorators import *
 from utils.utils import check_translate_word
 from pathlib import Path
 from utils.utils import *
+from emails.email import SendEmail
 
 
 query = QueryType()
@@ -376,7 +377,7 @@ def resolve_login(*_, email, password):
 
 
 @mutation.field("requestPasswordReset")
-def resolve_request_password_reset(*_, email):
+def resolve_request_password_reset(*_, email, lang):
     if not validate_email(email):
         return { 'requestResetError': 'noEmail'}
     user = get_user_by_email(email)
@@ -385,6 +386,7 @@ def resolve_request_password_reset(*_, email):
     expiry = datetime.now(timezone.utc) + timedelta(minutes=30)
     payload = { "email": email, "exp": expiry}
     token = jwt.encode(payload, getenv('SECRET'), algorithm="HS256")
+    print(SendEmail().send_email_password_reset(lang, user['firstName'], email))
     return {'requestResetConfirmation': token}
 
 
