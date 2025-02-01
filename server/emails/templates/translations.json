@@ -1,12 +1,20 @@
 {
     "en-us": {
         "greeting": "Hello, {{name}}!",
-        "message": "Thank you for using our service. Please let us know if you need any help.",
+        "passwordReset": {
+            "message": "You requested to reset your password. Click the button below to proceed:",
+            "noMessage": "If you didn’t request this, ignore this email.",
+            "button": "Reset Password"
+        },
         "signature": "Best regards,"
     },
     "pt-br": {
-        "greeting": "Hola, {{name}}!",
-        "message": "Gracias por usar nuestro servicio. Por favor, avísenos si necesita ayuda.",
-        "signature": "Saludos cordiales,"
+        "greeting": "Olá, {{name}}!",
+        "passwordReset": {
+            "message": "Você solicitou a redefinição de sua senha. Clique no botão abaixo para prosseguir:",
+            "noMessage": "Se você não solicitou isso, ignore este e-mail.",
+            "button": "Redefinir Senha"
+        },
+        "signature": "Atenciosamente,"
     }
 }
