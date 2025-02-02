@@ -75,7 +75,7 @@ class SendEmail():
             server.login(self.EMAIL_SENDER, self.APP_PASSWORD)
             server.sendmail(self.EMAIL_SENDER, email, msg.as_string())
             server.quit()
-            print("Email sent successfully!")
+            return {'resetConfirmation': 'requestResetConfirmation'}
         except Exception as e:
             print("Error:", str(e))
-        return email_content
+            return { 'resetError': 'requestResetError'}

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment, recordTypeFragment } from "./fragments";
+import { userConfirmationFragment, userDetailFragment, patientDetailFragment, doctorDetailFragment, medicalRecordsFragment, tokenFragment, tokenAccessFragment, fileFragment, recordTypeFragment, resetResultFragment } from "./fragments";
 
 
 export const mutationCreateUser = gql`
@@ -106,6 +106,16 @@ export const mutationLogin = gql`
         }
     }
     ${userDetailFragment}
+`;
+
+
+export const mutationRequestPasswordReset = gql`
+    mutation RequestPasswordReset ($email: String!, $lang: String!) {
+        requestPasswordReset(email: $email, lang: $lang) {
+            ...resetResultDetail
+        }
+    }
+    ${resetResultFragment}
 `;
 
 

@@ -379,15 +379,15 @@ def resolve_login(*_, email, password):
 @mutation.field("requestPasswordReset")
 def resolve_request_password_reset(*_, email, lang):
     if not validate_email(email):
-        return { 'requestResetError': 'noEmail'}
+        return { 'resetError': 'noEmail'}
     user = get_user_by_email(email)
     if not user:
-        return { 'requestResetError': 'emailNotExists'}
+        return { 'resetError': 'emailNotExists'}
     expiry = datetime.now(timezone.utc) + timedelta(minutes=30)
     payload = { "email": email, "exp": expiry}
     token = jwt.encode(payload, getenv('SECRET'), algorithm="HS256")
-    print(SendEmail().send_email_password_reset(lang, user['firstName'], email, token))
-    return {'requestResetConfirmation': token}
+    res = SendEmail().send_email_password_reset(lang, user['firstName'], email, token)
+    return res
 
 
 @query.field("medicalRecords")

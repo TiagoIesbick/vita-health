@@ -86,6 +86,7 @@
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
+            "requestResetError": "Falha ao enviar o e-mail de redefinição de senha. Tente novamente mais tarde.",
             "translationExists": "Esta tradução já existe",
             "tokenAlreadyDeactivated": "Token já desativado",
             "tokenNotDeactivated": "Token não desativado",
@@ -105,6 +106,7 @@
             "healthDataCreated": "Dados de saúde salvos!",
             "permissionGranted": "Permissão Concedida",
             "profileUpdated": "Perfil atualizado!",
+            "requestResetConfirmation": "Um e-mail foi enviado para redefinir sua senha. Verifique sua caixa de entrada e siga as instruções.",
             "tokenDeactivated": "Token desativado",
             "tokenRegistered": "Token registrado",
             "tokenReserved": "Token reservado",
@@ -202,6 +204,9 @@
             "expandAll": "Expandir Tudo",
             "notes": "Anotações",
             "recordsFor": "Registros para"
+        },
+        "requestPasswordReset": {
+            "title": "Solicitar Redefinição de Senha"
         },
         "required": "Obrigatório",
         "search": {

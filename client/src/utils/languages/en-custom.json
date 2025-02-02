@@ -86,6 +86,7 @@
             "fileNotSaved": "File not saved",
             "fileSize": "Uploaded file is too big (max 5 MB)",
             "maxFiles": "You can only upload a maximum of 10 files",
+            "requestResetError": "Failed to send password reset email. Please try again later.",
             "translationExists": "This translation already exists",
             "tokenAlreadyDeactivated": "Token already deactivated",
             "tokenNotDeactivated": "Token not deactivated",
@@ -105,6 +106,7 @@
             "healthDataCreated": "Health Data Created!",
             "permissionGranted": "Permission Granted",
             "profileUpdated": "Profile updated!",
+            "requestResetConfirmation": "An email has been sent to reset your password. Please check your inbox and follow the instructions.",
             "tokenDeactivated": "Token deactivated",
             "tokenRegistered": "Registered token",
             "tokenReserved": "Reserved Token",
@@ -202,6 +204,9 @@
             "expandAll": "Expand All",
             "notes": "Notes",
             "recordsFor": "Records for"
+        },
+        "requestPasswordReset": {
+            "title": "Request Password Reset"
         },
         "required": "Required",
         "search": {

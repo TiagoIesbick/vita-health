@@ -40,6 +40,14 @@ export const userConfirmationFragment = gql`
 `;
 
 
+export const resetResultFragment = gql`
+    fragment resetResultDetail on ResetResult {
+        resetConfirmation
+        resetError
+    }
+`;
+
+
 export const recordTypeFragment = gql`
     fragment RecordTypeDetail on RecordTypes {
         recordTypeId

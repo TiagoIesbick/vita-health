@@ -23,6 +23,7 @@ const Login = () => {
     const { translations } = useLanguage();
     const { setUser, showMessage } = useUser();
     const { doLogin, loading, error } = useLogin();
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -48,6 +49,7 @@ const Login = () => {
                 .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.error?.passwordValidation)
         }),
     });
+
     if (error) {
         navigate('/');
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
