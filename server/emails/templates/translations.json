@@ -2,7 +2,7 @@
     "en-us": {
         "greeting": "Hello, {{name}}!",
         "passwordReset": {
-            "message": "You requested to reset your password. Click the button below to proceed:",
+            "message": "You requested a password reset. Click the button below within the next 30 minutes to continue.",
             "noMessage": "If you didn’t request this, ignore this email.",
             "button": "Reset Password"
         },
@@ -11,7 +11,7 @@
     "pt-br": {
         "greeting": "Olá, {{name}}!",
         "passwordReset": {
-            "message": "Você solicitou a redefinição de sua senha. Clique no botão abaixo para prosseguir:",
+            "message": "Você solicitou a redefinição de senha. Clique no botão abaixo dentro dos próximos 30 minutos para continuar.",
             "noMessage": "Se você não solicitou isso, ignore este e-mail.",
             "button": "Redefinir Senha"
         },

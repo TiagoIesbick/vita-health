@@ -57,6 +57,7 @@
             "expTimeMaxDateValidation": "Maximum 90 days",
             "firstNameValidation": "First name must start with at least 2 word characters",
             "invalidExpiredToken": "Invalid and/or expired token",
+            "invalidLink": "Invalid link",
             "invalidPassword": "Invalid password",
             "langNotDetected": "Language not detected",
             "lastNameValidation": "Last name must start with at least 2 word characters",
@@ -66,6 +67,7 @@
             "noEmail": "Invalid e-mail",
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
+            "passwordMismatch": "Passwords do not match.",
             "passwordValidation": "At least one lowercase, one uppercase and one numeric",
             "profileNotUpdated": "Profile NOT updated",
             "message": "Data not available. Try again later.",
@@ -194,6 +196,10 @@
             "history": "History",
             "login": "Login",
             "signUp": "Sign Up"
+        },
+        "passwordReset" :{
+            "title": "Password Reset",
+            "confirmPassword": "Confirm Password"
         },
         "patient": "Patient",
         "patients": {
