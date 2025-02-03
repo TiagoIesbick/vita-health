@@ -130,8 +130,8 @@ type Mutation {
     generateToken(expirationDate: String!): TokenResult
     login(email: String!, password: String!): LoginResult
     multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
+    passwordReset(input: PasswordResetInput!): ResetResult
     requestPasswordReset(email: String!, lang: String!): ResetResult
-    resetPassword(token: String!, newPassword: String!): ResetResult
     saveTokenAccess(token: String!): TokenAccessResult
     updateDoctorUser(input: UpdateDoctorInput!): UserConfirmation
     updatePatientUser(input: UpdatePatientInput!): UserConfirmation
@@ -145,6 +145,12 @@ input CreateUserInput {
     userType: String!
     password: String!
     acceptTerms: Boolean!
+}
+
+input PasswordResetInput {
+    token: String!
+    newPassword: String!
+    confirmPassword: String!
 }
 
 input UpdateUserInput {

@@ -369,6 +369,10 @@ def resolve_login(*_, email, password):
         If unsuccessful:
             {'error': 'Invalid email or password'}
     """
+    if not validate_email(email):
+        return { 'error': 'noEmail'}
+    if not validate_password(password):
+        return { 'error': 'invalidPassword' }
     user = get_user_by_email_password(email, password)
     if user:
         token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
@@ -384,10 +388,30 @@ def resolve_request_password_reset(*_, email, lang):
     if not user:
         return { 'resetError': 'emailNotExists'}
     expiry = datetime.now(timezone.utc) + timedelta(minutes=30)
-    payload = { "email": email, "exp": expiry}
+    payload = { "email": email, "exp": expiry, "type": "passwordReset" }
     token = jwt.encode(payload, getenv('SECRET'), algorithm="HS256")
     res = SendEmail().send_email_password_reset(lang, user['firstName'], email, token)
     return res
+
+
+@mutation.field("passwordReset")
+def resolve_reset_password(*_, input):
+    token, newPassword, confirmPassword = input['token'], input['newPassword'], input['confirmPassword']
+    try:
+        decoded = jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
+    except jwt.exceptions.PyJWTError as exc:
+        return {'resetError': 'invalidExpiredToken'}
+
+    email, token_type = decoded.get('email', ''), decoded.get('type', '')
+    if token_type != 'passwordReset':
+        return {'resetError': 'invalidLink'}
+    if not validate_email(email):
+        return { 'resetError': 'noEmail'}
+    if not validate_password(newPassword):
+        return { 'resetError': 'invalidPassword' }
+    if newPassword != confirmPassword:
+        return { 'resetError': 'passwordMismatch'}
+    return update_user_password(email, encrypt(newPassword))
 
 
 @query.field("medicalRecords")

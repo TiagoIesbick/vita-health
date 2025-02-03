@@ -119,6 +119,16 @@ export const mutationRequestPasswordReset = gql`
 `;
 
 
+export const mutationPasswordReset = gql`
+    mutation PasswordReset ($input: PasswordResetInput!) {
+        passwordReset(input: $input) {
+            ...resetResultDetail
+        }
+    }
+    ${resetResultFragment}
+`;
+
+
 export const mutationGenerateToken = gql`
     mutation GenerateToken ($expirationDate: String!) {
         generateToken(expirationDate: $expirationDate) {

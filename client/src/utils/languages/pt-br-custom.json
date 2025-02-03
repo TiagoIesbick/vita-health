@@ -67,6 +67,7 @@
             "noEmail": "E-mail inválido",
             "numericValidation": "Pelo menos um numérico",
             "uppercaseValidation": "Pelo menos uma maiúscula",
+            "passwordNotUpdated": "Sua senha não pôde ser atualizada. Tente novamente mais tarde.",
             "passwordMismatch": "As senhas não são iguais.",
             "passwordValidation": "Pelo menos uma minúscula, uma maiúscula e um número",
             "profileNotUpdated": "Perfil NÃO atualizado",
@@ -106,6 +107,7 @@
             "fileSaved": "Arquivo salvo!",
             "filesSaved": "Arquivos salvos!",
             "healthDataCreated": "Dados de saúde salvos!",
+            "passwordUpdated": "Sua senha foi atualizada com sucesso. Agora você pode fazer login com sua nova senha.",
             "permissionGranted": "Permissão Concedida",
             "profileUpdated": "Perfil atualizado!",
             "requestResetConfirmation": "Um e-mail foi enviado para redefinir sua senha. Verifique sua caixa de entrada e siga as instruções.",
@@ -199,7 +201,8 @@
         },
         "passwordReset" :{
             "title": "Redefinição de Senha",
-            "confirmPassword": "Confirmar Senha"
+            "confirmPassword": "Confirmar Senha",
+            "newPassword": "Nova Senha"
         },
         "patient": "Paciente",
         "patients": {

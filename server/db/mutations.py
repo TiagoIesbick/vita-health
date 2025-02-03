@@ -96,6 +96,13 @@ def update_doctor_user(specialty: str, licenseNumber: str, doctorId: int) -> Non
     return None if not confirmation else confirmation[0]
 
 
+def update_user_password(email: str, password: str) -> None | dict:
+    args = [email, password]
+    query = 'UpdateUserPassword'
+    confirmation = mysql_client(query, type='procedure', args=args)
+    return None if not confirmation else confirmation[0]
+
+
 def reserve_token_id(patientId: int, expirationDate: str, token: str = 'reserve') -> None | dict:
     """
     Reserves a token ID for a patient in the database.

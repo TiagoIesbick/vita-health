@@ -537,6 +537,41 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- Create Procedure to update user's password
+-- -----------------------------------------------------
+DELIMITER //
+CREATE PROCEDURE UpdateUserPassword(IN EMAIL VARCHAR(255), IN PASW VARCHAR(255))
+BEGIN
+DECLARE resetConfirmation VARCHAR(45);
+DECLARE resetError VARCHAR(45);
+PREPARE CountUserEmail FROM 'SELECT COUNT(`userId`) INTO @countUserEmail FROM `Users` WHERE `email` = ?' ;
+PREPARE PasswordReset FROM 'UPDATE `vita_health`.`Users` SET `password` = ? WHERE `email` = ?' ;
+START TRANSACTION;
+SET @email = EMAIL ;
+SET @password = PASW ;
+EXECUTE CountUserEmail USING @email ;
+IF @countUserEmail  != 1 THEN
+  ROLLBACK;
+  SET resetError = 'emailNotExists' ;
+ELSE
+  EXECUTE PasswordReset USING @password, @email ;
+  IF ROW_COUNT() = 1 THEN
+    COMMIT ;
+    SET resetConfirmation = 'passwordUpdated' ;
+  ELSE
+    ROLLBACK;
+    SET resetError = 'passwordNotUpdated' ;
+  END IF ;
+END IF ;
+SELECT * FROM(
+  (SELECT resetConfirmation) resetConfirmation,
+  (SELECT resetError) resetError
+);
+END //
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- Create Procedure to reserve tokenId
 -- -----------------------------------------------------
 DELIMITER //

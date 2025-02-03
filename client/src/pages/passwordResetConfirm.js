@@ -24,17 +24,17 @@ const PasswordResetConfirm = () => {
 
     const formik = useFormik({
             initialValues: {
-                password: '',
+                newPassword: '',
                 confirmPassword: '',
             },
             onSubmit: async (values) => {
                 console.log(values);
             },
             validationSchema: Yup.object({
-                password: Yup.string().required(translations?.required).min(8, translations?.error?.minChars?.replace(/{(\w+)}/g, '8'))
+                newPassword: Yup.string().required(translations?.required).min(8, translations?.error?.minChars?.replace(/{(\w+)}/g, '8'))
                                 .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.error?.passwordValidation),
                 confirmPassword: Yup.string().required(translations?.required)
-                                    .oneOf([Yup.ref('password')], translations?.error?.passwordMismatch),
+                                    .oneOf([Yup.ref('newPassword')], translations?.error?.passwordMismatch),
             }),
         });
 
@@ -87,21 +87,21 @@ const PasswordResetConfirm = () => {
                         footer={passwordFooter(translations)}
                         toggleMask
                         className="w-full login-width"
-                        {...formik.getFieldProps("password")}
+                        {...formik.getFieldProps("newPassword")}
                     />
-                    <label htmlFor="password">{translations?.login?.password}</label>
-                    {formik.touched.password && formik.errors.password &&<div className="text-red-500 text-xs">{formik.errors.password}</div>}
+                    <label htmlFor="password">{translations?.passwordReset?.newPassword}</label>
+                    {formik.touched.newPassword && formik.errors.newPassword &&<div className="text-red-500 text-xs">{formik.errors.newPassword}</div>}
                 </FloatLabel>
                 <FloatLabel>
                     <Password
-                        inputId="password-confirm"
+                        inputId="confirm-password"
                         autoComplete="new-password"
                         feedback={false}
                         toggleMask
                         className="w-full login-width"
                         {...formik.getFieldProps("confirmPassword")}
                     />
-                    <label htmlFor="password-confirm">{translations?.passwordReset?.confirmPassword}</label>
+                    <label htmlFor="confirm-password">{translations?.passwordReset?.confirmPassword}</label>
                     {formik.touched.confirmPassword && formik.errors.confirmPassword &&<div className="text-red-500 text-xs">{formik.errors.confirmPassword}</div>}
                 </FloatLabel>
                 <Button type="submit" label={translations?.confirm} disabled={!formik.isValid} loading={false}  />

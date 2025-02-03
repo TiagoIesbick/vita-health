@@ -67,6 +67,7 @@
             "noEmail": "Invalid e-mail",
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
+            "passwordNotUpdated": "Your password could not be updated. Please try again later.",
             "passwordMismatch": "Passwords do not match.",
             "passwordValidation": "At least one lowercase, one uppercase and one numeric",
             "profileNotUpdated": "Profile NOT updated",
@@ -106,6 +107,7 @@
             "fileSaved": "Saved file!",
             "filesSaved": "Saved files!",
             "healthDataCreated": "Health Data Created!",
+            "passwordUpdated": "Your password has been successfully updated. You can now log in with your new password.",
             "permissionGranted": "Permission Granted",
             "profileUpdated": "Profile updated!",
             "requestResetConfirmation": "An email has been sent to reset your password. Please check your inbox and follow the instructions.",
@@ -199,7 +201,8 @@
         },
         "passwordReset" :{
             "title": "Password Reset",
-            "confirmPassword": "Confirm Password"
+            "confirmPassword": "Confirm Password",
+            "newPassword": "New Password"
         },
         "patient": "Patient",
         "patients": {

@@ -22,6 +22,7 @@ websockets = "*"
 elasticsearch = "*"
 beautifulsoup4 = "*"
 google-cloud-translate = "*"
+bcrypt = "*"
 
 [dev-packages]
 

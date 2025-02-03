@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useApolloClient, useSubscription } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
 import { activeDoctorTokensQuery, activePatientTokensQuery, aiConversationQuery, doctorPatientsQuery, inactiveTokensQuery, medicalRecordQuery, medicalRecordsQuery, messageSubscription, patientRecordsbyDoctorQuery, recordTypesQuery, searchFilesQuery, searchMedicalRecordsQuery, userQuery } from "../graphql/queries";
-import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationRequestPasswordReset, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
+import { mutationCreateConversation, mutationCreateMedicalRecord, mutationCreatePatientOrDoctor, mutationCreateRecordType, mutationCreateUser, mutationDeactivateToken, mutationGenerateToken, mutationLogin, mutationMultipleUpload, mutationPasswordReset, mutationRequestPasswordReset, mutationSaveTokenAccess, mutationUpdateDoctorUser, mutationUpdatePatientUser, mutationUpdateUser } from "../graphql/mutations";
 import { limit, localDateTime } from "../utils/utils";
 import { updateInactiveTokensCache } from "../graphql/cache";
 
@@ -158,6 +158,23 @@ export const useRequestPasswordReset = () => {
     };
     return {
         askPasswordReset,
+        loading,
+        error
+    };
+};
+
+
+export const usePasswordReset = () => {
+    const [mutate, { loading, error }] = useMutation(mutationPasswordReset);
+
+    const updatePassword = async (values) => {
+        const { data: { passwordReset } } = await mutate({
+            variables: { input: values }
+        });
+        return passwordReset;
+    };
+    return {
+        updatePassword,
         loading,
         error
     };
