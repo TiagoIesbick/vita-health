@@ -11,6 +11,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { usePasswordReset } from '../hooks/hooks';
 
 
 const PasswordResetConfirm = () => {
@@ -20,6 +21,7 @@ const PasswordResetConfirm = () => {
     const { showMessage } = useUser();
     const [email, setEmail] = useState('');
     const [errorMessage, setErrorMessage] = useState(null);
+    const { updatePassword, loading, error } = usePasswordReset();
     const token = new URLSearchParams(location.search).get('token');
 
     const formik = useFormik({
@@ -27,8 +29,15 @@ const PasswordResetConfirm = () => {
                 newPassword: '',
                 confirmPassword: '',
             },
-            onSubmit: async (values) => {
-                console.log(values);
+            onSubmit: async (values, { resetForm }) => {
+                const resReset = await updatePassword({...values, token: token});
+                if (resReset.resetError) {
+                    showMessage('error', translations?.error?.title, translations?.error?.[resReset.resetError], true);
+                } else if (resReset.resetConfirmation) {
+                    resetForm();
+                    navigate('/login');
+                    showMessage('success', translations?.success?.title, translations?.success?.[resReset.resetConfirmation], true);
+                };
             },
             validationSchema: Yup.object({
                 newPassword: Yup.string().required(translations?.required).min(8, translations?.error?.minChars?.replace(/{(\w+)}/g, '8'))
@@ -38,31 +47,36 @@ const PasswordResetConfirm = () => {
             }),
         });
 
-        useEffect(() => {
-            if (!token) {
-                setErrorMessage('invalidLink');
+    useEffect(() => {
+        if (!token) {
+            setErrorMessage('invalidLink');
+            return;
+        };
+        try {
+            const decoded = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+            if (decoded.exp < currentTime) {
+                setErrorMessage('expiredAccess');
                 return;
-            };
-            try {
-                const decoded = jwtDecode(token);
-                const currentTime = Date.now() / 1000;
-                if (decoded.exp < currentTime) {
-                    setErrorMessage('expiredAccess');
-                    return;
-                }
-                setEmail(decoded.email);
-            } catch (error) {
-                console.log('Error:', error);
-                setErrorMessage('invalidLink');
-            };
-        }, [token, navigate]);
-
-        useEffect(() => {
-            if (errorMessage && translations?.error) {
-                showMessage('error', translations.error.title, translations.error[errorMessage], true);
-                navigate('/');
             }
-        }, [errorMessage, translations, showMessage, navigate]);
+            setEmail(decoded.email);
+        } catch (error) {
+            console.log('Error:', error);
+            setErrorMessage('invalidLink');
+        };
+    }, [token, navigate]);
+
+    useEffect(() => {
+        if (errorMessage && translations?.error) {
+            showMessage('error', translations.error.title, translations.error[errorMessage], true);
+            navigate('/');
+        }
+    }, [errorMessage, translations, showMessage, navigate]);
+
+    if (error) {
+        navigate('/');
+        showMessage('error', translations?.error?.title, translations?.error?.message, true);
+    };
 
     return (
         <Card
@@ -104,7 +118,7 @@ const PasswordResetConfirm = () => {
                     <label htmlFor="confirm-password">{translations?.passwordReset?.confirmPassword}</label>
                     {formik.touched.confirmPassword && formik.errors.confirmPassword &&<div className="text-red-500 text-xs">{formik.errors.confirmPassword}</div>}
                 </FloatLabel>
-                <Button type="submit" label={translations?.confirm} disabled={!formik.isValid} loading={false}  />
+                <Button type="submit" label={translations?.confirm} disabled={loading || !formik.isValid} loading={loading}  />
             </form>
         </Card>
     );

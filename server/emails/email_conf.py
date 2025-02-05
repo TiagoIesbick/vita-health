@@ -1,5 +1,5 @@
 import json
-from smtplib import SMTP
+from smtplib import SMTP, SMTPException
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from os import getenv
@@ -63,19 +63,18 @@ class SendEmail():
 
         msg = MIMEMultipart()
 
-        msg["From"] = self.EMAIL_SENDER
+        msg["From"] = f'Vita <{self.EMAIL_SENDER}>'
         msg["To"] = email
-        msg["Subject"] = "Styled Email with Signature"
+        msg["Subject"] =  'Redefinir Senha' if lang == 'pt-br' else 'Reset Password'
 
         msg.attach(MIMEText(email_content, "html"))
 
         try:
-            server = SMTP(self.SMTP_SERVER, self.SMTP_PORT)
-            server.starttls()
-            server.login(self.EMAIL_SENDER, self.APP_PASSWORD)
-            server.sendmail(self.EMAIL_SENDER, email, msg.as_string())
-            server.quit()
+            with SMTP(self.SMTP_SERVER, self.SMTP_PORT) as server:
+                server.starttls()
+                server.login(self.EMAIL_SENDER, self.APP_PASSWORD)
+                server.sendmail(self.EMAIL_SENDER, email, msg.as_string())
             return {'resetConfirmation': 'requestResetConfirmation'}
-        except Exception as e:
+        except SMTPException as e:
             print("Error:", str(e))
             return { 'resetError': 'requestResetError'}
