@@ -7,7 +7,6 @@ export const userDetailFragment = gql`
         firstName
         lastName
         email
-        password
         userType
         acceptTerms
     }

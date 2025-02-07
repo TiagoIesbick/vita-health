@@ -1,6 +1,5 @@
 import re
 import jwt
-from cryptography.fernet import Fernet
 from bcrypt import hashpw, gensalt, checkpw
 from bs4 import BeautifulSoup
 from os import getenv
@@ -10,38 +9,19 @@ from google.cloud import translate_v2 as translate
 UPLOAD_DIR = "uploads"
 
 
-fernet = Fernet(getenv('FERNET_KEY'))
-
-
-def encrypt(msg: str) -> bytes:
-    """
-    Encrypts a given message using the Fernet symmetric encryption algorithm.
-
-    Parameters:
-    msg (str): The message to be encrypted. It should be a string.
-
-    Returns:
-    bytes: The encrypted message as bytes.
-    """
-    encrypted = fernet.encrypt(msg.encode())
-    return encrypted
-
-
-def decrypt(encrypted: bytes) -> str:
-    """
-    Decrypts a given encrypted message using the Fernet symmetric encryption algorithm.
-
-    Parameters:
-    encrypted (bytes): The encrypted message as bytes.
-
-    Returns:
-    str: The decrypted message as a UTF-8 encoded string.
-    """
-    decrypted = fernet.decrypt(encrypted).decode('utf-8')
-    return decrypted
-
-
 def hash_password(password: str) -> str:
+    """
+    Hash a password using bcrypt.
+
+    This function generates a salt and uses it to hash the provided password
+    using the bcrypt algorithm. The resulting hash is returned as a string.
+
+    Parameters:
+    password (str): The plain-text password to be hashed.
+
+    Returns:
+    str: The bcrypt hash of the password, encoded as a string.
+    """
     salt = gensalt()
     return hashpw(password.encode(), salt).decode()
 
@@ -50,7 +30,7 @@ def verify_password(input_password: str, stored_hash: str) -> bool:
     return checkpw(input_password.encode(), stored_hash.encode())
 
 
-def generate_token(exp: int, patient: dict) -> str:
+def generate_token(exp: int, user: dict) -> str:
     """
     Generate a JSON Web Token (JWT) for a patient.
 
@@ -64,7 +44,7 @@ def generate_token(exp: int, patient: dict) -> str:
     Returns:
     str: A string representation of the generated JWT.
     """
-    token = jwt.encode({"exp": exp} | patient , getenv('SECRET'), algorithm="HS256")
+    token = jwt.encode({"exp": exp} | user , getenv('SECRET'), algorithm="HS256")
     return token
 
 

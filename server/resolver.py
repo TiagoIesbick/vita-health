@@ -203,7 +203,7 @@ def resolve_create_user(*_, input):
         email,
         firstName,
         lastName,
-        encrypt(password),
+        hash_password(password),
         userType,
         acceptTerms
     )
@@ -375,7 +375,8 @@ def resolve_login(*_, email, password):
         return { 'error': 'invalidPassword' }
     user = get_user_by_email_password(email, password)
     if user:
-        token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
+        exp = datetime.now(timezone.utc) + timedelta(days=7)
+        token = generate_token(exp, user)
         return { 'user': user, 'token': token }
     return { 'error': 'invalidLogin' }
 
@@ -411,7 +412,7 @@ def resolve_reset_password(*_, input):
         return { 'resetError': 'invalidPassword' }
     if newPassword != confirmPassword:
         return { 'resetError': 'passwordMismatch'}
-    return update_user_password(email, encrypt(newPassword))
+    return update_user_password(email, hash_password(newPassword))
 
 
 @query.field("medicalRecords")

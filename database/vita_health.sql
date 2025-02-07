@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `vita_health`.`Users` (
   `lastName` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
   `userType` ENUM('Patient', 'Doctor') NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(60) NOT NULL,
   `acceptTerms` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
@@ -206,16 +206,16 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 INSERT INTO `vita_health`.`Users` (`firstName`, `lastName`, `email`,
 `userType`, `password`, `acceptTerms`) VALUES
-('John', 'Doe', 'john.doe@example.com', 'Patient', 'gAAAAABmjFhohl9fnj3zOzITtFx8bfOR8cXEVab_Lfb-ppcMu5dEo-2hwlJzoDA29yTDQCY2ov_L4F205nxzQIhstP6lixc57Q==', 1),
-('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', 'gAAAAABmjFjHy_qCV_YdYN26gehW9GTpFU0yoUDuke0dc3ck4tKdskTvp2Hid_xZCmoAZUS1CN7jK0W7GHp4uT4l_gsqMXihPQ==', 1),
-('Emily', 'Johnson', 'emily.johnson@example.com', 'Patient', 'gAAAAABmjFjclLj-tfhXEPycoo08y7bPVdEdd41b5ubD3xDb3FhgnVd2VQlVEdYaTzEeCVRg-7ONvkyY_8YI-UulIzTyV2-CJA==', 1),
-('Michael', 'Brown', 'michael.brown@example.com', 'Doctor', 'gAAAAABmjFjyEj5f-NIsuYg7s2YCHpNXjPbTXmV40tfTtpevBlLQLKdb7qMSh4yBwTuyci3s-cNlODh39TWePcW_mnzXWbxiCQ==', 1),
-('Sarah', 'Wilson', 'sarah.wilson@example.com', 'Patient', 'gAAAAABmjFknXkAD-haeLWL6t45KWQdLViodlTceFqtgruCjKLRyg84zKt1f1K5f8MQylf9vv9ushJRO118VrSqhb2IWgLgb-A==', 1),
-('Tom', 'Brad', 'tom.brad@example.com', 'Doctor', 'gAAAAABmjFlV2ezsDdIzkkTjrqDKthtVBNzivJgA6CIUvduqiVbN2PlEn0TytNvbpzdM-q59wWxxDmSSd8WH7qXmPc64E9tizA==', 1),
-('Adam', 'Sand', 'adam.sand@example.com', 'Patient', 'gAAAAABmjFlndokfBnRgzrcP-nDq-svSpjYpjhU6-HuNbVte_Bpm8YymT2woxTYqv6qpnhvtJQZljye1F3SsG4XdHfaJzjPkFw==', 1),
-('Emma', 'Park', 'ema.park@example.com', 'Doctor', 'gAAAAABmjFmEtGz4ACW531XTPVWykWOxJd8vyiPQu4M5at_kqKmSCTyECTxqz4RcvW02BHRjj_YpL_PKTqyUFwQa7z-W1uRMJA==', 1),
-('Peter', 'Mel', 'peter.mel@example.com', 'Patient', 'gAAAAABmjFmzmrkxPRpDiqL6dctMC2ZLYUmwY6GQHEEzsjqsFhBLLvTKmUQlPW8hPJGDiMtXQrejvRVDhvW0ZyBRZOr2FeovSg==', 1),
-('Dina', 'Hank', 'dina.hank@example.com', 'Doctor', 'gAAAAABmjFnLAsTFwSifdMvftS1b1kGu4M3SqSfOkutydUoQgrld069T3eHwO8PW1eCoATnN96A84CPsE-08LIeHsrEL6j-YAg==', 1) ;
+('John', 'Doe', 'john.doe@example.com', 'Patient', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Jane', 'Smith', 'jane.smith@example.com', 'Doctor', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Emily', 'Johnson', 'emily.johnson@example.com', 'Patient', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Michael', 'Brown', 'michael.brown@example.com', 'Doctor', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Sarah', 'Wilson', 'sarah.wilson@example.com', 'Patient', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Tom', 'Brad', 'tom.brad@example.com', 'Doctor', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Adam', 'Sand', 'adam.sand@example.com', 'Patient', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Emma', 'Park', 'ema.park@example.com', 'Doctor', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Peter', 'Mel', 'peter.mel@example.com', 'Patient', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1),
+('Dina', 'Hank', 'dina.hank@example.com', 'Doctor', '$2b$12$jPJklo8D1Qoh80JUUb9hZe/ZIpBVbl264eBUQLqt8ptKBdtb0iGi2', 1) ;
 
 
 -- -----------------------------------------------------
@@ -329,7 +329,7 @@ VALUES
 -- Create Procedure to create user
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE AddUser(IN EMAIL VARCHAR(255), IN FTNM VARCHAR(255), IN LTNM VARCHAR(255), IN PASW VARCHAR(255), IN USTY ENUM('Patient', 'Doctor'), IN ACTR TINYINT)
+CREATE PROCEDURE AddUser(IN EMAIL VARCHAR(255), IN FTNM VARCHAR(255), IN LTNM VARCHAR(255), IN PASW VARCHAR(60), IN USTY ENUM('Patient', 'Doctor'), IN ACTR TINYINT)
 BEGIN
 DECLARE userConfirmation VARCHAR(45);
 DECLARE userError VARCHAR(45);
@@ -540,7 +540,7 @@ DELIMITER ;
 -- Create Procedure to update user's password
 -- -----------------------------------------------------
 DELIMITER //
-CREATE PROCEDURE UpdateUserPassword(IN EMAIL VARCHAR(255), IN PASW VARCHAR(255))
+CREATE PROCEDURE UpdateUserPassword(IN EMAIL VARCHAR(255), IN PASW VARCHAR(60))
 BEGIN
 DECLARE resetConfirmation VARCHAR(45);
 DECLARE resetError VARCHAR(45);

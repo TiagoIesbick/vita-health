@@ -83,7 +83,6 @@ type Users {
     lastName: String!
     email: String!
     userType: String!
-    password: String!
     acceptTerms: Boolean!
     patient: Patients
     doctor: Doctors
