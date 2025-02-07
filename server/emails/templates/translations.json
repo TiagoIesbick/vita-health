@@ -6,7 +6,8 @@
             "noMessage": "If you didn’t request this, ignore this email.",
             "button": "Reset Password"
         },
-        "signature": "Best regards,"
+        "signature": "Best regards,",
+        "signatureFooter": "Take Control of Your Health: Manage Your Medical History with AI-Driven Insights"
     },
     "pt-br": {
         "greeting": "Olá, {{name}}!",
@@ -15,6 +16,7 @@
             "noMessage": "Se você não solicitou isso, ignore este e-mail.",
             "button": "Redefinir Senha"
         },
-        "signature": "Atenciosamente,"
+        "signature": "Atenciosamente,",
+        "signatureFooter": "Transforme sua Saúde: Controle seu histórico médico com percepções baseadas em Inteligência Artificial"
     }
 }

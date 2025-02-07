@@ -50,6 +50,7 @@ class SendEmail():
             "greeting": lang_data['greeting'].replace("{{name}}", firstName),
             "message": lang_data['passwordReset']['message'],
             "signature": lang_data['signature'],
+            "signatureFooter": lang_data['signatureFooter'],
             "reset_link": reset_link,
             "image_link": "https://vita-health.fr.to/static/media/logo-vita-no-bg.24089dd1c17004d30191.png"
         }
