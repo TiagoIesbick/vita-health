@@ -190,7 +190,7 @@ def resolve_create_user(*_, input):
         - If creation fails: The result from the create_user function.
     """
     email, firstName, lastName, password, userType, acceptTerms = \
-        input['email'], nh3.clean(input['firstName'].strip().capitalize()), nh3.clean(input['lastName'].strip().capitalize()), input['password'], input['userType'], input['acceptTerms']
+        input['email'], nh3.clean(input['firstName'].strip().title()), nh3.clean(input['lastName'].strip().title()), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
         return { 'userError': 'noEmail'}
     if not validate_name(firstName):
@@ -271,8 +271,8 @@ def resolve_update_user(_, info, input):
             }
     """
     email, firstName, lastName, userId = \
-        input['email'], nh3.clean(input['firstName'].strip().capitalize()), \
-        nh3.clean(input['lastName'].strip().capitalize()), info.context['user_detail']['userId']
+        input['email'], nh3.clean(input['firstName'].strip().title()), \
+        nh3.clean(input['lastName'].strip().title()), info.context['user_detail']['userId']
     if not validate_email(email):
         return { 'userError': 'noEmail'}
     if not validate_name(firstName):

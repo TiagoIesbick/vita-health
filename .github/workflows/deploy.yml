@@ -33,7 +33,6 @@ jobs:
         echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
         echo "HOST=${{ secrets.HOST }}" >> .env
         echo "PORT=${{ secrets.PORT }}" >> .env
-        echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
         echo "SECRET=${{ secrets.SECRET }}" >> .env
         echo "TINYMCE_API_KEY=${{ secrets.TINYMCE_API_KEY }}" >> .env
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
@@ -41,6 +40,10 @@ jobs:
         echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
         echo "ELASTICSEARCH_HOST=${{ secrets.ELASTICSEARCH_HOST }}" >> .env
         echo "ELASTICSEARCH_PORT=${{ secrets.ELASTICSEARCH_PORT }}" >> .env
+        echo "SMTP_SERVER=${{ secrets.SMTP_SERVER }}" >> .env
+        echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+        echo "EMAIL_SENDER=${{ secrets.EMAIL_SENDER }}" >> .env
+        echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env
         echo "GOOGLE_APPLICATION_CREDENTIALS=/server/config/google-credentials.json" >> .env
         echo "Generating google-credentials.json"
         echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" | sed 's/\\"/"/g' | sed 's/\\\\n/\\n/g' > google-credentials.json

@@ -1,7 +1,7 @@
 from .mysql import mysql_client
 
 
-def create_user(email: str, firstName: str, lastName: str, password: bytes, userType: str, acceptTerms: bool) -> None | dict:
+def create_user(email: str, firstName: str, lastName: str, password: str, userType: str, acceptTerms: bool) -> None | dict:
     """
     Create a new user in the database.
 
@@ -9,7 +9,7 @@ def create_user(email: str, firstName: str, lastName: str, password: bytes, user
         email (str): The email address of the user.
         firstName (str): The first name of the user.
         lastName (str): The last name of the user.
-        password (bytes): The hashed password of the user.
+        password (str): The hashed password of the user.
         userType (str): The type of user (e.g., 'patient', 'doctor').
         acceptTerms (bool): Whether the user has accepted the terms and conditions.
 
