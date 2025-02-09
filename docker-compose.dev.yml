@@ -42,6 +42,8 @@ services:
       - database
       - redis
       - elasticsearch
+    environment:
+      - SERVER_ENV=development
     env_file:
       - .env
 

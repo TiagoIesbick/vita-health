@@ -6,7 +6,7 @@ import os
 import json
 from os import getenv
 from ariadne import QueryType, ObjectType, MutationType, SubscriptionType
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from db.queries import *
 from db.mutations import *
 from db.redis import pubsub
@@ -16,6 +16,7 @@ from utils.decorators import *
 from utils.utils import check_translate_word
 from pathlib import Path
 from utils.utils import *
+from emails.email_conf import SendEmail
 
 
 query = QueryType()
@@ -189,7 +190,7 @@ def resolve_create_user(*_, input):
         - If creation fails: The result from the create_user function.
     """
     email, firstName, lastName, password, userType, acceptTerms = \
-        input['email'], nh3.clean(input['firstName'].strip().capitalize()), nh3.clean(input['lastName'].strip().capitalize()), input['password'], input['userType'], input['acceptTerms']
+        input['email'], nh3.clean(input['firstName'].strip().title()), nh3.clean(input['lastName'].strip().title()), input['password'], input['userType'], input['acceptTerms']
     if not validate_email(email):
         return { 'userError': 'noEmail'}
     if not validate_name(firstName):
@@ -202,7 +203,7 @@ def resolve_create_user(*_, input):
         email,
         firstName,
         lastName,
-        encrypt(password),
+        hash_password(password),
         userType,
         acceptTerms
     )
@@ -270,8 +271,8 @@ def resolve_update_user(_, info, input):
             }
     """
     email, firstName, lastName, userId = \
-        input['email'], nh3.clean(input['firstName'].strip().capitalize()), \
-        nh3.clean(input['lastName'].strip().capitalize()), info.context['user_detail']['userId']
+        input['email'], nh3.clean(input['firstName'].strip().title()), \
+        nh3.clean(input['lastName'].strip().title()), info.context['user_detail']['userId']
     if not validate_email(email):
         return { 'userError': 'noEmail'}
     if not validate_name(firstName):
@@ -368,11 +369,50 @@ def resolve_login(*_, email, password):
         If unsuccessful:
             {'error': 'Invalid email or password'}
     """
+    if not validate_email(email):
+        return { 'error': 'noEmail'}
+    if not validate_password(password):
+        return { 'error': 'invalidPassword' }
     user = get_user_by_email_password(email, password)
     if user:
-        token = jwt.encode(user, getenv('SECRET'), algorithm="HS256")
+        exp = datetime.now(timezone.utc) + timedelta(days=7)
+        token = generate_token(exp, user)
         return { 'user': user, 'token': token }
     return { 'error': 'invalidLogin' }
+
+
+@mutation.field("requestPasswordReset")
+def resolve_request_password_reset(*_, email, lang):
+    if not validate_email(email):
+        return { 'resetError': 'noEmail'}
+    user = get_user_by_email(email)
+    if not user:
+        return { 'resetError': 'emailNotExists'}
+    expiry = datetime.now(timezone.utc) + timedelta(minutes=30)
+    payload = { "email": email, "exp": expiry, "type": "passwordReset" }
+    token = jwt.encode(payload, getenv('SECRET'), algorithm="HS256")
+    res = SendEmail().send_email_password_reset(lang, user['firstName'], email, token)
+    return res
+
+
+@mutation.field("passwordReset")
+def resolve_reset_password(*_, input):
+    token, newPassword, confirmPassword = input['token'], input['newPassword'], input['confirmPassword']
+    try:
+        decoded = jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
+    except jwt.exceptions.PyJWTError as exc:
+        return {'resetError': 'invalidExpiredToken'}
+
+    email, token_type = decoded.get('email', ''), decoded.get('type', '')
+    if token_type != 'passwordReset':
+        return {'resetError': 'invalidLink'}
+    if not validate_email(email):
+        return { 'resetError': 'noEmail'}
+    if not validate_password(newPassword):
+        return { 'resetError': 'invalidPassword' }
+    if newPassword != confirmPassword:
+        return { 'resetError': 'passwordMismatch'}
+    return update_user_password(email, hash_password(newPassword))
 
 
 @query.field("medicalRecords")
@@ -1216,6 +1256,28 @@ async def resolve_search_medical_records(*_, term, languageCode, patient_id, doc
 
 @search_medical_records_results.field("recordTypeTranslations")
 async def resolve_record_type_translations(result, *_):
+    """
+    Resolves the recordTypeTranslations field for the searchMedicalRecordsResults query.
+
+    This function processes the result of a search on medical records and extracts the
+    translations for record types. It checks if the 'recordTypeTranslations' field is present
+    in the result and if it contains any translations. If the conditions are met, it returns
+    a list of dictionaries, each representing a translation. Each dictionary contains the
+    language code, translated name, and any highlighted search terms. If the conditions are not
+    met, it retrieves the 'recordTypeTranslations' field from the Elasticsearch document
+    associated with the result's 'recordId' and returns it.
+
+    Parameters:
+    result (dict): The result of a search on medical records. It should contain the
+                   'recordTypeTranslations' field.
+    *_ : Variable length argument list for additional parameters (unused).
+
+    Returns:
+    list: A list of dictionaries representing the translations for record types. Each
+          dictionary contains the language code, translated name, and any highlighted
+          search terms. If no translations are found, it returns the 'recordTypeTranslations'
+          field from the Elasticsearch document associated with the result's 'recordId'.
+    """
     if "recordTypeTranslations" in result and result["recordTypeTranslations"]:
         return [
             {

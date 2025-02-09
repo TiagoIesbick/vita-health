@@ -50,12 +50,14 @@
             "categoryNotCreated": "Categoria NÃO criada",
             "dobValidation": "A data não pode estar no futuro",
             "emailExists": "Esse e-mail já existe",
+            "emailNotExists": "Este e-mail não existe em nosso banco de dados. Por favor, cadastre-se.",
             "expired": "Expirado",
             "expiredAccess": "A permissão de acesso expirou.",
             "expTimeMinDateValidation": "A data e a hora não podem estar no passado",
             "expTimeMaxDateValidation": "Máximo 90 dias",
             "firstNameValidation": "O nome deve começar com pelo menos 2 caracteres de palavra",
             "invalidExpiredToken": "Token inválido e/ou expirado",
+            "invalidLink": "Link inválido",
             "invalidPassword": "Senha inválida",
             "langNotDetected": "Idioma não detectado",
             "lastNameValidation": "O sobrenome deve começar com pelo menos 2 caracteres de palavra",
@@ -65,6 +67,8 @@
             "noEmail": "E-mail inválido",
             "numericValidation": "Pelo menos um numérico",
             "uppercaseValidation": "Pelo menos uma maiúscula",
+            "passwordNotUpdated": "Sua senha não pôde ser atualizada. Tente novamente mais tarde.",
+            "passwordMismatch": "As senhas não são iguais.",
             "passwordValidation": "Pelo menos uma minúscula, uma maiúscula e um número",
             "profileNotUpdated": "Perfil NÃO atualizado",
             "message": "Dados não disponíveis. Tente novamente mais tarde.",
@@ -85,6 +89,7 @@
             "fileNotSaved": "Arquivo não salvo",
             "fileSize": "O arquivo enviado é muito grande (máximo de 5 MB)",
             "maxFiles": "Você só pode enviar no máximo 10 arquivos",
+            "requestResetError": "Falha ao enviar o e-mail de redefinição de senha. Tente novamente mais tarde.",
             "translationExists": "Esta tradução já existe",
             "tokenAlreadyDeactivated": "Token já desativado",
             "tokenNotDeactivated": "Token não desativado",
@@ -102,8 +107,10 @@
             "fileSaved": "Arquivo salvo!",
             "filesSaved": "Arquivos salvos!",
             "healthDataCreated": "Dados de saúde salvos!",
+            "passwordUpdated": "Sua senha foi atualizada com sucesso. Agora você pode fazer login com sua nova senha.",
             "permissionGranted": "Permissão Concedida",
             "profileUpdated": "Perfil atualizado!",
+            "requestResetConfirmation": "Um e-mail foi enviado para redefinir sua senha. Verifique sua caixa de entrada e siga as instruções.",
             "tokenDeactivated": "Token desativado",
             "tokenRegistered": "Token registrado",
             "tokenReserved": "Token reservado",
@@ -174,6 +181,7 @@
         },
         "lastRecord": "Último Registro",
         "login": {
+            "forgotPassword": "Esqueceu a senha?",
             "loggedIn": "Conectado",
             "noAccount": "Não tem uma conta?",
             "password": "Senha",
@@ -191,6 +199,11 @@
             "login": "Entre",
             "signUp": "Cadastre-se"
         },
+        "passwordReset" :{
+            "title": "Redefinição de Senha",
+            "confirmPassword": "Confirmar Senha",
+            "newPassword": "Nova Senha"
+        },
         "patient": "Paciente",
         "patients": {
             "title": "Pacientes",
@@ -200,6 +213,9 @@
             "expandAll": "Expandir Tudo",
             "notes": "Anotações",
             "recordsFor": "Registros para"
+        },
+        "requestPasswordReset": {
+            "title": "Solicitar Redefinição de Senha"
         },
         "required": "Obrigatório",
         "search": {

@@ -1,5 +1,5 @@
 from .mysql import mysql_client
-from utils.utils import decrypt
+from utils.utils import verify_password
 from datetime import datetime
 
 
@@ -17,7 +17,7 @@ def get_user(id: int) -> None | dict:
         None | dict: A dictionary containing the user's information if found,
                      or None if no user matches the given ID.
     """
-    query = rf'SELECT * FROM Users WHERE userId = {id};'
+    query = rf'SELECT userId, firstName, lastName, email, userType, acceptTerms FROM Users WHERE userId = {id};'
     user = mysql_client(query)
     return None if not user else user[0]
 
@@ -222,30 +222,48 @@ def get_doctors_tokens_access(id: int) -> None | list[dict]:
     return None if not tokens_access else tokens_access
 
 
-def get_user_by_email_password(email:str, password:str) -> None | dict:
+def get_user_by_email_password(email: str, password: str) -> None | dict:
     """
-    Retrieve user information from the database based on email and password.
+    Retrieve a user from the database based on their email and password.
 
-    This function queries the Users table in the database to fetch user information
-    associated with the provided email. It then verifies if the provided password
-    matches the decrypted password stored in the database.
-
-    Args:
-        email (str): The email address of the user to retrieve.
-        password (str): The password to verify against the stored password.
+    Parameters:
+    email (str): The email address of the user to retrieve.
+    password (str): The password of the user to verify.
 
     Returns:
-        None | dict: A dictionary containing the user's information if found and the
-                     password is correct, or None if no user matches the given email
-                     or the password is incorrect.
+    None | dict: A dictionary containing the user's information if the email and password are valid.
+                 The dictionary will not include the user's password.
+                 If the email or password is invalid, the function will return None.
     """
     query = rf"SELECT * FROM Users WHERE email = '{email}';"
     user = mysql_client(query)
     if not user:
         return None
-    if decrypt(user[0]['password']) != password:
+    if not verify_password(password, user[0]['password']):
         return None
+    del user[0]['password']
     return user[0]
+
+
+def get_user_by_email(email: str) -> None | dict:
+    """
+    Retrieve user information from the database based on the provided email address.
+
+    This function queries the Users table to fetch specific user details associated
+    with the given email address.
+
+    Args:
+        email (str): The email address of the user to retrieve.
+
+    Returns:
+        None | dict: A dictionary containing the user's information if found,
+                     including userId, firstName, lastName, email, userType,
+                     and acceptTerms. Returns None if no user is found with
+                     the given email address.
+    """
+    query = rf"SELECT userId, firstName, lastName, email, userType, acceptTerms FROM Users WHERE email = '{email}';"
+    user = mysql_client(query)
+    return None if not user else user[0]
 
 
 def get_record_type_translation(id: int) -> None | list[dict]:

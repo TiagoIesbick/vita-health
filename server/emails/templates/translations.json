@@ -1,0 +1,22 @@
+{
+    "en-us": {
+        "greeting": "Hello, {{name}}!",
+        "passwordReset": {
+            "message": "You requested a password reset. Click the button below within the next 30 minutes to continue.",
+            "noMessage": "If you didn’t request this, ignore this email.",
+            "button": "Reset Password"
+        },
+        "signature": "Best regards,",
+        "signatureFooter": "Take Control of Your Health: Manage Your Medical History with AI-Driven Insights"
+    },
+    "pt-br": {
+        "greeting": "Olá, {{name}}!",
+        "passwordReset": {
+            "message": "Você solicitou a redefinição de senha. Clique no botão abaixo dentro dos próximos 30 minutos para continuar.",
+            "noMessage": "Se você não solicitou isso, ignore este e-mail.",
+            "button": "Redefinir Senha"
+        },
+        "signature": "Atenciosamente,",
+        "signatureFooter": "Transforme sua Saúde: Controle seu histórico médico com percepções baseadas em Inteligência Artificial"
+    }
+}

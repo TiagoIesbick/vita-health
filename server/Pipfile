@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 mysql-connector-python = "*"
-cryptography = "*"
 pyjwt = "*"
 nh3 = "*"
 pytz = "*"
@@ -22,6 +21,7 @@ websockets = "*"
 elasticsearch = "*"
 beautifulsoup4 = "*"
 google-cloud-translate = "*"
+bcrypt = "*"
 
 [dev-packages]
 

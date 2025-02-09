@@ -35,7 +35,6 @@ def extract_text_from_pdf(file_path: str) -> str:
     return text
 
 
-
 def extract_text_with_ocr(file_path: str, content_type: str ="application/pdf") -> str:
     """
     Extract text from a file using OCR (Optical Character Recognition).
@@ -64,7 +63,6 @@ def extract_text_with_ocr(file_path: str, content_type: str ="application/pdf") 
         img = Image.open(file_path)
         text = pytesseract.image_to_string(img)
         return text
-
 
 
 async def openai_chat_stream(conversation: List[Dict[str, str]], key: str) -> None:

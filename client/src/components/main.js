@@ -12,6 +12,8 @@ import InactiveTokens from "../pages/inactiveTokens";
 import InsertMedicalRecord from "../pages/insertMedicalRecord";
 import SearchResults from "../pages/searchResults";
 import Patients from "../pages/patients";
+import PasswordReset from "../pages/passwordReset";
+import PasswordResetConfirm from "../pages/passwordResetConfirm";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { useUser } from "../providers/userContext";
@@ -27,8 +29,8 @@ const Main = () => {
             <Toast ref={toast} position="top-center" />
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/sign-up" element={<CreateUser />} />
+                <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
+                <Route path="/sign-up" element={!user ? <CreateUser />: <Navigate to="/" replace />} />
                 <Route path="/edit-profile" element={user ? <EditProfile /> : <Navigate to="/" replace />} />
                 <Route path="/medical-records" element={user && user.userType === 'Patient' ? <MedicalRecords /> : <Navigate to="/" replace />} />
                 <Route path="/generate-access-token" element={user && user.userType === 'Patient' ? <GenerateAccessToken /> : <Navigate to="/" replace />} />
@@ -40,6 +42,8 @@ const Main = () => {
                 <Route path="/medical-record/:recordId" element={user ? <MedicalRecord /> : <Navigate to="/" replace />} />
                 <Route path="/search-results" element={user ? <SearchResults /> : <Navigate to="/" replace />} />
                 <Route path="/patients" element={user && user.userType === 'Doctor' ? <Patients /> : <Navigate to="/" replace />} />
+                <Route path="/password-reset" element={!user ? <PasswordReset /> : <Navigate to="/" replace />} />
+                <Route path="/password-reset-confirm" element={!user ? <PasswordResetConfirm /> : <Navigate to="/" replace />} />
             </Routes>
         </main>
     );

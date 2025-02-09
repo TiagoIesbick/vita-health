@@ -7,7 +7,6 @@ export const userDetailFragment = gql`
         firstName
         lastName
         email
-        password
         userType
         acceptTerms
     }
@@ -36,6 +35,14 @@ export const userConfirmationFragment = gql`
     fragment UserConfirmationDetail on UserConfirmation {
         userConfirmation
         userError
+    }
+`;
+
+
+export const resetResultFragment = gql`
+    fragment resetResultDetail on ResetResult {
+        resetConfirmation
+        resetError
     }
 `;
 

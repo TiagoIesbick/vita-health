@@ -1,7 +1,7 @@
 from .mysql import mysql_client
 
 
-def create_user(email: str, firstName: str, lastName: str, password: bytes, userType: str, acceptTerms: bool) -> None | dict:
+def create_user(email: str, firstName: str, lastName: str, password: str, userType: str, acceptTerms: bool) -> None | dict:
     """
     Create a new user in the database.
 
@@ -9,7 +9,7 @@ def create_user(email: str, firstName: str, lastName: str, password: bytes, user
         email (str): The email address of the user.
         firstName (str): The first name of the user.
         lastName (str): The last name of the user.
-        password (bytes): The hashed password of the user.
+        password (str): The hashed password of the user.
         userType (str): The type of user (e.g., 'patient', 'doctor').
         acceptTerms (bool): Whether the user has accepted the terms and conditions.
 
@@ -92,6 +92,13 @@ def update_doctor_user(specialty: str, licenseNumber: str, doctorId: int) -> Non
     """
     args = [specialty, licenseNumber, doctorId]
     query = 'UpdateDoctorUser'
+    confirmation = mysql_client(query, type='procedure', args=args)
+    return None if not confirmation else confirmation[0]
+
+
+def update_user_password(email: str, password: str) -> None | dict:
+    args = [email, password]
+    query = 'UpdateUserPassword'
     confirmation = mysql_client(query, type='procedure', args=args)
     return None if not confirmation else confirmation[0]
 

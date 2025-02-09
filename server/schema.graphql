@@ -83,7 +83,6 @@ type Users {
     lastName: String!
     email: String!
     userType: String!
-    password: String!
     acceptTerms: Boolean!
     patient: Patients
     doctor: Doctors
@@ -121,19 +120,21 @@ type Subscription {
 }
 
 type Mutation {
-    createUser(input: CreateUserInput!): UserConfirmation
-    createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
-    updateUser(input: UpdateUserInput!): UserConfirmation
-    updatePatientUser(input: UpdatePatientInput!): UserConfirmation
-    updateDoctorUser(input: UpdateDoctorInput!): UserConfirmation
-    login(email: String!, password: String!): LoginResult
-    generateToken(expirationDate: String!): TokenResult
-    saveTokenAccess(token: String!): TokenAccessResult
-    createRecordType(recordName: String!): RecordTypeResult
-    createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
-    multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
-    deactivateToken(tokenId: ID!): DeactivateTokenResult
     createConversation(content: String!, allRecords: String!): ConversationResult
+    createMedicalRecord(recordTypeId: ID!, recordData: String!): MedicalRecordResult
+    createPatientOrDoctorUser(userId: ID!, userType: String!): UserConfirmation
+    createRecordType(recordName: String!): RecordTypeResult
+    createUser(input: CreateUserInput!): UserConfirmation
+    deactivateToken(tokenId: ID!): DeactivateTokenResult
+    generateToken(expirationDate: String!): TokenResult
+    login(email: String!, password: String!): LoginResult
+    multipleUpload(recordId: ID!, files: [Upload!]): MultipleUploadResult
+    passwordReset(input: PasswordResetInput!): ResetResult
+    requestPasswordReset(email: String!, lang: String!): ResetResult
+    saveTokenAccess(token: String!): TokenAccessResult
+    updateDoctorUser(input: UpdateDoctorInput!): UserConfirmation
+    updatePatientUser(input: UpdatePatientInput!): UserConfirmation
+    updateUser(input: UpdateUserInput!): UserConfirmation
 }
 
 input CreateUserInput {
@@ -143,6 +144,12 @@ input CreateUserInput {
     userType: String!
     password: String!
     acceptTerms: Boolean!
+}
+
+input PasswordResetInput {
+    token: String!
+    newPassword: String!
+    confirmPassword: String!
 }
 
 input UpdateUserInput {
@@ -204,6 +211,11 @@ type TokenAccessResult {
     accessConfirmation: String
     accessError: String
     tokenAccess: TokenAccess
+}
+
+type ResetResult {
+    resetConfirmation: String
+    resetError: String
 }
 
 type RecordTypeResult {

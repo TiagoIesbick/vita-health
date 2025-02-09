@@ -7,20 +7,14 @@ export const ACCESS_TOKEN_KEY = 'accessToken';
 export const ACCESS_MEDICAL_TOKEN_KEY = 'accessMedicalToken';
 
 
-const setCookie = (name, value, days) => {
+const setCookie = (name, value) => {
   let expires = "";
-  if (days && name !== 'accessMedicalToken') {
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    expires = "; expires=" + date.toUTCString();
-  } else if (name === 'accessMedicalToken') {
-    try {
-      const { exp } = getCredentialsFromToken(value);
-      const expirationDate = new Date(exp * 1000);
-      expires = "; expires=" + expirationDate.toUTCString();
-    } catch (error) {
-      console.error("Invalid JWT token:", error);
-    }
+  try {
+    const { exp } = getCredentialsFromToken(value);
+    const expirationDate = new Date(exp * 1000);
+    expires = "; expires=" + expirationDate.toUTCString();
+  } catch (error) {
+    console.error("Invalid JWT token:", error);
   };
   document.cookie = `${name}=${value || ""}${expires}; path=/; Secure; SameSite=Strict`;
 };
@@ -50,7 +44,7 @@ export const getAccessToken = (access) => {
 
 
 export const storeToken = (access, token) => {
-  setCookie(access, token, 7); // Store token in cookies for 7 days
+  setCookie(access, token);
 };
 
 

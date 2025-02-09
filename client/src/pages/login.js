@@ -23,6 +23,7 @@ const Login = () => {
     const { translations } = useLanguage();
     const { setUser, showMessage } = useUser();
     const { doLogin, loading, error } = useLogin();
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -48,6 +49,7 @@ const Login = () => {
                 .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/, translations?.error?.passwordValidation)
         }),
     });
+
     if (error) {
         navigate('/');
         showMessage('error', translations?.error?.title, translations?.error?.message, true);
@@ -59,7 +61,7 @@ const Login = () => {
             className="flex justify-content-center align-items-center card-min-height"
         >
             <form className="flex flex-column gap-4" onSubmit={formik.handleSubmit}>
-            <FloatLabel>
+                <FloatLabel>
                     <InputText
                         id="email"
                         autoComplete="email"
@@ -84,6 +86,7 @@ const Login = () => {
                 </FloatLabel>
                 <Button type="submit" label={translations?.navbar?.login} disabled={loading || !formik.isValid} loading={loading}  />
             </form>
+            <Link className='flex mt-2 w-full text-sm justify-content-center' to="/password-reset">{translations?.login?.forgotPassword}</Link>
             <Divider />
             <div className="flex flex-column mt-4 text-center text-sm">
                 {translations?.login?.noAccount}

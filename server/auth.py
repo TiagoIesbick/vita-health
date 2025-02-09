@@ -5,8 +5,7 @@ import starlette.requests
 from starlette.requests import Request
 from os import getenv
 from datetime import datetime
-from db.queries import get_user_by_email_password, get_token
-from utils.utils import decrypt
+from db.queries import get_user_by_email, get_token
 
 
 class UserDetail(SimpleUser):
@@ -71,8 +70,7 @@ class BasicAuthBackend(AuthenticationBackend):
             print('[JWT Error]:', exc)
             raise AuthenticationError('Invalid basic auth credentials')
 
-        email, password = decoded['email'], decrypt(decoded['password'])
-        user = get_user_by_email_password(email, password)
+        user = get_user_by_email(decoded.get('email', ''))
 
         if not user:
             return

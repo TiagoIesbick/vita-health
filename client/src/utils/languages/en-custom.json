@@ -50,12 +50,14 @@
             "categoryNotCreated": "Category NOT created",
             "dobValidation": "The date cannot be in the future",
             "emailExists": "This e-mail already exists",
+            "emailNotExists": "This e-mail does not exist in our database. Please sign up instead.",
             "expired": "Expired",
             "expiredAccess": "Access permission has expired.",
             "expTimeMinDateValidation": "The date and time cannot be in the past",
             "expTimeMaxDateValidation": "Maximum 90 days",
             "firstNameValidation": "First name must start with at least 2 word characters",
             "invalidExpiredToken": "Invalid and/or expired token",
+            "invalidLink": "Invalid link",
             "invalidPassword": "Invalid password",
             "langNotDetected": "Language not detected",
             "lastNameValidation": "Last name must start with at least 2 word characters",
@@ -65,6 +67,8 @@
             "noEmail": "Invalid e-mail",
             "numericValidation": "At least one numeric",
             "uppercaseValidation": "At least one uppercase",
+            "passwordNotUpdated": "Your password could not be updated. Please try again later.",
+            "passwordMismatch": "Passwords do not match.",
             "passwordValidation": "At least one lowercase, one uppercase and one numeric",
             "profileNotUpdated": "Profile NOT updated",
             "message": "Data not available. Try again later.",
@@ -85,6 +89,7 @@
             "fileNotSaved": "File not saved",
             "fileSize": "Uploaded file is too big (max 5 MB)",
             "maxFiles": "You can only upload a maximum of 10 files",
+            "requestResetError": "Failed to send password reset email. Please try again later.",
             "translationExists": "This translation already exists",
             "tokenAlreadyDeactivated": "Token already deactivated",
             "tokenNotDeactivated": "Token not deactivated",
@@ -102,8 +107,10 @@
             "fileSaved": "Saved file!",
             "filesSaved": "Saved files!",
             "healthDataCreated": "Health Data Created!",
+            "passwordUpdated": "Your password has been successfully updated. You can now log in with your new password.",
             "permissionGranted": "Permission Granted",
             "profileUpdated": "Profile updated!",
+            "requestResetConfirmation": "An email has been sent to reset your password. Please check your inbox and follow the instructions.",
             "tokenDeactivated": "Token deactivated",
             "tokenRegistered": "Registered token",
             "tokenReserved": "Reserved Token",
@@ -174,6 +181,7 @@
         },
         "lastRecord": "Last Record",
         "login": {
+            "forgotPassword": "Forgot Password?",
             "loggedIn": "Logged In",
             "noAccount": "Don't have an account?",
             "password": "Password",
@@ -191,6 +199,11 @@
             "login": "Login",
             "signUp": "Sign Up"
         },
+        "passwordReset" :{
+            "title": "Password Reset",
+            "confirmPassword": "Confirm Password",
+            "newPassword": "New Password"
+        },
         "patient": "Patient",
         "patients": {
             "title": "Patients",
@@ -200,6 +213,9 @@
             "expandAll": "Expand All",
             "notes": "Notes",
             "recordsFor": "Records for"
+        },
+        "requestPasswordReset": {
+            "title": "Request Password Reset"
         },
         "required": "Required",
         "search": {
