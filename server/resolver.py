@@ -184,7 +184,7 @@ def resolve_create_user(*_, input):
     dict: A dictionary containing the result of the user creation:
         - If validation fails: {'userError': <error_message>}
         - If creation is successful: {
-            'userConfirmation': True,
+            'userConfirmation': <success_message>,
             'user': <user_object>
           }
         - If creation fails: The result from the create_user function.
@@ -383,6 +383,23 @@ def resolve_login(*_, email, password):
 
 @mutation.field("requestPasswordReset")
 def resolve_request_password_reset(*_, email, lang):
+    """
+    Initiate a password reset request for a user.
+
+    This function validates the provided email, generates a password reset token,
+    and sends a password reset email to the user.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    email (str): The email address of the user requesting a password reset.
+    lang (str): The language code for the email content (e.g., 'en-us' for English).
+
+    Returns:
+    dict: A dictionary containing the result of the password reset request.
+          If the email is invalid: {'resetError': 'noEmail'}
+          If the email doesn't exist in the system: {'resetError': 'emailNotExists'}
+          Otherwise: The result from sending the password reset email.
+    """
     if not validate_email(email):
         return { 'resetError': 'noEmail'}
     user = get_user_by_email(email)
@@ -397,6 +414,29 @@ def resolve_request_password_reset(*_, email, lang):
 
 @mutation.field("passwordReset")
 def resolve_reset_password(*_, input):
+    """
+    Resolve the password reset mutation.
+
+    This function handles the password reset process by validating the reset token,
+    checking the new password, and updating the user's password if all checks pass.
+
+    Parameters:
+    *_ : Variable length argument list (unused).
+    input (dict): A dictionary containing the following keys:
+        - 'token': The password reset token.
+        - 'newPassword': The new password to be set.
+        - 'confirmPassword': Confirmation of the new password.
+
+    Returns:
+    dict: A dictionary containing the result of the password reset operation.
+        Possible return values:
+        - {'resetError': 'invalidExpiredToken'}: If the token is invalid or expired.
+        - {'resetError': 'invalidLink'}: If the token type is not 'passwordReset'.
+        - {'resetError': 'noEmail'}: If the email in the token is invalid.
+        - {'resetError': 'invalidPassword'}: If the new password is invalid.
+        - {'resetError': 'passwordMismatch'}: If the new password and confirmation don't match.
+        - The result of update_user_password() if all checks pass.
+    """
     token, newPassword, confirmPassword = input['token'], input['newPassword'], input['confirmPassword']
     try:
         decoded = jwt.decode(token, getenv('SECRET'), algorithms=["HS256"])
