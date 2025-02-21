@@ -23,6 +23,22 @@ class SendEmail():
 
 
     def _load_email_template(self, template_name: str, placeholders: dict) -> str:
+        """
+        Load and customize an email template with provided placeholders.
+
+        This method reads an HTML email template file and replaces placeholder
+        values with the provided content.
+
+        Parameters:
+        template_name (str): The name of the template file to be loaded.
+        placeholders (dict): A dictionary of key-value pairs where keys are
+                             placeholders in the template and values are the
+                             content to replace them with.
+
+        Returns:
+        str: The customized HTML content of the email template with all
+             placeholders replaced by their corresponding values.
+        """
         template_path = self.BASE_DIR / "templates" / template_name
         with template_path.open("r", encoding="utf-8") as file:
             html_content = file.read()
@@ -34,6 +50,21 @@ class SendEmail():
 
 
     def _get_localized_email_content(self, lang: str, firstName: str, token: str) -> dict:
+        """
+        Prepares localized content for a password reset email.
+
+        This method loads translations, determines the appropriate base URL,
+        and constructs a dictionary of placeholders for the email template.
+
+        Parameters:
+        lang (str): The language code for the email content (e.g., 'en-us', 'pt-br').
+        firstName (str): The first name of the email recipient.
+        token (str): The unique token for the password reset process.
+
+        Returns:
+        dict: A dictionary containing placeholders for the email template,
+              including localized text, personalized greetings, and the reset link.
+        """
         translations = self._load_translations()
         lang_data = translations.get(lang, translations["en-us"])
         BASE_URL_CLIENT = (
@@ -58,7 +89,21 @@ class SendEmail():
         return placeholders
 
 
-    def send_email_password_reset(self, lang: str, firstName: str, email: str, token: str):
+    def send_email_password_reset(self, lang: str, firstName: str, email: str, token: str) -> dict:
+        """
+        Sends a password reset email to the specified email address.
+
+        Parameters:
+        lang (str): The language code for the email content.
+        firstName (str): The first name of the recipient.
+        email (str): The email address to send the password reset email to.
+        token (str): The unique token for password reset confirmation.
+
+        Returns:
+        dict: A dictionary containing the status of the password reset email.
+              If the email is sent successfully, it returns {'resetConfirmation': 'requestResetConfirmation'}.
+              If an error occurs during the email sending process, it returns {'resetError': 'requestResetError'}.
+        """
         placeholders = self._get_localized_email_content(lang, firstName, token)
         email_content = self._load_email_template("passwordResetEmail.html", placeholders)
 
