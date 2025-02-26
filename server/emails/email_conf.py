@@ -8,6 +8,27 @@ from pathlib import Path
 
 class SendEmail():
     def __init__(self):
+        """
+        Initialize the SendEmail class with configuration settings.
+
+        This constructor sets up the necessary attributes for sending emails,
+        including SMTP server details, sender information, and environment settings.
+
+        The method uses environment variables to configure the following:
+        - SMTP_SERVER: The address of the SMTP server
+        - SMTP_PORT: The port number for the SMTP server
+        - EMAIL_SENDER: The email address of the sender
+        - APP_PASSWORD: The password or app-specific password for authentication
+        - SERVER_ENV: The current server environment (e.g., 'production', 'development')
+
+        It also sets the BASE_DIR attribute to the parent directory of the current file.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+        """
         self.SMTP_SERVER = getenv('SMTP_SERVER')
         self.SMTP_PORT = getenv('SMTP_PORT')
         self.EMAIL_SENDER = getenv('EMAIL_SENDER')
@@ -17,6 +38,20 @@ class SendEmail():
 
 
     def _load_translations(self) -> dict:
+        """
+        Load translations from the JSON file located in the templates directory.
+
+        This function reads the translations.json file located in the templates directory
+        and returns its content as a dictionary.
+
+        Parameters:
+        None
+
+        Returns:
+        dict: A dictionary containing the translations for different languages.
+              The keys are language codes (e.g., 'en-us', 'pt-br'), and the values
+              are dictionaries containing the translated strings.
+        """
         translations_path = self.BASE_DIR / "templates" / "translations.json"
         with translations_path.open("r", encoding="utf-8") as file:
             return json.load(file)
