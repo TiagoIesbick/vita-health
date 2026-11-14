@@ -25,6 +25,8 @@
   <a href="docs/demo.mp4"><b>▶ Watch the 48-second walkthrough</b></a>
 </p>
 
+https://github.com/user-attachments/assets/23a31237-5a6d-42eb-8753-69c7d9af9b51
+
 ---
 
 ## What it does
